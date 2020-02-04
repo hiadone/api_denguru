@@ -18,7 +18,7 @@ class Board_post extends CB_Controller
 	/**
 	 * 모델을 로딩합니다
 	 */
-	protected $models = array('Post', 'Post_meta', 'Post_extra_vars','Crawl','Crawl_file','Crawl_tag','Vision_api_label');
+	protected $models = array('Post', 'Post_meta', 'Post_extra_vars','Crawl_tag','Vision_api_label','Post_link','Cmall_item','Board_crawl');
 
 	/**
 	 * 헬퍼를 로딩합니다
@@ -986,7 +986,7 @@ class Board_post extends CB_Controller
 		}
 	}
 
-	public function crawl_get($crawl_id = 0, $print = false)
+	public function crawl_get($cit_id = 0, $print = false)
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -1002,18 +1002,18 @@ class Board_post extends CB_Controller
 		/**
 		 * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
 		 */
-		$crawl_id = (int) $crawl_id;
-		if (empty($crawl_id) OR $crawl_id < 1) {
+		$cit_id = (int) $cit_id;
+		if (empty($cit_id) OR $cit_id < 1) {
 			show_404();
 		}
 
-		$crawl = $this->Crawl_model->get_one($crawl_id);
+		$crawl = $this->Cmall_item_model->get_one($cit_id);
 		
 		$view['view']['crawl'] = $crawl;
 
 		$mem_id = (int) $this->member->item('mem_id');
 
-		if ( ! element('crawl_id', $crawl)) {
+		if ( ! element('cit_id', $crawl)) {
 			show_404();
 		}
 
@@ -2277,8 +2277,9 @@ class Board_post extends CB_Controller
 	public function _get_crawl($brd_key, $post_id, $from_view = '')
 	{
 
+
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_board_crawl_get_list';
+		$eventname = 'event_board_cit_get_list';
 		$this->load->event($eventname);
 
 		$view = array();
@@ -2337,9 +2338,9 @@ class Board_post extends CB_Controller
 		$page = (((int) $this->input->get('page_sub')) > 0) ? ((int) $this->input->get('page_sub')) : 1;
 		$order_by_field = element('order_by_field', $board)
 			? element('order_by_field', $board)
-			: 'crawl_id asc';
+			: 'cit_id asc';
 
-		$order_by_field = 'crawl_id asc';
+		$order_by_field = 'cit_id asc';
 		$findex = $this->input->get('findex', null, $order_by_field);
 		$sfield = $sfieldchk = $this->input->get('sfield', null, '');
 		
@@ -2354,8 +2355,8 @@ class Board_post extends CB_Controller
 		}
 		$offset = ($page - 1) * $per_page;
 
-		$this->Crawl_model->allow_search_field = array('crawl_id', 'crawl_title'); // 검색이 가능한 필드
-		$this->Crawl_model->search_field_equal = array('crawl_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
+		$this->Cmall_item_model->allow_search_field = array('cit_id', 'cit_name'); // 검색이 가능한 필드
+		$this->Cmall_item_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
 
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['step1'] = Events::trigger('list_step1', $eventname);
@@ -2425,10 +2426,10 @@ class Board_post extends CB_Controller
 		
 		
 
-		$this->load->model(array('Crawl_scrap_model'));
+		$this->load->model(array('Cmall_wishlist_model','Cmall_category_model'));
 		
-		$result = $this->Crawl_model
-			->get_crawl_list($per_page, $offset, $where, '', $findex, $sfield, $skeyword);
+		$result = $this->Cmall_item_model
+			->get_list($per_page, $offset, $where, '', $findex,'', $sfield, $skeyword);
 		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -2437,50 +2438,51 @@ class Board_post extends CB_Controller
 				
 				
 				
-
+				$result['list'][$key]['display_category'] = $this->Cmall_category_model->get_category(element('cit_id', $val));
 
 				$result['list'][$key]['display_datetime'] = display_datetime(
-					element('crawl_updated_datetime', $val),
+					element('cit_updated_datetime', $val),
 					$list_date_style,
 					$list_date_style_manual
 				);
 
-				$result['list'][$key]['display_price'] = element('crawl_price', $val) ? element('crawl_price', $val) : 0 ; 
+				$result['list'][$key]['display_price'] = element('cit_price', $val) ? element('cit_price', $val) : 0 ; 
 
-				$result['list'][$key]['crawl_link'] = site_url('postact/crawl_link/' . element('crawl_id', $val)); 
+				$result['list'][$key]['cit_link'] = site_url('item/' . element('cit_key', $val)); 
+				$result['list'][$key]['cit_link'] = site_url('/postact/cit_link/' . element('cit_id', $val)); 
 				
 				$result['list'][$key]['num'] = $list_num--;
 							
 				
-				$crawl_scrap_where = array(
-					'crawl_id' => element('crawl_id', $val),
+				$cmall_wishlist_where = array(
+					'cit_id' => element('cit_id', $val),
 					
 				);
-				$crawl_scrap_count = $this->Crawl_scrap_model
-					->count_by($crawl_scrap_where);
+				$cmall_wishlist_count = $this->Cmall_wishlist_model
+					->count_by($cmall_wishlist_where);
 
-				$result['list'][$key]['crawl_scrap_count'] = $crawl_scrap_count ? $crawl_scrap_count : 0;;
+				$result['list'][$key]['cmall_wishlist_count'] = $cmall_wishlist_count ? $cmall_wishlist_count : 0;
 
 				$result['list'][$key]['thumb_url'] = '';
 				$result['list'][$key]['origin_image_url'] = ''	;
 				
-				$filewhere = array(
-					'crawl_id' => element('crawl_id', $val),
-					'cfi_is_image' => 1,
-				);
-				$file = $this->Crawl_file_model
-					->get_one('', '', $filewhere, '', '', 'cfi_id', 'ASC');
-				// $result['list'][$key]['thumb_url'] = thumb_url('crawl', element('cfi_filename', $file), $gallery_image_width, $gallery_image_height);
-				$result['list'][$key]['origin_image_url'] = config_item('cdn_url').config_item('s3_folder_name').'/crawl/'.element('cfi_filename', $file);
+				// $filewhere = array(
+				// 	'cit_id' => element('cit_id', $val),
+				// 	'cfi_is_image' => 1,
+				// );
+				// $file = $this->cit_file_model
+				// 	->get_one('', '', $filewhere, '', '', 'cfi_id', 'ASC');
+				$result['list'][$key]['thumb_url'] = thumb_url('cmallitem', element('cit_file_1', $val), $gallery_image_width, $gallery_image_height);
+				$result['list'][$key]['origin_image_url'] = config_item('cdn_url').config_item('uploads_dir').'/cmallitem/'.element('cit_file_1', $val);
 
-				if(!$result['list'][$key]['origin_image_url'])
-				$result['list'][$key]['origin_image_url'] = thumb_url('', '', $gallery_image_width, $gallery_image_height);
+				if(!$result['list'][$key]['thumb_url'])
+				$result['list'][$key]['thumb_url'] = thumb_url('', '', $gallery_image_width, $gallery_image_height);
 				
-				$result['list'][$key]['display_color'] =  str_replace("<br>",",",element('crawl_color', $val));
+				$result['list'][$key]['display_color'] =  element('cit_color', $val);
 
 				$result['list'][$key]['display_tag'] = '';
 				$crawlwhere = array(
-					'crawl_id' => element('crawl_id', $val),
+					'cit_id' => element('cit_id', $val),
 				);
 				$tag = $this->Crawl_tag_model->get('', '', $crawlwhere, '', '', 'cta_id', 'ASC');
 				if ($tag && is_array($tag)) {
@@ -2495,7 +2497,7 @@ class Board_post extends CB_Controller
 
 				$result['list'][$key]['display_label'] = '';
 				$crawlwhere = array(
-					'crawl_id' => element('crawl_id', $val),
+					'cit_id' => element('cit_id', $val),
 				);
 				$tag = $this->Vision_api_label_model->get('', '', $crawlwhere, '', '', 'val_id', 'ASC');
 				if ($tag && is_array($tag)) {
@@ -2514,7 +2516,7 @@ class Board_post extends CB_Controller
 		$return['list_url'] = post_url($brd_key,$post_id);
 		$return['data'] = $result;
 
-		$return['primary_key'] = $this->Crawl_model->primary_key;
+		$return['primary_key'] = $this->Cmall_item_model->primary_key;
 		
 
 		// /**
@@ -2537,5 +2539,6 @@ class Board_post extends CB_Controller
 		
 
 		return $return;
+	
 	}
 }
