@@ -1,0 +1,284 @@
+{ 
+   "post":{ 
+      "post_id":"2",   // 해당 게시물 primary key 
+      "post_num":"-2",   // 해당 게시물 정렬 (계층형 게시판) 
+      "post_reply":"",   
+      "brd_id":"1",  //총속된 게시판 primary key
+      "post_title":"top",  // 게시물 제목
+      "post_content":"",
+      "post_category":"1",  //카테고리 primary key
+      "mem_id":"1",  // 게시물 등록자 primary key 
+      "post_userid":"admin", // 게시물 등록자 아이디
+      "post_username":"관리자", //게시물 등록자 이름 
+      "post_nickname":"관리자", //게시물 등록자 닉네임 
+      "post_email":"admin@dbpopcon.com", //게시물 등록자 메일주소
+      "post_homepage":"0", 
+      "post_datetime":"2019-03-11 13:22:18", //게시물 등록일 
+      "post_password":"", //비회원일 게시물일경우 패스워드  
+      "post_updated_datetime":"2019-04-01 10:17:27", //게시물 업데이트일
+      "post_update_mem_id":"1", //게시물 업데이트 등록자 primary key
+      "post_comment_count":"0", //게시물에 종속된 댓글 카운트 
+      "post_comment_updated_datetime":null, //게시물에 종속된 댓글 업데이트일
+      "post_link_count":"4", //게시물에 종속되어 있는 링크 카운트 
+      "post_secret":"0", //게시물 비밀기능 on/off 여부 
+      "post_html":"0", //게시물 html 편집기 사용 여부 
+      "post_hide_comment":"0", //게시물에 댓글 숨김 처리 기능 on/off 여부 
+      "post_notice":"0", //게시물이 공지 사항인지 체크 
+      "post_receive_email":"0",  //게시물에 리플에 관한 답변 메일 기능 on/off 여부 
+      "post_hit":"34", //게시물 조회수 
+      "post_like":"0", //게시물 좋아요 카운트 
+      "post_dislike":"0", //게시물 싫어요 카운트 
+      "post_ip":"61.82.191.161", //게시물 등록 ip
+      "post_blame":"0", //게시물 신고 여부
+      "post_device":"desktop", //게시물 등록 디바이스 타입
+      "post_file":"0", //게시물에 종속된 파일(업로드 파일) 존재 여부  
+      "post_image":"0", //게시물에 종속된 이미지 파일(업로드 파일) 존재 여부 
+      "post_del":"0", // 삭제된 게시물인지 체크 
+      "meta":[ 
+
+      ],
+      "extravars":[ 
+
+      ],
+      "display_name":"관리자", // display용 게시물 등록자명  
+      "display_datetime":"03-11", // display용 게시물 등록일자  
+      "is_mobile":false, // 게시물 등록시 모바일이었는지 체크 
+      "category":{ 
+         "bca_id":"9",  //카테고리 DB primary key 
+         "brd_id":"1", //카테고리에 종속된  게시판 primary key  
+         "bca_key":"1", //게시물에 종속된 카테고리 key  
+         "bca_value":"의류", //게시물에 종속된 카테고리 명   
+         "bca_parent":"0", //카테고리에 하위 카테고리가 있는지 체크    
+         "bca_order":"0" // 카테고리 정렬 순번 
+      },
+      "display_ip":"", // display용 게시물 IP   
+      "content":"", // display할 게시물 컨첸츠
+      "tag":[ 
+                // 종속되어 있는 태그
+      ],
+      "scrap_count":0 // 게시물 스크랩 카운트
+   },
+   "board":{ 
+      "brd_id":"1", //게시판 프라이머리 키
+      "bgr_id":"1", //게시판그룹 프라이머리 키
+      "brd_key":"b-a-1", //게시판그룹  키
+      "brd_name":"허츠앤베이", //게시판 명
+      "brd_mobile_name":"", //게시판 모바일 명
+      "brd_order":"1", //게시판 정렬 순번
+      "brd_search":"1",  
+      "brd_url":"http:\/\/www.hutsandbay.com", 
+      "brd_order_url":"",
+      "brd_register_url":"",
+      "brd_goods_key":"product_no",      
+      "board_name":"허츠앤베이",
+      "access_blame":"1",
+      "access_blame_group":"\"\"",
+      "access_blame_level":"1",
+      "access_comment":"",
+      "access_comment_group":"\"\"",
+      "access_comment_level":"1",
+      "access_dhtml":"",
+      "access_dhtml_group":"\"\"",
+      "access_dhtml_level":"1",
+      "access_download":"",
+      "access_download_group":"\"\"",
+      "access_download_level":"1",
+      "access_list":"",
+      "access_list_group":"\"\"",
+      "access_list_level":"1",
+      "access_reply":"",
+      "access_reply_group":"\"\"",
+      "access_reply_level":"1",
+      "access_subject_style":"",
+      "access_subject_style_group":"\"\"",
+      "access_subject_style_level":"1",
+      "access_tag_write":"",
+      "access_tag_write_group":"\"\"",
+      "access_tag_write_level":"1",
+      "access_upload":"",
+      "access_upload_group":"\"\"",
+      "access_upload_level":"1",
+      "access_view":"",
+      "access_view_group":"\"\"",
+      "access_view_level":"1",
+      "access_write":"",
+      "access_write_group":"\"\"",
+      "access_write_level":"1",
+      "always_show_write_button":"",
+      "blame_blind_count":"3",
+      "block_delete":"",
+      "board_layout":"",
+      "board_mobile_layout":"",
+      "board_mobile_sidebar":"",
+      "board_mobile_skin":"",
+      "board_sidebar":"",
+      "board_skin":"",
+      "board_use_captcha":"",
+      "category_display_style":"tab",
+      "comment_blame_blind_count":"3",
+      "comment_count":"20",
+      "comment_date_style":"",
+      "comment_date_style_manual":"",
+      "comment_order":"asc",
+      "comment_page_count":"5",
+      "comment_syntax_highlighter":"1",
+      "comment_to_download":"",
+      "content_target_blank":"1",
+      "except_all_notice":"",
+      "except_notice":"",
+      "footer_content":"",
+      "gallery_cols":"4",
+      "gallery_image_height":"90",
+      "gallery_image_width":"120",
+      "header_content":"",
+      "hot_icon_day":"30",
+      "hot_icon_hit":"100",
+      "like_to_download":"",
+      "link_num":"11",
+      "list_count":"20",
+      "list_date_style":"",
+      "list_date_style_manual":"",
+      "mobile_always_show_write_button":"",
+      "mobile_category_display_style":"",
+      "mobile_comment_count":"20",
+      "mobile_comment_date_style":"",
+      "mobile_comment_date_style_manual":"",
+      "mobile_comment_page_count":"3",
+      "mobile_except_all_notice":"",
+      "mobile_except_notice":"",
+      "mobile_footer_content":"",
+      "mobile_gallery_cols":"2",
+      "mobile_gallery_image_height":"90",
+      "mobile_gallery_image_width":"120",
+      "mobile_header_content":"",
+      "mobile_hot_icon_hit":"",
+      "mobile_link_num":"11",
+      "mobile_list_count":"10",
+      "mobile_list_date_style":"",
+      "mobile_list_date_style_manual":"",
+      "mobile_new_icon_hour":"",
+      "mobile_page_count":"3",
+      "mobile_post_default_content":"",
+      "mobile_post_default_title":"",
+      "mobile_show_list_from_view":"1",
+      "mobile_subject_length":"40",
+      "mobile_upload_file_num":"",
+      "mobile_view_date_style":"",
+      "mobile_view_date_style_manual":"",
+      "new_icon_hour":"24",
+      "order_by_field":"post_num, post_reply",
+      "page_count":"5",
+      "post_default_content":"",
+      "post_default_title":"",
+      "post_image_width":"700",
+      "post_max_length":"",
+      "post_min_length":"",
+      "post_mobile_image_width":"400",
+      "protect_comment_day":"",
+      "protect_comment_num":"5",
+      "protect_post_day":"",
+      "reply_order":"asc",
+      "save_external_image":"",
+      "show_list_from_view":"1",
+      "subject_length":"60",
+      "syntax_highlighter":"1",
+      "upload_file_extension":"",
+      "upload_file_max_size":"32",
+      "upload_file_num":"",
+      "use_anonymous":"",
+      "use_autoplay":"1",
+      "use_auto_url":"1",
+      "use_bitly":"",
+      "use_blame":"1",
+      "use_category":"1",
+      "use_comment_blame":"1",
+      "use_comment_delete_log":"",
+      "use_comment_dislike":"1",
+      "use_comment_like":"1",
+      "use_comment_secret":"1",
+      "use_download_log":"",
+      "use_gallery_list":"",
+      "use_google_map":"",
+      "use_link_click_log":"1",
+      "use_mobile_auto_url":"1",
+      "use_mobile_post_dhtml":"",
+      "use_mobile_post_emoticon":"",
+      "use_mobile_post_specialchars":"",
+      "use_mobile_prev_next_post":"1",
+      "use_mobile_sideview":"",
+      "use_mobile_sideview_icon":"",
+      "use_mobile_sns":"",
+      "use_mobile_subject_style":"",
+      "use_naver_syndi":"",
+      "use_only_one_post":"",
+      "use_personal":"",
+      "use_posthistory":"",
+      "use_post_delete_log":"",
+      "use_post_dhtml":"",
+      "use_post_dislike":"",
+      "use_post_emoticon":"",
+      "use_post_like":"",
+      "use_post_receive_email":"",
+      "use_post_secret":"",
+      "use_post_secret_selected":"",
+      "use_post_specialchars":"",
+      "use_post_tag":"1",
+      "use_prev_next_post":"1",
+      "use_print":"",
+      "use_scrap":"",
+      "use_sideview":"",
+      "use_sideview_icon":"",
+      "use_sitemap":"",
+      "use_sns":"",
+      "use_subject_style":"",
+      "use_tempsave":"",
+      "use_upload_file":"1",
+      "view_date_style":"",
+      "view_date_style_manual":"",
+      "write_possible_days":"",
+      "target_blank":"1",
+      "show_url_qrcode":null,
+      "show_attached_url_qrcode":null,
+      "headercontent":""
+   },
+   "list":{ 
+      "list_url":"http:\/\/api_test.newspopcon.com\/post\/2", // 해당 json url 주소 
+      "data":{ 
+         "list":[ 
+            { 
+               "crawl_id":"6642", // 크롤링 프라이머리 키 
+               "post_id":"2", //크롤링 아이템에 종속된 게시물(post) 프라미머리 키
+               "brd_id":"1", //크롤링 아이템에 종속된 게시판(board) 프라미머리 키
+               "crawl_title":"애니멀 프린트 후디 옐로우", //크롤링 아이템 제목 
+               "crawl_color":"", //크롤링 아이템 컬러 
+               "crawl_price":"38000", //크롤링 아이템 가격(원)
+               "crawl_size":"", //크롤링 아이템 사이즈
+               "crawl_datetime":"2019-12-24 14:00:17", //크롤링 아이템 등록 날짜
+               "crawl_updated_datetime":"2019-12-24 14:00:17", //크롤링 아이템 업데이트 날짜
+               "crawl_post_url":"http:\/\/www.hutsandbay.com\/product\/detail.html?product_no=1126&cate_no=62&display_group=1", //크롤링 아이템 url  
+               "crawl_image":"0", //크롤링 아이템 이미지 존재 여부(현재는 무시)   
+               "pln_id":"1",  //크롤링 아이템 종속된 link 프라이머리 키 (현재는 무시)      
+               "crawl_hit":"0", //크롤링 아이템 조회수
+               "crawl_blame":"0", //크롤링 아이템 신고 여부 
+               "crawl_goods_code":"1126", //크롤링 아이템 상품 코드 (현재는 무시)    
+               "crawl_val1":"",
+               "crawl_val2":"",
+               "crawl_val3":"",
+               "display_datetime":"12-24", //크롤링 아이템 디스플레이용 날짜    
+               "display_price":"38000", //크롤링 아이템 디스플레이용 가격    
+               "crawl_link":"http:\/\/api_test.newspopcon.com\/postact\/crawl_link\/6642", //크롤링 아이템 클릭 url    
+               "num":96, //크롤링 아이템 정렬 순번 
+               "crawl_scrap_count":0, //크롤링 아이템 정렬 순번 
+               "thumb_url":"", // 이미지 섬네일 url 
+               "origin_image_url":"d2b5p43s4lz69z.cloudfront.net\/denguru_uploads\/crawl\/2019\/12\/36f89e9d927307b869ea021c06f1e9f2.jpg", //cdn 서버 이미지 url
+               "display_color":"", // 디스플레이용 컬러 object
+               "display_tag":"", // 디스플레이용 태그  object
+               "display_label":"Dog\nDog clothes\nCanidae\nToy Poodle\nDog breed\nPuppy\nMaltepoo\nCompanion dog\nToy\nTeddy bear" // 디스플레이용 라벨 
+            },
+            ...
+         ],
+         "total_rows":"96" //요청한 해당 게시물 크롤링 아이템 총 개수 
+      },
+      "primary_key":"crawl_id" 
+   }
+}
