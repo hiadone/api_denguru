@@ -55,6 +55,8 @@ class Main extends CB_Controller
 
 		$where = array(
 			'brd_search' => 1,
+			'brd_blind' => 0,
+			
 		);
 		$board_id = $this->Board_model->get_board_list($where);
 		$board_list = array();
@@ -65,7 +67,7 @@ class Main extends CB_Controller
 		}
 		$view['view']['board_list'] = $board_list;
 		$view['view']['canonical'] = site_url();
-
+		
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
@@ -94,7 +96,7 @@ class Main extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		// $view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
 		$this->data = $view;		
 		
 
