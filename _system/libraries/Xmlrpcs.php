@@ -225,6 +225,11 @@ class CI_Xmlrpcs extends CI_Xmlrpc {
 			{
 				$data = $CI->input->raw_input_stream;
 			}
+
+			if ($CI->input->method() === 'put')
+			{
+				$data = $CI->input->raw_input_stream;
+			}
 		}
 
 		//-------------------------------------

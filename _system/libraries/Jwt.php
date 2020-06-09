@@ -342,26 +342,20 @@ class CI_Jwt {
         return $userdata;
     }
 
-    // ------------------------------------------------------------------------
-
- 
-
-    /**
-     * Has userdata
-     *
-     * Legacy CI_Session compatibility method
-     *
-     * @param   string  $key    Session data key
-     * @return  bool
-     */
-    public function has_userdata($key)
-    {
-        return isset($this->userdata[$key]);
-    }
-
-    // ------------------------------------------------------------------------
-
     
-  
+    public function set_userdata($data, $value = NULL)
+    {
+        if (is_array($data))
+        {
+            foreach ($data as $key => &$value)
+            {
+                $this->userdata[$key] = $value;
+            }
+
+            return;
+        }
+
+        $this->userdata[$data] = $value;
+    }
 
 }

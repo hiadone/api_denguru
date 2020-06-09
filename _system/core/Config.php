@@ -376,4 +376,23 @@ class CI_Config {
 		$this->config[$item] = $value;
 	}
 
+	public function cdn_url($uri = '', $protocol = NULL)
+	{
+		$cdn_url = $this->slash_item('cdn_url').$this->slash_item('uploads_dir');
+
+		if (isset($protocol))
+		{
+			// For protocol-relative links
+			if ($protocol === '')
+			{
+				$cdn_url = substr($cdn_url, strpos($cdn_url, '//'));
+			}
+			else
+			{
+				$cdn_url = $protocol.substr($cdn_url, strpos($cdn_url, '://'));
+			}
+		}
+
+		return $cdn_url.$this->_uri_string($uri);
+	}
 }

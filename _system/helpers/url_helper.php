@@ -566,4 +566,24 @@ if ( ! function_exists('redirect'))
 		}
 		exit;
 	}
+
+
+	if ( ! function_exists('cdn_url'))
+{
+	/**
+	 * Base URL
+	 *
+	 * Create a local URL based on your basepath.
+	 * Segments can be passed in as a string or an array, same as site_url
+	 * or a URL to a file can be passed in, e.g. to an image file.
+	 *
+	 * @param	string	$uri
+	 * @param	string	$protocol
+	 * @return	string
+	 */
+	function cdn_url($type = '',$uri = '', $protocol = 'http://')
+	{
+		return get_instance()->config->cdn_url($type."/".$uri, $protocol);
+	}
+}
 }

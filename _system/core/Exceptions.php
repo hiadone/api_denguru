@@ -170,7 +170,7 @@ class CI_Exceptions {
 		else
 		{
 			set_status_header($status_code);
-			$message = '<p>'.(is_array($message) ? implode('</p><p>', $message) : $message).'</p>';
+			$message = (is_array($message) ? implode('</p><p>', $message) : $message);
 			$template = 'html'.DIRECTORY_SEPARATOR.$template;
 		}
 

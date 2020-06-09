@@ -356,6 +356,7 @@ if ( ! is_php('5.4'))
  */
 	// Load the base controller class
 	require_once BASEPATH.'core/Controller.php';
+	
 
 	/**
 	 * Reference to the CI_Controller method.
@@ -369,10 +370,17 @@ if ( ! is_php('5.4'))
 		return CI_Controller::get_instance();
 	}
 
+	
+	if (file_exists(APPPATH.'core/'.$CFG->config['subclass_prefix'].'REST_Controller.php'))
+	{
+		require_once APPPATH.'core/'.$CFG->config['subclass_prefix'].'REST_Controller.php';
+	}
+	
 	if (file_exists(APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php'))
 	{
 		require_once APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php';
 	}
+
 
 	// Set a mark point for benchmarking
 	$BM->mark('loading_time:_base_classes_end');
