@@ -464,11 +464,11 @@ class Cmallact extends CB_Controller
 		$wishlist = $this->Cmall_storewishlist_model->get_one($csi_id);
 
 		if ( ! element('csi_id', $wishlist)) {
-			show_404();
+			alert('이 스토어는 즐겨찾기 목록에 존재하지 않습니다',"",406);
 		}
 
 		if ((int) element('mem_id', $wishlist) !== $mem_id) {
-			show_404();
+			alert_close('본인외에는 접근하실 수 없습니다');
 		}
 
 		$this->Cmall_storewishlist_model->delete($csi_id);

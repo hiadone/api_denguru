@@ -3566,7 +3566,7 @@ class Postact extends CB_Controller
 		return $this->response($result, 204);
 	}
 
-	public function cit_link($cit_id = 0)
+	public function cit_link_get($cit_id = 0)
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -3600,9 +3600,9 @@ class Postact extends CB_Controller
 		$post = $this->Post_model->get_one(element('post_id', $link));
 		$board = $this->board->item_all(element('brd_id', $post));
 		
-		if ( ! $this->session->userdata('cit_outlink_click_' . element('cit_id', $link))) {
+		if ( ! $this->cb_jwt->userdata('cit_outlink_click_' . element('cit_id', $link))) {
 
-			$this->session->set_userdata(
+			$this->cb_jwt->set_userdata(
 				'cit_outlink_click_' . element('cit_id', $link),
 				'1'
 			);
@@ -3634,7 +3634,7 @@ class Postact extends CB_Controller
 
 	}
 
-	public function brd_link($brd_id = 0)
+	public function brd_link_get($brd_id = 0)
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -3662,9 +3662,9 @@ class Postact extends CB_Controller
 			alert('이 스토어는 현재 판매하지 않습니다',"",406);
 		}
 		
-		if ( ! $this->session->userdata('brd_outlink_click_' . element('brd_id', $board))) {
+		if ( ! $this->cb_jwt->userdata('brd_outlink_click_' . element('brd_id', $board))) {
 
-			$this->session->set_userdata(
+			$this->cb_jwt->set_userdata(
 				'brd_outlink_click_' . element('brd_id', $board),
 				'1'
 			);
