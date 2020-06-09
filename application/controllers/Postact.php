@@ -3652,7 +3652,7 @@ class Postact extends CB_Controller
 
 		
 		
-		$board = $this->board->item_all(element('brd_id', $post));
+		$board = $this->board->item_all($brd_id);
 
 		if ( ! element('brd_id', $board)) {
 			alert('이 스토어는 현재 존재하지 않습니다',"",406);
@@ -3693,7 +3693,15 @@ class Postact extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('after', $eventname);
 
-		redirect(prep_url(strip_tags(element('brd_url', $board))));
+		
+
+		$board_crawl = $this->board->get_all_crawl($brd_id);
+		if ( ! element('brd_id', $board_crawl)) {
+		    alert('이 스토어는 현재 존재하지 않습니다',"",406);
+		}
+
+
+		redirect(prep_url(strip_tags(element('brd_url', $board_crawl))));
 
 	}
 

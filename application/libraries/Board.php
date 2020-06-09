@@ -56,6 +56,10 @@ class Board extends CI_Controller
 			if (is_array($board_meta)) {
 				$board = array_merge($board, $board_meta);
 			}
+			// $board_crawl = $this->get_all_crawl(element('brd_id', $board));
+			// if (is_array($board_crawl)) {
+			// 	$board = array_merge($board, $board_crawl);
+			// }
 		}
 
 		if (element('brd_id', $board)) {
@@ -963,5 +967,17 @@ class Board extends CI_Controller
 
 		}
 		return isset($data['result']) ? $data['result'] : array();
+	}
+
+	public function get_all_crawl($brd_id = 0)
+	{
+		$brd_id = (int) $brd_id;
+		if (empty($brd_id) OR $brd_id < 1) {
+			return false;
+		}
+		$this->CI->load->model('Board_crawl_model');
+		$result = $this->CI->Board_crawl_model->get_one('','',array('brd_id' => $brd_id));
+
+		return $result;
 	}
 }
