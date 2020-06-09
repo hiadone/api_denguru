@@ -676,7 +676,7 @@ class Note extends CB_Controller
 	/**
 	 * 쪽지를 삭제하는 함수입니다
 	 */
-	public function delete($note_type = 'recv', $note_id = 0)
+	public function note_delete($note_type = 'recv', $note_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_note_delete';

@@ -117,110 +117,213 @@ class Managelayout extends CI_Controller
 			return $this->preview($config);
 		}
 
-		$searchconfig = array(
-			'{홈페이지제목}',
-			'{현재주소}',
-			'{회원아이디}',
-			'{회원닉네임}',
-			'{회원레벨}',
-			'{회원포인트}',
-		);
-		$replaceconfig = array(
-			$CI->cbconfig->item('site_title'),
-			current_full_url(),
-			$CI->member->item('mem_userid'),
-			$CI->member->item('mem_nickname'),
-			$CI->member->item('mem_level'),
-			$CI->member->item('mem_point'),
-		);
+		// $searchconfig = array(
+		// 	'{홈페이지제목}',
+		// 	'{현재주소}',
+		// 	'{회원아이디}',
+		// 	'{회원닉네임}',
+		// 	'{회원레벨}',
+		// 	'{회원포인트}',
+		// );
+		// $replaceconfig = array(
+		// 	$CI->cbconfig->item('site_title'),
+		// 	current_full_url(),
+		// 	$CI->member->item('mem_userid'),
+		// 	$CI->member->item('mem_nickname'),
+		// 	$CI->member->item('mem_level'),
+		// 	$CI->member->item('mem_point'),
+		// );
 
-		$page_title = element('page_title', $config) ? element('page_title', $config) : $CI->cbconfig->item('site_meta_title_default');
-		$meta_description = element('meta_description', $config) ? element('meta_description', $config) : $CI->cbconfig->item('site_meta_description_default');
-		$meta_keywords = element('meta_keywords', $config) ? element('meta_keywords', $config) : $CI->cbconfig->item('site_meta_keywords_default');
-		$meta_author = element('meta_author', $config) ? element('meta_author', $config) : $CI->cbconfig->item('site_meta_author_default');
-		$page_name = element('page_name', $config) ? element('page_name', $config) : $CI->cbconfig->item('site_page_name_default');
+		// $page_title = element('page_title', $config) ? element('page_title', $config) : $CI->cbconfig->item('site_meta_title_default');
+		// $meta_description = element('meta_description', $config) ? element('meta_description', $config) : $CI->cbconfig->item('site_meta_description_default');
+		// $meta_keywords = element('meta_keywords', $config) ? element('meta_keywords', $config) : $CI->cbconfig->item('site_meta_keywords_default');
+		// $meta_author = element('meta_author', $config) ? element('meta_author', $config) : $CI->cbconfig->item('site_meta_author_default');
+		// $page_name = element('page_name', $config) ? element('page_name', $config) : $CI->cbconfig->item('site_page_name_default');
 
-		$data['page_title'] = $page_title = str_replace($searchconfig, $replaceconfig, $page_title);
-		$data['meta_description'] = $meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
-		$data['meta_keywords'] = $meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
-		$data['meta_author'] = $meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
-		$data['page_name'] = $page_name = str_replace($searchconfig, $replaceconfig, $page_name);
+		// $data['page_title'] = $page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		// $data['meta_description'] = $meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		// $data['meta_keywords'] = $meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		// $data['meta_author'] = $meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		// $data['page_name'] = $page_name = str_replace($searchconfig, $replaceconfig, $page_name);
 
-		$layoutdirname = $device_view_type === 'mobile' ? element('mobile_layout_dir', $config) : element('layout_dir', $config);
-		if (empty($layoutdirname)) {
-			$layoutdirname = $device_view_type === 'mobile' ? $CI->cbconfig->item('mobile_layout_default') : $CI->cbconfig->item('layout_default');
-		}
-		if (empty($layoutdirname)) {
-			$layoutdirname = 'basic';
-		}
-		$layout = '_layout/' . $layoutdirname;
-		$data['layout_skin_path'] = $layout;
-		$data['layout_skin_url'] = base_url( VIEW_DIR . $data['layout_skin_path']);
-		$layout .= '/';
-		if (element('layout', $config)) {
-			$layout .= element('layout', $config);
-		}
-		$data['layout_skin_file'] = $layout;
+		// $layoutdirname = $device_view_type === 'mobile' ? element('mobile_layout_dir', $config) : element('layout_dir', $config);
+		// if (empty($layoutdirname)) {
+		// 	$layoutdirname = $device_view_type === 'mobile' ? $CI->cbconfig->item('mobile_layout_default') : $CI->cbconfig->item('layout_default');
+		// }
+		// if (empty($layoutdirname)) {
+		// 	$layoutdirname = 'basic';
+		// }
+		// $layout = '_layout/' . $layoutdirname;
+		// $data['layout_skin_path'] = $layout;
+		// $data['layout_skin_url'] = base_url( VIEW_DIR . $data['layout_skin_path']);
+		// $layout .= '/';
+		// if (element('layout', $config)) {
+		// 	$layout .= element('layout', $config);
+		// }
+		// $data['layout_skin_file'] = $layout;
 
-		$skindir = $device_view_type === 'mobile' ? element('mobile_skin_dir', $config) : element('skin_dir', $config);
-		if (empty($skindir)) {
-			$skindir = $device_view_type === 'mobile' ? $CI->cbconfig->item('mobile_skin_default') : $CI->cbconfig->item('skin_default');
-		}
-		if (empty($skindir)) {
-			$skindir = 'basic';
-		}
-		$skin = '';
-		if (element('path', $config)) {
-			$skin .= element('path', $config) . '/';
-		}
-		$skin .= $skindir;
-		$data['view_skin_path'] = $skin;
-		$data['view_skin_url'] = base_url( VIEW_DIR . $data['view_skin_path']);
-		$skin .= '/';
-		if (element('skin', $config)) {
-			$skin .= element('skin', $config);
-		}
-		$data['view_skin_file'] = $skin;
+		// $skindir = $device_view_type === 'mobile' ? element('mobile_skin_dir', $config) : element('skin_dir', $config);
+		// if (empty($skindir)) {
+		// 	$skindir = $device_view_type === 'mobile' ? $CI->cbconfig->item('mobile_skin_default') : $CI->cbconfig->item('skin_default');
+		// }
+		// if (empty($skindir)) {
+		// 	$skindir = 'basic';
+		// }
+		// $skin = '';
+		// if (element('path', $config)) {
+		// 	$skin .= element('path', $config) . '/';
+		// }
+		// $skin .= $skindir;
+		// $data['view_skin_path'] = $skin;
+		// $data['view_skin_url'] = base_url( VIEW_DIR . $data['view_skin_path']);
+		// $skin .= '/';
+		// if (element('skin', $config)) {
+		// 	$skin .= element('skin', $config);
+		// }
+		// $data['view_skin_file'] = $skin;
 
-		$user_sidebar = $device_view_type === 'mobile' ? element('use_mobile_sidebar', $config) : element('use_sidebar', $config);
-		if ($user_sidebar === '1') {
-			$data['use_sidebar'] = '1';
-		} elseif ($user_sidebar === '2') {
-			$data['use_sidebar'] = '';
-		} else {
-			$user_sidebar = $device_view_type === 'mobile' ? $CI->cbconfig->item('mobile_sidebar_default') : $CI->cbconfig->item('sidebar_default');
-			if ($user_sidebar === '1') {
-				$data['use_sidebar'] = '1';
-			} elseif ($user_sidebar === '2') {
-				$data['use_sidebar'] = '';
-			} else {
-				$data['use_sidebar'] = '';
+		// $user_sidebar = $device_view_type === 'mobile' ? element('use_mobile_sidebar', $config) : element('use_sidebar', $config);
+		// if ($user_sidebar === '1') {
+		// 	$data['use_sidebar'] = '1';
+		// } elseif ($user_sidebar === '2') {
+		// 	$data['use_sidebar'] = '';
+		// } else {
+		// 	$user_sidebar = $device_view_type === 'mobile' ? $CI->cbconfig->item('mobile_sidebar_default') : $CI->cbconfig->item('sidebar_default');
+		// 	if ($user_sidebar === '1') {
+		// 		$data['use_sidebar'] = '1';
+		// 	} elseif ($user_sidebar === '2') {
+		// 		$data['use_sidebar'] = '';
+		// 	} else {
+		// 		$data['use_sidebar'] = '';
+		// 	}
+		// }
+
+		// $data['favicon'] = $CI->cbconfig->item('site_favicon') ? site_url(config_item('uploads_dir') . '/favicon/' . $CI->cbconfig->item('site_favicon')) : '';
+
+		$mem_id = (int) $CI->member->item('mem_id');
+		
+
+		if(element('path', $config) == 'cmall' && element('skin', $config) == 'main' ){
+
+			if ($CI->member->is_member()) {
+				$data['member'] = $CI->member->get_member();					
+			}
+			
+			$data['popup'] = $CI->popuplib->display_popup();
+
+			$data['banner']['main_top'] =array();
+			$data['banner']['main_middle'] =array();
+			$data['banner']['main_bottom'] =array();
+			$result = $this->Banner_model->get_banner('main_top', "", 1);
+
+			if ($result) {
+				foreach ($result as $key => $val) {
+
+					$data['banner']['main_top']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+					$data['banner']['main_top']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+				}
+			}
+
+			$result = $this->Banner_model->get_banner('main_middle', '', 1);
+
+			if ($result) {
+				foreach ($result as $key => $val) {
+
+					$data['banner']['main_middle']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+					$data['banner']['main_middle']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+				}
+			}
+
+			$result = $this->Banner_model->get_banner('main_bottom', '', 1);
+
+			if ($result) {
+				foreach ($result as $key => $val) {
+
+					$data['banner']['main_bottom']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+					$data['banner']['main_bottom']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+				}
+			}
+		}
+		
+		$data['search_url'] = base_url('search');
+
+		$start_date = cdate("Y-m-d", strtotime("-1 month", time()));
+		$end_date = cdate('Y-m-d');
+
+		$CI->load->model('Search_keyword_model');
+		$result = $CI->Search_keyword_model->get_rank($start_date, $end_date);
+
+		$sum_count = 0;
+		$arr = array();
+		$max = 0;
+
+		if ($result && is_array($result)) {
+			foreach ($result as $key => $value) {
+				$s = element('sek_keyword', $value);
+				if ( ! isset($arr[$s])) {
+					$arr[$s] = 0;
+				}
+				$arr[$s]++;
+
+				if ($arr[$s] > $max) {
+					$max = $arr[$s];
+				}
+				$sum_count++;
+
 			}
 		}
 
-		$data['favicon'] = $CI->cbconfig->item('site_favicon') ? site_url(config_item('uploads_dir') . '/favicon/' . $CI->cbconfig->item('site_favicon')) : '';
+		$view['search']['list'] = array();
+		$i = 0;
+		$k = 0;
+		$save_count = -1;
+		$tot_count = 0;
 
-		$mem_id = (int) $CI->member->item('mem_id');
+		if (count($arr)) {
+			arsort($arr);
+			foreach ($arr as $key => $value) {
+				$count = (int) $arr[$key];
+				$view['search']['list'][$k]['count'] = $count;
+				$i++;
+				if ($save_count !== $count) {
+					$no = $i;
+					$save_count = $count;
+				}
+				$view['search']['list'][$k]['no'] = $no;
+
+				$view['search']['list'][$k]['key'] = $key;
+				
+				
+
+				
+				$k++;
+			}
+
+			// $view['view']['max_value'] = $max;
+			// $view['view']['sum_count'] = $sum_count;
+		}
+
+		$data['search_keyword_rank'] = $view['search'];
 
 		if ($CI->input->is_ajax_request() === false) {
 
 			// 현재 접속자
-			$CI->load->model('Currentvisitor_model');
-			$currentpage = $page_name ? $page_name : $page_title;
-			$currentpage = $currentpage ? $currentpage : $CI->cbconfig->item('site_title');
-			$agent_referrer = $CI->agent->referrer() ? $CI->agent->referrer() : '';
-			$agent_string = $CI->agent->agent_string() ? $CI->agent->agent_string() : '';
-			$CI->Currentvisitor_model->add_visitor($CI->input->ip_address(), $mem_id,
-			$CI->member->item('mem_nickname'), cdate('Y-m-d H:i:s'), $currentpage, current_full_url(), $agent_referrer, $agent_string);
-			if ($CI->cbconfig->item('open_currentvisitor') OR $CI->member->is_admin() === 'super') {
+			// $CI->load->model('Currentvisitor_model');
+			// $currentpage = $page_name ? $page_name : $page_title;
+			// $currentpage = $currentpage ? $currentpage : $CI->cbconfig->item('site_title');
+			// $agent_referrer = $CI->agent->referrer() ? $CI->agent->referrer() : '';
+			// $agent_string = $CI->agent->agent_string() ? $CI->agent->agent_string() : '';
+			// $CI->Currentvisitor_model->add_visitor($CI->input->ip_address(), $mem_id,
+			// $CI->member->item('mem_nickname'), cdate('Y-m-d H:i:s'), $currentpage, current_full_url(), $agent_referrer, $agent_string);
+			// if ($CI->cbconfig->item('open_currentvisitor') OR $CI->member->is_admin() === 'super') {
 
-				$minute = (int) $CI->cbconfig->item('currentvisitor_minute');
-				if ($minute < 1) {
-					$minute = 10;
-				}
-				$curdatetime = cdate('Y-m-d H:i:s', ctimestamp() - $minute * 60);
-				$data['current_visitor_num'] = $CI->Currentvisitor_model->get_current_count($curdatetime);
-			}
+			// 	$minute = (int) $CI->cbconfig->item('currentvisitor_minute');
+			// 	if ($minute < 1) {
+			// 		$minute = 10;
+			// 	}
+			// 	$curdatetime = cdate('Y-m-d H:i:s', ctimestamp() - $minute * 60);
+			// 	$data['current_visitor_num'] = $CI->Currentvisitor_model->get_current_count($curdatetime);
+			// }
 
 			// 알림
 			$data['notification_num'] = 0;
@@ -228,16 +331,17 @@ class Managelayout extends CI_Controller
 				if ($CI->member->is_member()) {
 					$CI->load->model('Notification_model');
 					$data['notification_num'] = $CI->Notification_model->unread_notification_num($mem_id);
+					$data['notification_url'] = base_url('notification/lists');
 				}
 			}
 
 			// 메뉴관리
-			$CI->load->model('Menu_model');
-			$data['menu'] = $CI->Menu_model->get_all_menu($device_view_type);
+			// $CI->load->model('Menu_model');
+			// $data['menu'] = $CI->Menu_model->get_all_menu($device_view_type);
 
 			//팝업관리
-			$CI->load->library('popuplib');
-			$data['popup'] = $CI->popuplib->display_popup();
+			// $CI->load->library('popuplib');
+			// $data['popup'] = $CI->popuplib->display_popup();
 
 		}
 

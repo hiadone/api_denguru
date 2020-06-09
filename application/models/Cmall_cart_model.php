@@ -183,6 +183,7 @@ class Cmall_cart_model extends CB_Model
 		$this->db->where('cct_cart', 1);
 		$this->db->select('cmall_cart.cit_id, cmall_item.cit_name');
 		$this->db->join('cmall_item', 'cmall_cart.cit_id = cmall_item.cit_id', 'inner');
+		$this->db->limit(10);
 		$qry = $this->db->get($this->_table);
 		$result = $qry->result_array();
 

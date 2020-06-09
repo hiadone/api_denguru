@@ -26,6 +26,8 @@ class CB_Model extends CI_Model
 	 */
 	protected $primary_key;
 
+	protected $select;
+
 	/**
 	 * 실제 어떤 식으로든 검색이 가능한 필드
 	 */
@@ -117,7 +119,11 @@ class CB_Model extends CI_Model
 
 	public function _get_list_common($select = '', $join = '', $limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
 	{
-		if (empty($findex) OR ! in_array($findex, $this->allow_order_field)) {
+		// if (empty($findex) OR ! in_array($findex, $this->allow_order_field)) {
+		// 	$findex = $this->primary_key;
+		// }
+
+		if (empty($findex) ) {
 			$findex = $this->primary_key;
 		}
 
@@ -376,5 +382,36 @@ class CB_Model extends CI_Model
 		$result = $this->db->update($this->_table);
 
 		return $result;
+	}
+
+	public function order_by($orderby, $direction = '', $escape = NULL)
+	{
+		$this->db->order_by($orderby, $direction, $escape);
+	}
+
+	public function group_or_where_in($field_key,$or_where = array())
+	{
+		if (empty($field_key)) {
+			return false;
+		}
+
+		if ($or_where && is_array($or_where)) {
+			$this->db->group_start();			
+			$this->db->or_where_in($field_key, $or_where);
+			$this->db->group_end();
+		}
+	}
+
+	public function group_where_in($field_key,$where = array())
+	{
+		if (empty($field_key)) {
+			return false;
+		}
+
+		if ($where && is_array($where)) {
+			$this->db->group_start();			
+			$this->db->where_in($field_key, $where);
+			$this->db->group_end();
+		}
 	}
 }

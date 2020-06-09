@@ -32,19 +32,227 @@ class Cmall extends CB_Controller
 		/**
 		 * 라이브러리를 로딩합니다
 		 */
-		$this->load->library(array('pagination', 'querystring', 'accesslevel', 'cmalllib'));
+		$this->load->library(array('pagination', 'querystring', 'accesslevel', 'cmalllib','review'));
 
 		if ( ! $this->cbconfig->item('use_cmall')) {
-			alert('이 웹사이트는 ' . html_escape($this->cbconfig->item('cmall_name')) . ' 기능을 사용하지 않습니다');
+			alert('이 웹사이트는 ' . html_escape($this->cbconfig->item('cmall_name')) . ' 기능을 사용하지 않습니다',"",406);
 			return;
 		}
+
+
 	}
 
 
 	/**
 	 * 컨텐츠몰 메인페이지입니다
 	 */
-	public function index_get()
+	protected function _main()
+	{
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		$this->load->model(array('Cmall_item_model','Other_model','Cmall_review_model','Banner_model'));
+		$this->load->library('popuplib');
+		$mem_id = (int) $this->member->item('mem_id');
+
+		
+		
+
+		
+		$view['view']['type1_url'] = base_url('cmall/cit_type1_lists');
+		
+		if ($this->member->is_member()) {
+				$view['view']['data']['ai_recom'] = $this->_itemairecomlists($mem_id);
+			}
+		
+		// $field = array(
+		// 	'board' => array('brd_name'),
+		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+		// 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// );
+		
+		// $select = get_selected($field);
+
+		$config = array(
+			'cit_type1' => '1',
+			'limit' => '5',
+			'cache_minute' => 10,
+			// 'select' => $select,
+		);
+		$result_1 = $this->board->cit_latest($config);
+		
+		// print_r2($result_1);
+		if ($result_1) {
+			foreach ($result_1 as $key => $val) {
+				// $view['list'][$key]['cit_id'] = element('cit_id',$val);
+				// $view['list'][$key]['cit_key'] = element('cit_key',$val);
+				// $view['list'][$key]['cit_name'] = element('cit_name',$val);
+				// $view['list'][$key]['cit_order'] = element('cit_order',$val);				
+				// $view['list'][$key]['cit_price'] = element('cit_price',$val);
+				// $view['list'][$key]['cit_file_1'] = cdn_url('cmallitem',element('cit_file_1',$val));
+				// $view['list'][$key]['cit_hit'] = element('cit_hit',$val);
+				// $view['list'][$key]['cit_datetime'] = element('cit_datetime',$val);
+				// $view['list'][$key]['cit_updated_datetime'] = element('cit_updated_datetime',$val);
+				// $view['list'][$key]['cit_sell_count'] = element('cit_sell_count',$val);
+				// $view['list'][$key]['cit_wish_count'] = element('cit_wish_count',$val);
+				// $view['list'][$key]['cit_review_count'] = element('cit_review_count',$val);
+				// $view['list'][$key]['cit_review_average'] = element('cit_review_average',$val);
+				// $view['list'][$key]['cit_qna_count'] = element('cit_qna_count',$val);
+				// $view['list'][$key]['cit_is_soldout'] = element('cit_is_soldout',$val);
+				// $view['list'][$key]['post_id'] = element('post_id',$val);
+				// $view['list'][$key]['cmall_item_url'] = cmall_item_url(element('cit_id',$val));
+				// $view['list'][$key]['board_url'] = board_url(element('brd_id',$val));
+				// $view['list'][$key]['post_url'] = post_url(element('post_id',$val));
+				// $view['list'][$key]['cit_post_url'] = element('cit_post_url',$val);
+				// $view['list'][$key]['cit_attr'] = element('cit_attr',$val);
+				$result_1[$key] = $this->cmalllib->convert_default_info($result_1[$key]);
+				$result_1[$key] = $this->board->convert_default_info($result_1[$key]);
+			}
+			
+			$view['view']['data']['type1']['list'] = $result_1;
+		}
+		
+		
+
+
+		$result_2_top = $this->Other_model->get_other();
+
+		if ($result_2_top) {
+			foreach ($result_2_top as $key => $val) {
+				$result_2_top[$key]['oth_image'] = cdn_url('other',element('oth_image',$val));
+				$result_2_top[$key]['search_url'] = base_url('search/'.element('oth_id',$val).'?skeyword='.element('oth_title',$val));
+			}
+			$view['view']['data']['type2']['top']['list'] = $result_2_top;
+		}
+
+
+		$config = array(
+			'cit_type2' => '2',
+			'limit' => '20',
+			'cache_minute' => 10,
+			// 'select' => $select,
+		);
+
+		$result_2 = $this->board->cit_latest($config);
+
+		if ($result_2) {
+			foreach ($result_2 as $key => $val) {
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_id'] = element('cit_id',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_key'] = element('cit_key',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_name'] = element('cit_name',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_order'] = element('cit_order',$val);
+			
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_price'] = element('cit_price',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_file_1'] = element('cit_file_1',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_hit'] = element('cit_hit',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_datetime'] = element('cit_datetime',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_updated_datetime'] = element('cit_updated_datetime',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_sell_count'] = element('cit_sell_count',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_wish_count'] = element('cit_wish_count',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_review_count'] = element('cit_review_count',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_review_average'] = element('cit_review_average',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_qna_count'] = element('cit_qna_count',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_is_soldout'] = element('cit_is_soldout',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['post_id'] = element('post_id',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cmall_item_url'] = cmall_item_url(element('cit_id',$val));
+				// $view['view']['data']['type2']['middle']['list'][$key]['board_url'] = board_url(element('brd_id',$val));
+				// $view['view']['data']['type2']['middle']['list'][$key]['post_url'] = post_url(element('post_id',$val));
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_post_url'] = element('cit_post_url',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_attr'] = element('cit_attr',$val);
+				// $view['view']['data']['type2']['middle']['list'][$key]['cit_brand'] = element('cbr_value_kr',$val,element('cbr_value_en',$val));
+				
+				$result_2[$key] = $this->cmalllib->convert_default_info($result_2[$key]);
+				$result_2[$key] = $this->board->convert_default_info($result_2[$key]);
+				
+			}
+
+			$view['view']['data']['type2']['middle']['list'] = $result_2;
+		}
+
+
+		if ($this->member->is_member()) {
+				$view['view']['data']['denguru_recom'] = $this->_itemdengururecomlists($mem_id);
+			}
+
+		// $param =& $this->querystring;
+		// $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+		// $findex = $this->input->get('findex', null, 'cre_id');
+		// $forder = $this->input->get('forder', null, 'desc');
+		// $sfield = '';
+		// $skeyword = '';
+
+		// $per_page = 5;
+		// $offset = ($page - 1) * $per_page;
+
+		// $is_admin = $this->member->is_admin();
+		
+		// $where = array();
+		// $where['cre_status'] = 1;
+		// $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+		// 	: $this->cbconfig->item('cmall_product_review_thumb_width');
+		// $autolink = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? $this->cbconfig->item('use_cmall_product_review_mobile_auto_url')
+		// 	: $this->cbconfig->item('use_cmall_product_review_auto_url');
+		// $popup = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? $this->cbconfig->item('cmall_product_review_mobile_content_target_blank')
+		// 	: $this->cbconfig->item('cmall_product_review_content_target_blank');
+
+		// $findex = $this->input->get('findex', null, 'cre_id');
+		// $forder = $this->input->get('forder', null, 'desc');
+
+		// $result = $this->Cmall_review_model
+		// 	->get_admin_list(5,'', $where, '', $findex, $forder);
+		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		// if (element('list', $result)) {
+		// 	foreach (element('list', $result) as $key => $val) {
+		// 		$view['view']['review'][$key]['cit_name'] = html_escape(element('cit_name', $val));
+		// 		$view['view']['review'][$key]['cre_title'] = html_escape(element('cre_title', $val));
+
+		// 		$view['view']['review'][$key]['mem_userid'] = element('mem_userid', $val);
+		// 		$view['view']['review'][$key]['mem_nickname'] = element('mem_nickname', $val);
+		// 		$view['view']['review'][$key]['mem_icon'] = element('mem_icon', $val);
+					
+		// 		$view['view']['review'][$key]['cre_datetime'] = element('cre_datetime', $val);
+
+		// 		$view['view']['review'][$key]['cre_score'] = element('cre_score', $val);
+
+		// 		$view['view']['review'][$key]['display_content'] = display_html_content(
+		// 			element('cre_content', $val),
+		// 			element('cre_content_html_type', $val),
+		// 			$thumb_width,
+		// 			$autolink,
+		// 			$popup
+		// 		);
+		// 		$view['view']['review'][$key]['cre_like'] = element('cre_like', $val);
+
+		// 		$view['view']['review'][$key]['can_update'] = false;
+		// 		$view['view']['review'][$key]['can_delete'] = false;
+		// 		if ($is_admin !== false
+		// 			OR (element('mem_id', $val) && $mem_id === (int) element('mem_id', $val))) {
+		// 			$view['view']['review'][$key]['can_update'] = true;
+		// 			$view['view']['review'][$key]['can_delete'] = true;
+		// 		}
+		// 		$view['view']['review'][$key]['num'] = $list_num--;
+		// 	}
+		// }
+		
+		
+		
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
+
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $view['view'];
+	}
+
+	public function main_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_index';
@@ -53,45 +261,293 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
+		
+		
+		$view['view'] = $this->_main();
+
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_cmall');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall');
+		$page_name = $this->cbconfig->item('site_page_name_cmall');
 
-		$this->load->model('Cmall_item_model');
-
-		$config = array(
-			'cit_type1' => '1',
-			'limit' => '5',
+		$searchconfig = array(
+			'{컨텐츠몰명}',
 		);
-		$view['view']['type1'] = $this->Cmall_item_model->get_latest($config);
-
-		$config = array(
-			'cit_type2' => '2',
-			'limit' => '6',
+		$replaceconfig = array(
+			$this->cbconfig->item('cmall_name'),
 		);
-		$view['view']['type2']['top'] = $this->Cmall_item_model->get_latest($config);
 
-		$config = array(
-			'cit_type2' => '2',
-			'limit' => '20',
+		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
+
+		$layoutconfig = array(
+			'path' => 'cmall',
+			'layout' => 'layout',
+			'skin' => '_main',
+			'layout_dir' => $this->cbconfig->item('layout_cmall'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+			'skin_dir' => $this->cbconfig->item('skin_cmall'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
 		);
-		$view['view']['type2']['middle'] = $this->Cmall_item_model->get_latest($config);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view['view'];
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
 
-		$config = array(
-			'cit_type3' => '3',
-			'limit' => '4',
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+
+	protected function _itemairecomlists($mem_id)
+	{
+		
+
+		$view = array();
+		$view['view'] = array();
+
+
+		$this->load->model(array('Board_model'));
+		/**
+		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+		 */
+		
+
+		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
+		
+
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array();
+		$where['cit_status'] = 1;
+		$where['brd_blind'] = 0;
+
+		// $field = array(
+		// 	'board' => array('brd_name'),
+		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+		// 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// );
+		
+		// $select = get_selected($field);
+
+		// $this->Board_model->select = $select;
+			
+		
+		$result = $this->Board_model
+			->get_item_list(20,'' , $where);
+		$list_num = $result['total_rows'];
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+
+				$result['list'][$key] = $this->cmalllib->convert_default_info($result['list'][$key]);
+				$result['list'][$key] = $this->board->convert_default_info($result['list'][$key]);
+				// $result['list'][$key]['num'] = $list_num--;
+			}
+		}
+		$view['view'] = $result;
+		
+		
+		return $view['view'];
+		
+	}
+
+	protected function _itemdengururecomlists($mem_id)
+	{
+		
+
+		$view = array();
+		$view['view'] = array();
+
+
+		$this->load->model(array('Board_model'));
+		/**
+		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+		 */
+		
+
+		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
+		
+
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array();
+		$where['cit_status'] = 1;
+		$where['brd_blind'] = 0;
+
+		
+
+		// $field = array(
+		// 	'board' => array('brd_name'),
+		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+		// 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// );
+		
+		// $select = get_selected($field);
+
+		// $this->Board_model->select = $select;
+
+		
+		$result = $this->Board_model
+			->get_item_list(20,'' , $where);
+		$list_num = $result['total_rows'];
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+				
+				$result['list'][$key] = $this->cmalllib->convert_default_info($result['list'][$key]);
+				$result['list'][$key] = $this->board->convert_default_info($result['list'][$key]);
+				// $result['list'][$key]['num'] = $list_num--;
+			}
+		}
+		$view['view']['data'] = $result;
+		
+		
+		return $view['view'];
+		
+	}
+
+	protected function _itemlists($category_id = 0,$brd_id = 0,$swhere = array())
+	{
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		$this->load->model(array('Board_model'));
+		/**
+		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+		 */
+		$param =& $this->querystring;
+		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+
+		$alertmessage = $this->member->is_member()
+			? '회원님은 상품 목록을 볼 수 있는 권한이 없습니다'
+			: '비회원은 상품목록에 접근할 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		$access_list = $this->cbconfig->item('access_cmall_list');
+		$access_list_level = $this->cbconfig->item('access_cmall_list_level');
+		$access_list_group = $this->cbconfig->item('access_cmall_list_group');
+		$this->accesslevel->check(
+			$access_list,
+			$access_list_level,
+			$access_list_group,
+			$alertmessage,
+			''
 		);
-		$view['view']['type3'] = $this->Cmall_item_model->get_latest($config);
 
-		$config = array(
-			'cit_type4' => '4',
-			'limit' => '4',
-		);
-		$view['view']['type4'] = $this->Cmall_item_model->get_latest($config);
+		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
+		$sfield = $this->input->get('sfield', null, '');
+		if ($sfield === 'cit_both') {
+			$sfield = array('cit_name', 'cit_content');
+		}
+		$skeyword = $this->input->get('skeyword', null, '');
 
-		$view['view']['canonical'] = site_url('cmall');
+		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$offset = ($page - 1) * $per_page;
 
+		$this->Board_model->allow_search_field = array('brd_name','cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
+		$this->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
+
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array();
+		$where['cit_status'] = 1;
+		$where['brd_blind'] = 0;
+		// $field = array(
+		// 	'board' => array('brd_name'),
+		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+		// 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// );
+		
+		// $select = get_selected($field);
+
+		// $this->Board_model->select = $select;
+
+		$item_ids = $this->input->get('chk_item_id');
+		if($item_ids && is_array($item_ids)){
+			$this->Board_model->group_where_in('cit_id',$item_ids);
+			$per_page = 9999;
+			$offset = '';
+		}
+
+		if($brd_id){
+			$where['board.brd_id'] = $brd_id;
+			$per_page = 18;
+			$offset = '';
+		}
+		$result = $this->Board_model
+			->get_item_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
+		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+
+				$result['list'][$key] = $this->cmalllib->convert_default_info($result['list'][$key]);
+				$result['list'][$key] = $this->board->convert_default_info($result['list'][$key]);
+				$result['list'][$key]['num'] = $list_num--;
+			}
+		}
+		$view['view'] = $result;
+		if($category_id){
+			$view['view']['category_nav'] = $this->cmalllib->get_nav_category($category_id);
+			$view['view']['category_all'] = $this->cmalllib->get_all_category();
+			$view['view']['category_id'] = $category_id;
+		}
+		/**
+		 * 페이지네이션을 생성합니다
+		 */
+		if(empty($brd_id)){
+			$config['base_url'] = site_url('cmall/itemlists/' . $category_id.'/' . $brd_id) . '?' . $param->replace('page');
+			$config['total_rows'] = $result['total_rows'];
+			$config['per_page'] = $per_page;
+			$this->pagination->initialize($config);
+			// $view['view']['paging'] = $this->pagination->create_links();
+			$view['view']['next_link'] = $this->pagination->get_next_link();
+			$view['view']['page'] = $page;
+
+
+		}
+		
+
+		
+		
+		return $view['view'];
+		
+	}
+
+	public function itemlists_get($category_id = 0,$brd_id = 0)
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_lists';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		$view['view']['data'] = $this->_itemlists($category_id,$brd_id);	
+			
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -131,108 +587,193 @@ class Cmall extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		// $view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+        $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+
 		$this->data = $view['view'];
-		// $this->layout = element('layout_skin_file', element('layout', $view));
-		// $this->view = element('view_skin_file', element('layout', $view));
-
 		
-		
-
-		// redirect(site_url('/board/b-a-1'));
-
+		// print_r2($this->data);
 		return $this->response($this->data, parent::HTTP_OK);
 	}
 
-
-	public function lists_get($category_id = '')
+	protected function _item($cit_id = 0)
 	{
+
+		
+		
+		$cit_id = (int) $cit_id;
+		if (empty($cit_id) OR $cit_id < 1) {
+		    show_404();
+		}
+
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		
+		$this->load->model(array('Board_model','Cmall_item_model','Cmall_review_model','Cmall_storewishlist_model','Cmall_wishlist_model'));
+
+		$field = array(
+			'board' => array('brd_id','brd_name','brd_image','brd_blind'),
+			'cmall_item' => array('cit_id','post_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale','cit_status','cit_mobile_content','cit_content','cit_content_html_type'),
+			'cmall_brand' => array('cbr_id','cbr_value_kr','cbr_value_en'),
+		);
+		
+		$select = get_selected($field);
+		
+		$this->Board_model->_select = $select;
+
+		$data = $this->Board_model->get_cit_one($cit_id);
+
+		$data = $this->cmalllib->convert_default_info($data);
+		$data = $this->board->convert_default_info($data);
+
+
+		if ( ! element('cit_id', $data)) {
+			alert('이 상품은 현재 존재하지 않습니다',"",406);
+		}
+		if (element('brd_blind', $data)) {
+			alert('이 스토어는 현재 운영하지 않습니다.',"",406);
+		}
+		if ( ! element('cit_status', $data)) {
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
+
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+
+		$alertmessage = $this->member->is_member()
+			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
+			: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		$access_read = $this->cbconfig->item('access_cmall_read');
+		$access_read_level = $this->cbconfig->item('access_cmall_read_level');
+		$access_read_group = $this->cbconfig->item('access_cmall_read_group');
+		$this->accesslevel->check(
+			$access_read,
+			$access_read_level,
+			$access_read_group,
+			$alertmessage,
+			''
+		);
+
+		
+
+		// if ( ! $this->cb_jwt->userdata('cmall_item_id_' . element('cit_id', $data))) {
+			// $this->Cmall_item_model->update_hit(element('cit_id', $data));
+		// 	$this->cb_jwt->set_userdata(
+		// 		'cmall_item_id_' . element('cit_id', $data),
+		// 		'1'
+		// 	);
+		// }
+		if ( ! $this->cb_jwt->userdata('cit_inlink_click_' . element('cit_id', $data))) {
+
+			$this->cb_jwt->set_userdata(
+				'cit_inlink_click_' . element('cit_id', $data),
+				'1'
+			);
+
+			
+			if($mem_id){
+				$insertdata = array(
+					// 'pln_id' => element('pln_id', $data),
+					'post_id' => element('post_id', $data),
+					'brd_id' => element('brd_id', $data),
+					'cit_id' => element('cit_id', $data),
+					'clc_datetime' => cdate('Y-m-d H:i:s'),
+					'clc_ip' => $this->input->ip_address(),
+					'clc_useragent' => $this->agent->agent_string(),
+					'mem_id' => $mem_id,
+				);
+
+				$this->load->model('Crawl_link_click_log_model');
+				$this->Crawl_link_click_log_model->insert($insertdata);
+			}	
+			
+			$this->Cmall_item_model->update_hit(element('cit_id', $data));
+
+			// $this->_stat_count_board(element('brd_id', $data));
+		}
+
+		$data['display_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
+			? (
+					element('cit_mobile_content', $data)
+					? element('cit_mobile_content', $data)
+					: element('cit_content', $data)
+				)
+			: element('cit_content', $data);
+		$thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+			? $this->cbconfig->item('cmall_product_mobile_thumb_width')
+			: $this->cbconfig->item('cmall_product_thumb_width');
+		$autolink = ($this->cbconfig->get_device_view_type() === 'mobile')
+			? $this->cbconfig->item('use_cmall_product_mobile_auto_url')
+			: $this->cbconfig->item('use_cmall_product_auto_url');
+		$popup = ($this->cbconfig->get_device_view_type() === 'mobile')
+			? $this->cbconfig->item('cmall_product_mobile_content_target_blank')
+			: $this->cbconfig->item('cmall_product_content_target_blank');
+		$data['display_content'] = display_html_content(
+			element('display_content', $data),
+			element('cit_content_html_type', $data),
+			$thumb_width,
+			$autolink,
+			$popup,
+			$writer_is_admin = true
+		);
+
+		// $data['header_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? display_html_content(element('mobile_header_content', element('meta', $data)), 1, $thumb_width)
+		// 	: display_html_content(element('header_content', element('meta', $data)), 1, $thumb_width);
+
+		// $data['footer_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? display_html_content(element('mobile_footer_content', element('meta', $data)), 1, $thumb_width)
+		// 	: display_html_content(element('footer_content', element('meta', $data)), 1, $thumb_width);
+
+		$data = $this->cmalllib->get_wish_info($data);
+
+		$data['reviewlist_url'] = base_url('cmall_review/reviewlist/'.element('cit_id',$data));
+		$data['cit_review_count'] = $this->Cmall_review_model->count_by(array('cit_id' => element('cit_id',$data)));	
+		// $data['reviewscore'] = $this->Cmall_review_model->get_review_count(element('cit_id',$data));
+		$data['popularreview'] = $this->review->get_popular_item_review(element('cit_id',$data));
+
+		$data['ai_keyword'] = array();
+		$data['similaritemlist'] = $this->_itemlists('',element('brd_id',$data));
+
+		$view['view']['data'] = $data;
+		
+
+
+		
+		
+		return $view['view'];
+	}
+
+	public function item_get($cit_id = 0)
+	{
+
+		
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_cmall_lists';
+		$eventname = 'event_cmall_item';
 		$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
 
+		
+
+		
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$this->load->model(array('Cmall_item_model'));
-		/**
-		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
-		 */
-		$param =& $this->querystring;
-		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+		
 
-		$alertmessage = $this->member->is_member()
-			? '회원님은 상품 목록을 볼 수 있는 권한이 없습니다'
-			: '비회원은 상품목록에 접근할 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
-		$access_list = $this->cbconfig->item('access_cmall_list');
-		$access_list_level = $this->cbconfig->item('access_cmall_list_level');
-		$access_list_group = $this->cbconfig->item('access_cmall_list_group');
-		$this->accesslevel->check(
-			$access_list,
-			$access_list_level,
-			$access_list_group,
-			$alertmessage,
-			''
-		);
-
-		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
-		$sfield = $this->input->get('sfield', null, '');
-		if ($sfield === 'cit_both') {
-			$sfield = array('cit_name', 'cit_content');
-		}
-		$skeyword = $this->input->get('skeyword', null, '');
-
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
-		$offset = ($page - 1) * $per_page;
-
-		$this->Cmall_item_model->allow_search_field = array('cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
-		$this->Cmall_item_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
-
-		/**
-		 * 게시판 목록에 필요한 정보를 가져옵니다.
-		 */
-		$where = array();
-		$where['cit_status'] = 1;
-		$result = $this->Cmall_item_model
-			->get_item_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
-		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
-		if (element('list', $result)) {
-			foreach (element('list', $result) as $key => $val) {
-				$result['list'][$key]['item_url'] = cmall_item_url(element('cit_key', $val));
-				$result['list'][$key]['num'] = $list_num--;
-			}
-		}
-		$view['view']['data'] = $result;
-
-		$view['view']['category_nav'] = $this->cmalllib->get_nav_category($category_id);
-		$view['view']['category_all'] = $this->cmalllib->get_all_category();
-		$view['view']['category_id'] = $category_id;
-
-		/**
-		 * 페이지네이션을 생성합니다
-		 */
-		$config['base_url'] = site_url('cmall/lists/' . $category_id) . '?' . $param->replace('page');
-		$config['total_rows'] = $result['total_rows'];
-		$config['per_page'] = $per_page;
-		$this->pagination->initialize($config);
-		$view['view']['paging'] = $this->pagination->create_links();
-		$view['view']['page'] = $page;
-
-
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
+		$view['view'] = $this->_item($cit_id);
 		/**
 		 * 레이아웃을 정의합니다
 		 */
-		$page_title = $this->cbconfig->item('site_meta_title_cmall_list');
-		$meta_description = $this->cbconfig->item('site_meta_description_cmall_list');
-		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_list');
-		$meta_author = $this->cbconfig->item('site_meta_author_cmall_list');
-		$page_name = $this->cbconfig->item('site_page_name_cmall_list');
+		$page_title = $this->cbconfig->item('site_meta_title_cmall');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall');
+		$page_name = $this->cbconfig->item('site_page_name_cmall');
 
 		$searchconfig = array(
 			'{컨텐츠몰명}',
@@ -250,7 +791,7 @@ class Cmall extends CB_Controller
 		$layoutconfig = array(
 			'path' => 'cmall',
 			'layout' => 'layout',
-			'skin' => 'lists',
+			'skin' => 'cmall',
 			'layout_dir' => $this->cbconfig->item('layout_cmall'),
 			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
 			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
@@ -263,15 +804,16 @@ class Cmall extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		$this->layout = element('layout_skin_file', element('layout', $view));
-		$this->view = element('view_skin_file', element('layout', $view));
+        $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
 	}
 
-
-	public function item_get($cit_key = '')
+	public function itemwish_post($cit_id = 0)
 	{
+
+		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_item';
 		$this->load->event($eventname);
@@ -283,25 +825,26 @@ class Cmall extends CB_Controller
 
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
-
-		if (empty($cit_key)) {
+		
+		if (empty($cit_id) || empty($this->input->post('stype'))) {
 			show_404();
 		}
-		$this->load->model(array('Cmall_item_model', 'Cmall_item_meta_model', 'Cmall_item_detail_model'));
+		$this->load->model(array('Cmall_item_model'));
 
 		$where = array(
-			'cit_key' => $cit_key,
+			'cit_id' => $cit_id,
 		);
-		$data = $this->Cmall_item_model->get_one('', '', $where);
+		$data = $this->Cmall_item_model->get_one($cit_id);
 		if ( ! element('cit_id', $data)) {
-			show_404();
+			alert('이 상품은 현재 존재하지 않습니다',"",406);
 		}
+		
 		if ( ! element('cit_status', $data)) {
-			alert('이 상품은 현재 판매하지 않습니다');
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
 		}
 
-		$data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
-		$data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
 
 		$alertmessage = $this->member->is_member()
 			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
@@ -319,158 +862,329 @@ class Cmall extends CB_Controller
 
 		if ($this->input->post('stype')) {
 			if ( ! $mem_id) {
-				$this->session->set_flashdata(
-					'message',
-					'로그인 후 이용이 가능합니다'
+				alert(
+					'로그인 후 이용이 가능합니다',
+					'',
+					403
 				);
-				redirect('login?url=' . urlencode(current_full_url()));
+				
 			}
 
-			$cit_id = (int) $this->input->post('cit_id');
-			if (empty($cit_id) OR $cit_id < 1) {
-				show_404();
-			}
+			
 
 			if ($this->input->post('stype') === 'wish') {
 				$return = $this->cmalllib->addwish($mem_id, $cit_id);
 				if ($return) {
-					redirect('cmall/wishlist');
+					$result = array('msg' => 'success');
+					$view['view']=$result;
 				}
 			} elseif ($this->input->post('stype') === 'cart'
-				&& $this->input->post('chk_detail')
-				&& is_array($this->input->post('chk_detail'))
+				// && $this->input->post('chk_detail')
+				// && is_array($this->input->post('chk_detail'))
 				&& $this->input->post('detail_qty')) {
 				$return = $this->cmalllib->addcart(
 					$mem_id,
 					$cit_id,
-					$this->input->post('chk_detail'),
+					'',
 					$this->input->post('detail_qty')
 				);
 				if ($return) {
-					redirect('cmall/cart');
+					$result = array('msg' => 'success');
+					$view['view']=$result;
 				}
 			} elseif ($this->input->post('stype') === 'order'
-				&& $this->input->post('chk_detail')
-				&& is_array($this->input->post('chk_detail'))
+				// && $this->input->post('chk_detail')
+				// && is_array($this->input->post('chk_detail'))
 				&& $this->input->post('detail_qty')) {
 				$return = $this->cmalllib->addorder(
 					$mem_id,
 					$cit_id,
-					$this->input->post('chk_detail'),
+					'',
 					$this->input->post('detail_qty')
 				);
 				if ($return) {
-					redirect('cmall/order');
+					$result = array('msg' => 'success');
+					$view['view']=$result;
 				}
 			}
 		}
 
-		if ( ! $this->session->userdata('cmall_item_id_' . element('cit_id', $data))) {
-			$this->Cmall_item_model->update_hit(element('cit_id', $data));
-			$this->session->set_userdata(
-				'cmall_item_id_' . element('cit_id', $data),
-				'1'
-			);
-		}
+		
 
-		$data['content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? (
-					element('cit_mobile_content', $data)
-					? element('cit_mobile_content', $data)
-					: element('cit_content', $data)
-				)
-			: element('cit_content', $data);
-		$thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('cmall_product_mobile_thumb_width')
-			: $this->cbconfig->item('cmall_product_thumb_width');
-		$autolink = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('use_cmall_product_mobile_auto_url')
-			: $this->cbconfig->item('use_cmall_product_auto_url');
-		$popup = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('cmall_product_mobile_content_target_blank')
-			: $this->cbconfig->item('cmall_product_content_target_blank');
-		$data['content'] = display_html_content(
-			element('content', $data),
-			element('cit_content_html_type', $data),
-			$thumb_width,
-			$autolink,
-			$popup,
-			$writer_is_admin = true
-		);
-
-		$data['header_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? display_html_content(element('mobile_header_content', element('meta', $data)), 1, $thumb_width)
-			: display_html_content(element('header_content', element('meta', $data)), 1, $thumb_width);
-
-		$data['footer_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? display_html_content(element('mobile_footer_content', element('meta', $data)), 1, $thumb_width)
-			: display_html_content(element('footer_content', element('meta', $data)), 1, $thumb_width);
-
-		$view['view']['data'] = $data;
-		$view['view']['item_key'] = $cit_key;
-
-		$layout_dir = (element('item_layout', element('meta', $data))) ? element('item_layout', element('meta', $data)) : $this->cbconfig->item('layout_cmall');
-		$mobile_layout_dir = (element('item_mobile_layout', element('meta', $data))) ? element('item_mobile_layout', element('meta', $data)) : $this->cbconfig->item('mobile_layout_cmall');
-		$use_sidebar = (element('item_layout', element('meta', $data))) ? element('item_sidebar', element('meta', $data)) : $this->cbconfig->item('sidebar_cmall');
-		$use_mobile_sidebar = (element('item_mobile_layout', element('meta', $data))) ? element('item_mobile_sidebar', element('meta', $data)) : $this->cbconfig->item('mobile_sidebar_cmall');
-		$skin_dir = (element('item_skin', element('meta', $data))) ? element('item_skin', element('meta', $data)) : $this->cbconfig->item('skin_cmall');
-		$mobile_skin_dir = (element('item_mobile_skin', element('meta', $data))) ? element('item_mobile_skin', element('meta', $data)) : $this->cbconfig->item('mobile_skin_cmall');
-
-		$view['view']['canonical'] = cmall_item_url($cit_key);
-
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
-		/**
-		 * 레이아웃을 정의합니다
-		 */
-		$page_title = $this->cbconfig->item('site_meta_title_cmall_item');
-		$meta_description = $this->cbconfig->item('site_meta_description_cmall_item');
-		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_item');
-		$meta_author = $this->cbconfig->item('site_meta_author_cmall_item');
-		$page_name = $this->cbconfig->item('site_page_name_cmall_item');
-
-		$searchconfig = array(
-			'{컨텐츠몰명}',
-			'{상품명}',
-			'{판매가격}',
-			'{기본설명}',
-		);
-		$replaceconfig = array(
-			$this->cbconfig->item('cmall_name'),
-			element('cit_name', $data),
-			element('cit_price', $data),
-			element('cit_summary', $data),
-		);
-
-		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
-		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
-		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
-		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
-		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
-
-		$layoutconfig = array(
-			'path' => 'cmall',
-			'layout' => 'layout',
-			'skin' => 'item',
-			'layout_dir' => $layout_dir,
-			'mobile_layout_dir' => $mobile_layout_dir,
-			'use_sidebar' => $use_sidebar,
-			'use_mobile_sidebar' => $use_mobile_sidebar,
-			'skin_dir' => $skin_dir,
-			'mobile_skin_dir' => $mobile_skin_dir,
-			'page_title' => $page_title,
-			'meta_description' => $meta_description,
-			'meta_keywords' => $meta_keywords,
-			'meta_author' => $meta_author,
-			'page_name' => $page_name,
-		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		$this->layout = element('layout_skin_file', element('layout', $view));
-		$this->view = element('view_skin_file', element('layout', $view));
+		
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
 	}
 
+	public function itemwish_delete($cit_id = 0)
+	{
+
+		
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_item';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
+		if (empty($cit_id) || empty($this->input->post('stype'))) {
+			show_404();
+		}
+		$this->load->model(array('Cmall_item_model'));
+
+		$where = array(
+			'cit_id' => $cit_id,
+		);
+		$data = $this->Cmall_item_model->get_one($cit_id);
+		if ( ! element('cit_id', $data)) {
+			alert('이 상품은 현재 존재하지 않습니다',"",406);
+		}
+		
+		if ( ! element('cit_status', $data)) {
+			// alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
+
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+
+		$alertmessage = $this->member->is_member()
+			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
+			: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		$access_read = $this->cbconfig->item('access_cmall_read');
+		$access_read_level = $this->cbconfig->item('access_cmall_read_level');
+		$access_read_group = $this->cbconfig->item('access_cmall_read_group');
+		$this->accesslevel->check(
+			$access_read,
+			$access_read_level,
+			$access_read_group,
+			$alertmessage,
+			''
+		);
+
+		if ($this->input->post('stype')) {
+			if ( ! $mem_id) {
+				alert(
+					'로그인 후 이용이 가능합니다',
+					'',
+					403
+				);
+				
+			}
+
+			
+
+			if ($this->input->post('stype') === 'wish') {
+				$return = $this->cmalllib->delwish($mem_id, $cit_id);
+				if ($return) {
+					$result = array('msg' => 'success');
+					$view['view']=$result;
+				}
+			} elseif ($this->input->post('stype') === 'cart'
+				// && $this->input->post('chk_detail')
+				// && is_array($this->input->post('chk_detail'))
+				&& $this->input->post('detail_qty')) {
+				$return = $this->cmalllib->addcart(
+					$mem_id,
+					$cit_id,
+					'',
+					$this->input->post('detail_qty')
+				);
+				if ($return) {
+					$result = array('msg' => 'success');
+					$view['view']=$result;
+				}
+			} elseif ($this->input->post('stype') === 'order'
+				// && $this->input->post('chk_detail')
+				// && is_array($this->input->post('chk_detail'))
+				&& $this->input->post('detail_qty')) {
+				$return = $this->cmalllib->addorder(
+					$mem_id,
+					$cit_id,
+					'',
+					$this->input->post('detail_qty')
+				);
+				if ($return) {
+					$result = array('msg' => 'success');
+					$view['view']=$result;
+				}
+			}
+		}
+
+		
+
+		
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, 204);
+	}
+
+	public function storewish_post($brd_id = '')
+	{
+
+		
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_store';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		
+		if (empty($brd_id ) || empty($this->input->post('stype'))) {
+			show_404();
+		}
+
+		
+
+		$board = $this->board->item_all($brd_id);
+
+		
+		if (element('brd_blind', $board)) {
+			alert('이 스토어는 현재 운영하지 않습니다',"",406);
+		}
+
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+
+		$alertmessage = $this->member->is_member()
+			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
+			: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		$check = array(
+			'group_id' => element('bgr_id', $board),
+			'board_id' => element('brd_id', $board),
+		);
+		$this->accesslevel->check(
+			element('access_write', $board),
+			element('access_write_level', $board),
+			element('access_write_group', $board),
+			$alertmessage,
+			$check
+		);
+
+		if ($this->input->post('stype')) {
+			if ( ! $mem_id) {
+				alert(
+					'로그인 후 이용이 가능합니다',"",403
+				);
+				
+			}
+
+			
+
+			if ($this->input->post('stype') === 'store') {
+				$return = $this->cmalllib->addstore($mem_id, $brd_id);	
+				if ($return) {
+					$result = array('msg' => 'success');
+					$view['view']=$result;
+				}			
+			} 
+		}
+
+		// if ( ! $this->cb_jwt->userdata('cmall_item_id_' . element('cit_id', $data))) {
+			// $this->Cmall_item_model->update_hit(element('cit_id', $data));
+		// 	$this->cb_jwt->set_userdata(
+		// 		'cmall_item_id_' . element('cit_id', $data),
+		// 		'1'
+		// 	);
+		// }
+
+		
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+	public function storewish_delete($brd_id = '')
+	{
+
+		
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_store';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		
+		if (empty($brd_id ) || empty($this->input->post('stype'))) {
+			show_404();
+		}
+
+		
+
+		$board = $this->board->item_all($brd_id);
+
+		
+		if (element('brd_blind', $board)) {
+			// alert('이 스토어는 현재 운영하지 않습니다',"",406);
+		}
+
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+
+		$alertmessage = $this->member->is_member()
+			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
+			: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		$check = array(
+			'group_id' => element('bgr_id', $board),
+			'board_id' => element('brd_id', $board),
+		);
+		$this->accesslevel->check(
+			element('access_write', $board),
+			element('access_write_level', $board),
+			element('access_write_group', $board),
+			$alertmessage,
+			$check
+		);
+
+		if ($this->input->post('stype')) {
+			if ( ! $mem_id) {
+				alert(
+					'로그인 후 이용이 가능합니다',"",403
+				);
+				
+			}
+
+			
+
+			if ($this->input->post('stype') === 'store') {
+				$return = $this->cmalllib->delstore($mem_id, $brd_id);	
+				if ($return) {
+					$result = array('msg' => 'success');
+					$view['view']=$result;
+				}			
+			} 
+		}
+
+		// if ( ! $this->cb_jwt->userdata('cmall_item_id_' . element('cit_id', $data))) {
+			// $this->Cmall_item_model->update_hit(element('cit_id', $data));
+		// 	$this->cb_jwt->set_userdata(
+		// 		'cmall_item_id_' . element('cit_id', $data),
+		// 		'1'
+		// 	);
+		// }
+
+		
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, 204);
+	}
 
 	public function cartoption_post()
 	{
@@ -540,7 +1254,7 @@ class Cmall extends CB_Controller
 	}
 
 
-	public function itemimage_get($cit_key = '')
+	public function itemimage_get($cit_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_itemimage';
@@ -552,13 +1266,13 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		if (empty($cit_key)) {
+		if (empty($cit_id)) {
 			show_404();
 		}
 		$this->load->model(array('Cmall_item_model'));
 
 		$where = array(
-			'cit_key' => $cit_key,
+			'cit_id' => $cit_id,
 		);
 		$data = $this->Cmall_item_model->get_one('', '', $where);
 		if ( ! element('cit_id', $data)) {
@@ -654,7 +1368,7 @@ class Cmall extends CB_Controller
 		$result = $this->Cmall_cart_model->get_cart_list($where, $findex, $forder);
 		if ($result) {
 			foreach ($result as $key => $val) {
-				$result[$key]['item_url'] = cmall_item_url(element('cit_key', $val));
+				$result[$key]['cit_inlink_url'] = cmall_item_url(element('cit_id', $val));
 				$result[$key]['detail'] = $this->Cmall_cart_model
 					->get_cart_detail($mem_id, element('cit_id', $val));
 			}
@@ -763,17 +1477,17 @@ class Cmall extends CB_Controller
 		$result = $this->Cmall_cart_model->get_order_list($where, $findex, $forder);
 		$good_name = '';
 		$good_count = -1;
-		$session_cct_id = array();
+		$jwt_cct_id = array();
 		if ($result) {
 			foreach ($result as $key => $val) {
-				$result[$key]['item_url'] = cmall_item_url(element('cit_key', $val));
+				$result[$key]['cit_inlink_url'] = cmall_item_url(element('cit_id', $val));
 				$result[$key]['detail'] = $this->Cmall_cart_model
 					->get_order_detail($mem_id, element('cit_id', $val));
 				if (empty($good_name)) {
 					$good_name = element('cit_name', $val);
 				}
 				$good_count ++;
-				$session_cct_id[] = element('cct_id', $val);
+				$jwt_cct_id[] = element('cct_id', $val);
 			}
 		}
 		$view['view']['data'] = $result;
@@ -785,13 +1499,13 @@ class Cmall extends CB_Controller
 		if ($good_count > 0) {
 			$view['view']['good_name'] .= ' 외 ' . $good_count . '건';
 		}
-		$this->session->set_userdata(
+		$this->cb_jwt->set_userdata(
 			'unique_id',
 			$unique_id
 		);
-		$this->session->set_userdata(
+		$this->cb_jwt->set_userdata(
 			'order_cct_id',
-			implode('-', $session_cct_id)
+			implode('-', $jwt_cct_id)
 		);
 
 		$view['view']['use_pg'] = $use_pg = false;
@@ -910,18 +1624,18 @@ class Cmall extends CB_Controller
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		if (empty($cor_id) OR $cor_id < 1) {
-			alert('잘못된 접근입니다');
+			show_404();
 		}
 
 		$this->load->model(array('Cmall_item_model', 'Cmall_order_model', 'Cmall_order_detail_model'));
 
 		$order = $this->Cmall_order_model->get_one($cor_id);
 		if ( ! element('cor_id', $order)) {
-			alert('잘못된 접근입니다');
+			show_404();
 		}
 		if ($this->member->is_admin() === false
 			&& (int) element('mem_id', $order) !== $mem_id) {
-			alert('잘못된 접근입니다');
+			alert('잘못된 접근입니다',"",400);
 		}
 		$orderdetail = $this->Cmall_order_detail_model->get_by_item($cor_id);
 		if ($orderdetail) {
@@ -944,7 +1658,7 @@ class Cmall extends CB_Controller
 			}
 		}
 		if (element('cor_status', $order) === '1') {
-			$this->session->set_userdata(
+			$this->cb_jwt->set_userdata(
 				'cmall_item_download_' . element('cor_id', $order),
 				'1'
 			);
@@ -1064,7 +1778,8 @@ class Cmall extends CB_Controller
 	}
 
 
-	public function inicisweb(){
+	public function inicisweb()
+	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_payment_inicis_pc_pay';
 		$this->load->event($eventname);
@@ -1080,16 +1795,16 @@ class Cmall extends CB_Controller
 		}
 
 		$request_mid = $this->input->post('mid', null, '');
-		$session_order_num = $this->session->userdata('unique_id');
+		$jwt_order_num = $this->cb_jwt->userdata('unique_id');
 
-		if( ($request_mid != element('pg_inicis_mid', $init)) || ! $session_order_num ){
-			alert("잘못된 요청입니다.");
+		if( ($request_mid != element('pg_inicis_mid', $init)) || ! $jwt_order_num ){
+			alert("잘못된 요청입니다.","",400);
 		}
 
 		$orderNumber = $this->input->post('orderNumber', true, 0);
 
 		if( !$orderNumber ){
-			alert("주문번호가 없습니다.");
+			alert("주문번호가 없습니다.","",400);
 		}
 
 		$this->load->model('Payment_order_data_model');
@@ -1098,7 +1813,7 @@ class Cmall extends CB_Controller
 		$data = cmall_tmp_replace_data($row['pod_data']);
 
 		if( !$data ){
-			alert("임시 주문 정보가 저장되지 않았습니다. \\n 다시 실행해 주세요.");
+			alert("임시 주문 정보가 저장되지 않았습니다. \\n 다시 실행해 주세요.","",500);
 		}
 
 		foreach($data as $key=>$value) {
@@ -1122,7 +1837,7 @@ class Cmall extends CB_Controller
 	 */
 	public function orderupdate($agent_type='')
 	{
-		if( 'mobile' == $agent_type && $this->cbconfig->item('use_payment_pg') === 'inicis' && ($unique_id = $this->session->userdata('unique_id')) && $exist_order = get_cmall_order_data($unique_id) ){	//상품주문
+		if( 'mobile' == $agent_type && $this->cbconfig->item('use_payment_pg') === 'inicis' && ($unique_id = $this->cb_jwt->userdata('unique_id')) && $exist_order = get_cmall_order_data($unique_id) ){	//상품주문
 			exists_inicis_cmall_order($unique_id, array(), $exist_order['cor_datetime']);
 			exit;
 		}
@@ -1146,10 +1861,10 @@ class Cmall extends CB_Controller
 			alert('결제등록 요청 후 주문해 주십시오');
 		}
 
-		if ( ! $this->session->userdata('unique_id') OR ! $this->input->post('unique_id') OR $this->session->userdata('unique_id') !== $this->input->post('unique_id')) {
+		if ( ! $this->cb_jwt->userdata('unique_id') OR ! $this->input->post('unique_id') OR $this->cb_jwt->userdata('unique_id') !== $this->input->post('unique_id')) {
 			alert('잘못된 접근입니다');
 		}
-		if ( ! $this->session->userdata('order_cct_id')) {
+		if ( ! $this->cb_jwt->userdata('order_cct_id')) {
 			alert('잘못된 접근입니다');
 		}
 
@@ -1158,7 +1873,7 @@ class Cmall extends CB_Controller
 		$where['cmall_cart.mem_id'] = $mem_id;
 		$findex = 'cmall_item.cit_id';
 		$forder = 'desc';
-		$session_cct_id = array();
+		$jwt_cct_id = array();
 
 		$good_mny = $this->input->post('good_mny', null, 0);	//request 값으로 받은 값
 		$item_cct_price = 0;		//주문한 상품의 총 금액의 초기화
@@ -1176,14 +1891,14 @@ class Cmall extends CB_Controller
 					}
 				}
 
-				$session_cct_id[] = element('cct_id', $val);
+				$jwt_cct_id[] = element('cct_id', $val);
 			}
 		}
 
 		if ( $item_cct_price != $good_mny ){
 		}
 
-		if ($this->session->userdata('order_cct_id') !== implode('-', $session_cct_id)) {
+		if ($this->cb_jwt->userdata('order_cct_id') !== implode('-', $jwt_cct_id)) {
 			alert('결제 내역이 상이합니다, 관리자에게 문의하여주세요');
 		}
 
@@ -1376,7 +2091,7 @@ class Cmall extends CB_Controller
 		Events::trigger('step2', $eventname);
 
 		// 정보 입력
-		$cor_id = $this->session->userdata('unique_id');
+		$cor_id = $this->cb_jwt->userdata('unique_id');
 		$insertdata['cor_id'] = $cor_id;
 		$insertdata['mem_id'] = $mem_id;
 		$insertdata['mem_nickname'] = $this->member->item('mem_nickname');
@@ -1454,8 +2169,8 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('after', $eventname);
 
-		$this->session->set_userdata('unique_id', '');
-		$this->session->set_userdata('order_cct_id', '');
+		$this->cb_jwt->set_userdata('unique_id', '');
+		$this->cb_jwt->set_userdata('order_cct_id', '');
 
 		redirect('cmall/orderresult/' . $cor_id);
 	}
@@ -1508,7 +2223,8 @@ class Cmall extends CB_Controller
 		$config['total_rows'] = $result['total_rows'];
 		$config['per_page'] = $per_page;
 		$this->pagination->initialize($config);
-		$view['view']['paging'] = $this->pagination->create_links();
+		// $view['view']['paging'] = $this->pagination->create_links();
+		$view['view']['next_link'] = $this->pagination->get_next_link();
 		$view['view']['page'] = $page;
 
 
@@ -1560,11 +2276,9 @@ class Cmall extends CB_Controller
 	}
 
 
-	public function wishlist()
+	public function _wishlist()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_cmall_wishlist';
-		$this->load->event($eventname);
+		
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1573,9 +2287,6 @@ class Cmall extends CB_Controller
 
 		$view = array();
 		$view['view'] = array();
-
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Cmall_wishlist_model'));
 		/**
@@ -1594,14 +2305,14 @@ class Cmall extends CB_Controller
 		 */
 		$where = array();
 		$where['cmall_wishlist.mem_id'] = $this->member->item('mem_id');
-		$where['cit_status'] = 1;
+		// $where['cit_status'] = 1;
 		$result = $this->Cmall_wishlist_model
 			->get_list($per_page, $offset, $where, '', $findex, $forder);
 		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
-				$result['list'][$key]['item_url'] = cmall_item_url(element('cit_key', $val));
-				$result['list'][$key]['delete_url'] = site_url('cmallact/wishlist_delete/' . element('cwi_id', $val) . '?' . $param->output());
+				$result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id',$val),$result['list'][$key]);
+				$result['list'][$key]['delete_url'] = site_url('cmallact/wishlist/' . element('cwi_id', $val) . '?' . $param->output());
 				$result['list'][$key]['num'] = $list_num--;
 			}
 		}
@@ -1614,13 +2325,30 @@ class Cmall extends CB_Controller
 		$config['total_rows'] = $result['total_rows'];
 		$config['per_page'] = $per_page;
 		$this->pagination->initialize($config);
-		$view['view']['paging'] = $this->pagination->create_links();
+		// $view['view']['paging'] = $this->pagination->create_links();
+		$view['view']['next_link'] = $this->pagination->get_next_link();
 		$view['view']['page'] = $page;
 
+		
+		return $view['view'];
+		
+	}
+
+	public function wishlist_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_wishlist';
+		$this->load->event($eventname);
+
+		
+		$view = array();
+		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
+		$view['view'] = $this->_wishlist();
+		
 		/**
 		 * 레이아웃을 정의합니다
 		 */
@@ -1659,385 +2387,336 @@ class Cmall extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		$this->layout = element('layout_skin_file', element('layout', $view));
-		$this->view = element('view_skin_file', element('layout', $view));
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
+
+	}
+	
+	protected function _storewishlist()
+	{
+		
+
+		/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$view = array();
+		$view['view'] = array();
+
+		$this->load->model(array('Cmall_storewishlist_model','Cmall_item_model','Crawl_tag_model'));
+		/**
+		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+		 */
+		$param =& $this->querystring;
+		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+		$findex = $this->Cmall_storewishlist_model->primary_key;
+		$forder = 'desc';
+
+		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$offset = ($page - 1) * $per_page;
+
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array();
+
+		// if($this->input->get('sform')){            
+  //               $where['pet_form'] = $this->input->get('sform');
+  //       }
+  //       if($this->input->get('skind')){            
+  //               $where['pet_kind'] = $this->input->get('skind');
+  //       }
+  //       if($this->input->get('sattr')){            
+  //               $where['pet_attr'] = $this->input->get('sattr');
+  //       }
+  
+		$where['cmall_storewishlist.mem_id'] = $this->member->item('mem_id');
+		
+
+		$field = array(
+            'cmall_storewishlist' => array('csi_id','csi_datetime','brd_id'),
+        );
+        
+        $select = get_selected($field);
+        
+        $this->Cmall_storewishlist_model->_select = $select;
+
+		// $result = $this->Cmall_storewishlist_model
+		// 	->get_list($per_page, $offset, $where, '', $findex, $forder);
+		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		$result = $this->Cmall_storewishlist_model
+			->get_list('','', $where);
+		
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+				$result['list'][$key] = $this->board->get_default_info(element('brd_id', $val),$result['list'][$key]);
+				$result['list'][$key]['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $val),8);
+
+				
+				$result['list'][$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
+				$result['list'][$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
+				// $result['list'][$key]['num'] = $list_num--;
+			}
+		}
+		$view['view']['data'] = $result;
+
+		/**
+		 * 페이지네이션을 생성합니다
+		 */
+		// $config['base_url'] = site_url('cmall/storewishlist') . '?' . $param->replace('page');
+		// $config['total_rows'] = $result['total_rows'];
+		// $config['per_page'] = $per_page;
+		// $this->pagination->initialize($config);
+		// $view['view']['paging'] = $this->pagination->create_links();
+		// $view['view']['page'] = $page;
+
+		
+		return $view['view'];
+		
 	}
 
-
-	/**
-	 * 상품후기 목록을 ajax 로 가져옵니다
-	 */
-	public function reviewlist($cit_id = 0)
+	public function storewishlist_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_cmall_reviewlist';
+		$eventname = 'event_cmall_wishlist';
 		$this->load->event($eventname);
 
-		$cit_id = (int) $cit_id;
-		if (empty($cit_id) OR $cit_id < 1) {
-			show_404();
-		}
-
+		
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
+		$view['view'] = $this->_storewishlist();
+		
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_cmall_wishlist');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall_wishlist');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_wishlist');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall_wishlist');
+		$page_name = $this->cbconfig->item('site_page_name_cmall_wishlist');
 
-		$this->load->model(array('Cmall_item_model', 'Cmall_review_model'));
+		$searchconfig = array(
+			'{컨텐츠몰명}',
+		);
+		$replaceconfig = array(
+			$this->cbconfig->item('cmall_name'),
+		);
 
-		$item = $this->Cmall_item_model->get_one($cit_id);
-		if ( ! element('cit_id', $item)) {
-			show_404();
-		}
+		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
 
-		$mem_id = (int) $this->member->item('mem_id');
+		$layoutconfig = array(
+			'path' => 'cmall',
+			'layout' => 'layout',
+			'skin' => 'wishlist',
+			'layout_dir' => $this->cbconfig->item('layout_cmall'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+			'skin_dir' => $this->cbconfig->item('skin_cmall'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
+
+	}
+
+	
+	protected function _storeranklist()
+	{
+		
+
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		$this->load->model(array('Board_model','Cmall_item_model'));
+
+
 
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
 		$param =& $this->querystring;
 		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
-		$findex = $this->input->get('findex', null, 'cre_id');
-		$forder = $this->input->get('forder', null, 'desc');
-		$sfield = '';
-		$skeyword = '';
+		
 
-		$per_page = 5;
+		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
 		$offset = ($page - 1) * $per_page;
-
-		$is_admin = $this->member->is_admin();
 
 		/**
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
 		$where = array();
-		$where['cre_status'] = 1;
-		$where['cit_id'] = $cit_id;
+		
+		if($this->input->get('sage')){
+            if($this->input->get('sage') === 1)
+                $where['pet_birthday > '] = cdate('Y-m-d',strtotime("-1 years"));
+            if($this->input->get('sage') === 2){
+                $where['pet_birthday >= '] = cdate('Y-m-d',strtotime("-1 years"));
+                $where['pet_birthday <= '] = cdate('Y-m-d',strtotime("-6 years"));
+            }
+            if($this->input->get('sage') === 1)
+                $where['pet_birthday < '] = cdate('Y-m-d',strtotime("-7 years"));
+        }
 
-		$thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
-			: $this->cbconfig->item('cmall_product_review_thumb_width');
-		$autolink = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('use_cmall_product_review_mobile_auto_url')
-			: $this->cbconfig->item('use_cmall_product_review_auto_url');
-		$popup = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('cmall_product_review_mobile_content_target_blank')
-			: $this->cbconfig->item('cmall_product_review_content_target_blank');
+        if($this->input->get('sform')){            
+                $where['pet_form'] = $this->input->get('sform');
+        }
+        if($this->input->get('skind')){            
+                $where['pet_kind'] = $this->input->get('skind');
+        }
+        if($this->input->get('sattr')){            
+                $where['pet_attr'] = $this->input->get('sattr');
+        }
+		// if($this->input->get('sform')){            
+  //               $where['pet_form'] = $this->input->get('sform');
+  //       }
+  //       if($this->input->get('skind')){            
+  //               $where['pet_kind'] = $this->input->get('skind');
+  //       }
+  //       if($this->input->get('sattr')){            
+  //               $where['pet_attr'] = $this->input->get('sattr');
+  //       }
+  //       
+		$where['brd_blind'] = 0;
+		// $where['cit_status'] = 1;
+		$result = $this->Board_model->get_board_list($where,'brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,cit_updated_datetime');
 
-		$result = $this->Cmall_review_model
-			->get_list($per_page, $offset, $where, '', $findex, $forder);
-		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
-		if (element('list', $result)) {
-			foreach (element('list', $result) as $key => $val) {
-				$result['list'][$key]['display_name'] = display_username(
-					element('mem_userid', $val),
-					element('mem_nickname', $val),
-					element('mem_icon', $val)
-				);
-				$result['list'][$key]['display_datetime'] = display_datetime(element('cre_datetime', $val), 'full');
-				$result['list'][$key]['content'] = display_html_content(
-					element('cre_content', $val),
-					element('cre_content_html_type', $val),
-					$thumb_width,
-					$autolink,
-					$popup
-				);
-				$result['list'][$key]['can_update'] = false;
-				$result['list'][$key]['can_delete'] = false;
-				if ($is_admin !== false
-					OR (element('mem_id', $val) && $mem_id === (int) element('mem_id', $val))) {
-					$result['list'][$key]['can_update'] = true;
-					$result['list'][$key]['can_delete'] = true;
-				}
-				$result['list'][$key]['num'] = $list_num--;
+		// $result = $this->Board_model->get_attr_list('','', $where);
+		
+		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		if ($result) {
+			foreach ($result as $key => $val) {
+
+				$result[$key] = $this->board->convert_default_info($result[$key]);
+				$result[$key]['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $val),8);
+
+				
+				$result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
+				
+				$result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
+				
 			}
 		}
-		$view['view']['data'] = $result;
-		$view['view']['cit_id'] = $cit_id;
+		$view['view']['data']['rank']['list'] = $result;
 
+		$result = $this->Board_model->get_board_list($where,'brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,cit_updated_datetime',10);
+		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		if ($result) {
+			foreach ($result as $key => $val) {
+
+				$result[$key] = $this->board->convert_default_info($result[$key]);
+				$result[$key]['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $val),8);
+
+				
+				$result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
+				
+				$result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
+				
+			}
+		}
+		$view['view']['data']['theme']['list'] = $result;
+
+		$view['view']['config']['pet_age'] = config_item('pet_age');
+        $view['view']['config']['pet_form'] = config_item('pet_form');
+        $view['view']['config']['pet_kind'] = array();
+        $view['view']['config']['pet_attr'] = config_item('pet_attr');
 		/**
 		 * 페이지네이션을 생성합니다
 		 */
-		$config['base_url'] = site_url('cmall/reviewlist/' . $cit_id) . '?' . $param->replace('page');
-		$config['total_rows'] = $result['total_rows'];
-		$config['per_page'] = $per_page;
+		// $config['base_url'] = site_url('cmall/storeranklist') . '?' . $param->replace('page');
+		// $config['total_rows'] = $result['total_rows'];
+		// $config['per_page'] = $per_page;
+		// $this->pagination->initialize($config);
+		// $view['view']['paging'] = $this->pagination->create_links();
+		// $view['view']['page'] = $page;
 
-		if ( ! $this->input->get('page')) {
-			$_GET['page'] = (string) $page;
-		}
-
-		$config['_attributes'] = 'onClick="cmall_review_page(\'' . $cit_id . '\', $(this).attr(\'data-ci-pagination-page\'));return false;"';
-		if ($this->cbconfig->get_device_view_type() === 'mobile') {
-			$config['num_links'] = 3;
-		} else {
-			$config['num_links'] = 5;
-		}
-		$this->pagination->initialize($config);
-		$view['view']['paging'] = $this->pagination->create_links();
-		$view['view']['page'] = $page;
-
-
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
-		/**
-		 * 레이아웃을 정의합니다
-		 */
-		$skindir = ($this->cbconfig->get_device_view_type() === 'mobile')
-			? $this->cbconfig->item('mobile_skin_cmall')
-			: $this->cbconfig->item('skin_cmall');
-		if (empty($skindir)) {
-			$skindir = ($this->cbconfig->get_device_view_type() === 'mobile')
-				? $this->cbconfig->item('mobile_skin_default')
-				: $this->cbconfig->item('skin_default');
-		}
-		if (empty($skindir)) {
-			$skindir = 'basic';
-		}
-		$skin = 'cmall/' . $skindir . '/review_list';
-
-		$view['view']['view_skin_url'] = site_url(VIEW_DIR . 'cmall/' . $skindir);
-
-		$this->data = $view;
-		$this->view = $skin;
+		
+		return $view['view'];
+		
 	}
 
-
-	public function review_write($cit_id = 0, $cre_id = 0)
+	public function storeranklist_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_cmall_review_write';
+		$eventname = 'event_cmall_wishlist';
 		$this->load->event($eventname);
 
-		/**
-		 * 로그인이 필요한 페이지입니다
-		 */
-		required_user_login('alert');
-
-
+		
 		$view = array();
 		$view['view'] = array();
 
-		$mem_id = (int) $this->member->item('mem_id');
-
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
-
-		$this->load->model(array('Cmall_item_model', 'Cmall_review_model'));
-
+		
+		$view['view'] = $this->_storeranklist();
+		
 		/**
-		 * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
+		 * 레이아웃을 정의합니다
 		 */
-		if ($cre_id) {
-			$cre_id = (int) $cre_id;
-			if (empty($cre_id) OR $cre_id < 1) {
-				show_404();
-			}
-		}
-		$cit_id = (int) $cit_id;
-		if (empty($cit_id) OR $cit_id < 1) {
-			show_404();
-		}
+		$page_title = $this->cbconfig->item('site_meta_title_cmall_wishlist');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall_wishlist');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_wishlist');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall_wishlist');
+		$page_name = $this->cbconfig->item('site_page_name_cmall_wishlist');
 
-		$primary_key = $this->Cmall_review_model->primary_key;
-
-		$item = $this->Cmall_item_model->get_one($cit_id);
-		if ( ! element('cit_id', $item) OR ! element('cit_status', $item)) {
-			alert_close('존재하지 않는 상품입니다');
-		}
-
-		/**
-		 * 수정 페이지일 경우 기존 데이터를 가져옵니다
-		 */
-		$getdata = array();
-		if ($cre_id) {
-			$getdata = $this->Cmall_review_model->get_one($cre_id);
-			if ( ! element('cre_id', $getdata)) {
-				alert_close('잘못된 접근입니다');
-			}
-			$is_admin = $this->member->is_admin();
-			if ($is_admin === false
-				&& (int) element('mem_id', $getdata) !== $mem_id) {
-				alert_close('본인의 글 외에는 접근하실 수 없습니다');
-			}
-		}
-
-		/**
-		 * 주문완료 후 사용후기 작성 가능한 경우
-		 **/
-		if ( ! $this->cbconfig->item('use_cmall_product_review_anytime')) {
-			$ordered = $this->cmalllib->is_ordered_item($mem_id, $cit_id);
-			if (empty($ordered)) {
-				alert_close('주문을 완료하신 후에 상품후기 작성이 가능합니다');
-			}
-
-		}
-
-		/**
-		 * Validation 라이브러리를 가져옵니다
-		 */
-		$this->load->library('form_validation');
-
-		/**
-		 * 전송된 데이터의 유효성을 체크합니다
-		 */
-		$config = array(
-			array(
-				'field' => 'cre_title',
-				'label' => '제목',
-				'rules' => 'trim|required',
-			),
-			array(
-				'field' => 'cre_content',
-				'label' => '내용',
-				'rules' => 'trim|required',
-			),
-			array(
-				'field' => 'cre_score',
-				'label' => '평점',
-				'rules' => 'trim|required|numeric|is_natural_no_zero|greater_than_equal_to[1]|less_than_equal_to[5]',
-			),
+		$searchconfig = array(
+			'{컨텐츠몰명}',
 		);
-		$this->form_validation->set_rules($config);
+		$replaceconfig = array(
+			$this->cbconfig->item('cmall_name'),
+		);
 
+		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
 
-		/**
-		 * 유효성 검사를 하지 않는 경우, 또는 유효성 검사에 실패한 경우입니다.
-		 * 즉 글쓰기나 수정 페이지를 보고 있는 경우입니다
-		 */
-		if ($this->form_validation->run() === false) {
+		$layoutconfig = array(
+			'path' => 'cmall',
+			'layout' => 'layout',
+			'skin' => 'wishlist',
+			'layout_dir' => $this->cbconfig->item('layout_cmall'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+			'skin_dir' => $this->cbconfig->item('skin_cmall'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
 
-			/**
-			 * primary key 정보를 저장합니다
-			 */
-			$view['view']['primary_key'] = $primary_key;
-			$view['view']['data'] = $getdata;
-			$view['view']['item'] = $item;
-
-			/**
-			 * 레이아웃을 정의합니다
-			 */
-			$page_title = $this->cbconfig->item('site_meta_title_cmall_review_write');
-			$meta_description = $this->cbconfig->item('site_meta_description_cmall_review_write');
-			$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_review_write');
-			$meta_author = $this->cbconfig->item('site_meta_author_cmall_review_write');
-			$page_name = $this->cbconfig->item('site_page_name_cmall_review_write');
-
-			$searchconfig = array(
-				'{컨텐츠몰명}',
-				'{상품명}',
-				'{판매가격}',
-				'{기본설명}',
-			);
-			$replaceconfig = array(
-				$this->cbconfig->item('cmall_name'),
-				element('cit_name', $item),
-				element('cit_price', $item),
-				element('cit_summary', $item),
-			);
-
-			$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
-			$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
-			$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
-			$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
-			$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
-
-			$layoutconfig = array(
-				'path' => 'cmall',
-				'layout' => 'layout_popup',
-				'skin' => 'review_write',
-				'layout_dir' => $this->cbconfig->item('layout_cmall'),
-				'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
-				'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
-				'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
-				'skin_dir' => $this->cbconfig->item('skin_cmall'),
-				'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
-				'page_title' => $page_title,
-				'meta_description' => $meta_description,
-				'meta_keywords' => $meta_keywords,
-				'meta_author' => $meta_author,
-				'page_name' => $page_name,
-			);
-			$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-			$this->data = $view;
-			$this->layout = element('layout_skin_file', element('layout', $view));
-			$this->view = element('view_skin_file', element('layout', $view));
-
-		} else {
-			/**
-			 * 유효성 검사를 통과한 경우입니다.
-			 * 즉 데이터의 insert 나 update 의 process 처리가 필요한 상황입니다
-			 */
-
-			// 이벤트가 존재하면 실행합니다
-			Events::trigger('formruntrue', $eventname);
-
-			$content_type = $this->cbconfig->item('use_cmall_product_review_dhtml') ? 1 : 0;
-			$updatedata = array(
-				'cit_id' => $cit_id,
-				'cre_title' => $this->input->post('cre_title', null, ''),
-				'cre_content' => $this->input->post('cre_content', null, ''),
-				'cre_content_html_type' => $content_type,
-				'cre_score' => $this->input->post('cre_score', null, 0),
-			);
-
-			/**
-			 * 게시물을 수정하는 경우입니다
-			 */
-			$param =& $this->querystring;
-			$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
-
-			if ($cre_id) {
-
-				// 이벤트가 존재하면 실행합니다
-				Events::trigger('before_update', $eventname);
-
-				$this->Cmall_review_model->update($cre_id, $updatedata);
-				$cntresult = $this->cmalllib->update_review_count($cit_id);
-				$jresult = json_decode($cntresult, true);
-				$cnt = element('cit_review_count', $jresult);
-				echo '<script type="text/javascript">window.opener.view_cmall_review("viewitemreview", ' . $cit_id . ', ' . $page . ');window.opener.cmall_review_count_update(' . $cnt . ');</script>';
-				alert_close('정상적으로 수정되었습니다.');
-			} else {
-
-				// 이벤트가 존재하면 실행합니다
-				Events::trigger('before_insert', $eventname);
-
-				/**
-				 * 게시물을 새로 입력하는 경우입니다
-				 */
-				$updatedata['cre_datetime'] = cdate('Y-m-d H:i:s');
-				$updatedata['mem_id'] = $mem_id;
-				$updatedata['cre_ip'] = $this->input->ip_address();
-
-				if ( ! $this->cbconfig->item('use_cmall_product_review_approve')) {
-					$updatedata['cre_status'] = 1;
-				}
-
-				$_cre_id = $this->Cmall_review_model->insert($updatedata);
-
-				$this->cmalllib->review_alarm($_cre_id);
-
-				$cntresult = $this->cmalllib->update_review_count($cit_id);
-				$jresult = json_decode($cntresult, true);
-				$cnt = element('cit_review_count', $jresult);
-				if ($this->cbconfig->item('use_cmall_product_review_approve')) {
-					echo '<script type="text/javascript">window.opener.view_cmall_review("viewitemreview", ' . $cit_id . ', ' . $page . ');window.opener.cmall_review_count_update(' . $cnt . ');</script>';
-					alert_close('정상적으로 입력되었습니다. 관리자의 승인 후 출력됩니다');
-				} else {
-					echo '<script type="text/javascript">window.opener.view_cmall_review("viewitemreview", ' . $cit_id . ', ' . $page . ');window.opener.cmall_review_count_update(' . $cnt . ');</script>';
-					alert_close('정상적으로 입력되었습니다.');
-				}
-			}
-		}
 	}
-
 
 	/**
 	 * Q&A 목록을 ajax 로 가져옵니다
@@ -2065,7 +2744,7 @@ class Cmall extends CB_Controller
 
 		$item = $this->Cmall_item_model->get_one($cit_id);
 		if ( ! element('cit_id', $item)) {
-			show_404();
+			alert('이 상품은 현재 존재하지 않습니다',"",406);
 		}
 
 		/**
@@ -2110,7 +2789,7 @@ class Cmall extends CB_Controller
 					element('mem_icon', $val)
 				);
 				$result['list'][$key]['display_datetime'] = display_datetime(element('cqa_datetime', $val), 'full');
-				$result['list'][$key]['content'] = display_html_content(
+				$result['list'][$key]['display_content'] = display_html_content(
 					element('cqa_content', $val),
 					element('cqa_content_html_type', $val),
 					$thumb_width,
@@ -2126,10 +2805,10 @@ class Cmall extends CB_Controller
 				);
 				if (element('cqa_secret', $val)) {
 					if ($mem_id && ($is_admin !== false OR (int) element('mem_id', $val) === $mem_id)) {
-						$result['list'][$key]['content'] = '<div class="label label-warning">비밀글입니다</div> ' . $result['list'][$key]['content'];
+						$result['list'][$key]['display_content'] = '<div class="label label-warning">비밀글입니다</div> ' . $result['list'][$key]['display_content'];
 						$result['list'][$key]['reply_content'] = '<div class="label label-warning">비밀글입니다</div>' . $result['list'][$key]['reply_content'];
 					} else {
-						$result['list'][$key]['content'] = '<div class="label label-warning">비밀글입니다</div>';
+						$result['list'][$key]['display_content'] = '<div class="label label-warning">비밀글입니다</div>';
 						$result['list'][$key]['reply_content'] = '<div class="label label-warning">비밀글입니다</div>';
 					}
 				}
@@ -2167,7 +2846,8 @@ class Cmall extends CB_Controller
 			$config['num_links'] = 5;
 		}
 		$this->pagination->initialize($config);
-		$view['view']['paging'] = $this->pagination->create_links();
+		// $view['view']['paging'] = $this->pagination->create_links();
+		$view['view']['next_link'] = $this->pagination->get_next_link();
 		$view['view']['page'] = $page;
 
 
@@ -2232,9 +2912,16 @@ class Cmall extends CB_Controller
 		$primary_key = $this->Cmall_qna_model->primary_key;
 
 		$item = $this->Cmall_item_model->get_one($cit_id);
-		if ( ! element('cit_id', $item) OR ! element('cit_status', $item)) {
-			alert_close('존재하지 않는 상품입니다');
-		}
+
+		if ( ! element('cit_id', $item) )
+		    alert('이 상품은 현재 존재하지 않습니다',"",406);
+		    
+		if(! element('cit_status', $item)) 
+		    alert('이 상품은 현재 판매하지 않습니다',"",406);
+
+		
+
+
 
 		/**
 		 * 수정 페이지일 경우 기존 데이터를 가져옵니다
@@ -2415,7 +3102,63 @@ class Cmall extends CB_Controller
 		}
 	}
 
-	public function cit_type1_lists()
+	
+
+
+	protected function _cit_type1_lists()
+	{
+		
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		$this->load->model('Cmall_item_model');
+
+		$config = array(
+			'cit_type1' => '1',
+			'limit' => '30',
+			'cache_minute' => 10
+		);
+
+		$result_1 = $this->board->cit_latest($config);
+
+		if ($result_1) {
+			foreach ($result_1 as $key => $val) {
+				// $view['view']['list'][$key]['cit_id'] = element('cit_id',$val);
+				// $view['view']['list'][$key]['cit_key'] = element('cit_key',$val);
+				// $view['view']['list'][$key]['cit_name'] = element('cit_name',$val);
+				// $view['view']['list'][$key]['cit_order'] = element('cit_order',$val);				
+				// $view['view']['list'][$key]['cit_price'] = element('cit_price',$val);
+				// $view['view']['list'][$key]['cit_file_1'] = element('cit_file_1',$val);
+				// $view['view']['list'][$key]['cit_hit'] = element('cit_hit',$val);
+				// $view['view']['list'][$key]['cit_datetime'] = element('cit_datetime',$val);
+				// $view['view']['list'][$key]['cit_updated_datetime'] = element('cit_updated_datetime',$val);
+				// $view['view']['list'][$key]['cit_sell_count'] = element('cit_sell_count',$val);
+				// $view['view']['list'][$key]['cit_wish_count'] = element('cit_wish_count',$val);
+				// $view['view']['list'][$key]['cit_review_count'] = element('cit_review_count',$val);
+				// $view['view']['list'][$key]['cit_review_average'] = element('cit_review_average',$val);
+				// $view['view']['list'][$key]['cit_qna_count'] = element('cit_qna_count',$val);
+				// $view['view']['list'][$key]['cit_is_soldout'] = element('cit_is_soldout',$val);
+				// $view['view']['list'][$key]['post_id'] = element('post_id',$val);
+				// $view['view']['list'][$key]['cmall_item_url'] = cmall_item_url(element('cit_id',$val));
+				// $view['view']['list'][$key]['board_url'] = board_url(element('brd_id',$val));
+				// $view['view']['list'][$key]['post_url'] = post_url(element('post_id',$val));
+				// $view['view']['list'][$key]['cit_post_url'] = element('cit_post_url',$val);
+				// $view['view']['list'][$key]['cit_attr'] = element('cit_attr',$val);
+				// $view['view']['list'][$key]['cit_brand'] = element('cbr_value_kr',$val,element('cbr_value_en',$val));
+				
+				$result_1[$key] = $this->cmalllib->convert_default_info($result_1[$key]);
+				
+			}
+		}
+
+		$view['view']['list'] = $result_1;
+
+		return $view['view'];
+	}
+
+	public function cit_type1_lists_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_index';
@@ -2426,21 +3169,7 @@ class Cmall extends CB_Controller
 
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
-
-		$this->load->model('Cmall_item_model');
-
-		$config = array(
-			'cit_type1' => '1',
-			'limit' => '30',
-		);
-		$view['view']['type1'] = $this->Cmall_item_model->get_latest($config);
-
-		
-
-		$view['view']['canonical'] = site_url('cmall');
-
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		$view['view']['data'] = $this->_cit_type1_lists();
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -2480,16 +3209,342 @@ class Cmall extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		// $view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		// $this->layout = element('layout_skin_file', element('layout', $view));
-		// $this->view = element('view_skin_file', element('layout', $view));
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
 
-		$this->data = $view;		
-		
+		$this->data = $view['view'];	
 
-		// redirect(site_url('/board/b-a-1'));
 
 		return $this->response($this->data, parent::HTTP_OK);
 	}
+
+	//카테고리 리스트
+	protected function _categorylists()
+	{
+
+
+		$view = array();
+		$key=0;
+		$view['view'] = array();
+		
+		$data['list'][$key]['cca_id'] = 0;
+		$data['list'][$key]['cca_value'] = '전체';
+		$data['list'][$key]['category_url'] = base_url('cmall/itemlists');
+		$category = $this->cmalllib->get_all_category();
+		if (element(0, $category)) {
+			foreach (element(0, $category) as $value) {
+				$key++;
+				$data['list'][$key]['cca_id'] = html_escape(element('cca_id', $value));
+				$data['list'][$key]['cca_value'] = html_escape(element('cca_value', $value));
+				$data['list'][$key]['category_url'] = base_url('cmall/itemlists/' . element('cca_id', $value));
+
+				// if (element(element('cca_id', $value), $category)) {
+				// 	foreach (element(element('cca_id', $value), $category) as $svalue) {
+		
+				// 	}
+				// }
+			}
+		}
+
+		$view['view']['data'] = $data;
+
+		return $view['view'];
+	}
+
+	public function categorylists_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_index';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		$view['view'] = $this->_categorylists();
+
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_cmall');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall');
+		$page_name = $this->cbconfig->item('site_page_name_cmall');
+
+		$searchconfig = array(
+			'{컨텐츠몰명}',
+		);
+		$replaceconfig = array(
+			$this->cbconfig->item('cmall_name'),
+		);
+
+		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
+
+		$layoutconfig = array(
+			'path' => 'cmall',
+			'layout' => 'layout',
+			'skin' => 'cmall',
+			'layout_dir' => $this->cbconfig->item('layout_cmall'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+			'skin_dir' => $this->cbconfig->item('skin_cmall'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+
+		$this->data = $view['view'];	
+
+
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+	protected function _store($brd_id = 0)
+	{
+
+		
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		
+		$this->load->model(array('Cmall_storewishlist_model'));
+
+		
+		
+		$data = $this->board->item_all($brd_id);
+
+		if ( ! element('brd_id', $data)) {
+			alert('이 스토어는 현재 존재하지 않습니다',"",406);
+		}
+		if (element('brd_blind', $data)) {
+			alert('이 스토어는 현재 운영하지 않습니다',"",406);
+		}
+
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+
+		$alertmessage = $this->member->is_member()
+			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
+			: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		$access_read = $this->cbconfig->item('access_cmall_read');
+		$access_read_level = $this->cbconfig->item('access_cmall_read_level');
+		$access_read_group = $this->cbconfig->item('access_cmall_read_group');
+		$this->accesslevel->check(
+			$access_read,
+			$access_read_level,
+			$access_read_group,
+			$alertmessage,
+			''
+		);
+
+		
+
+		// if ( ! $this->cb_jwt->userdata('cmall_item_id_' . element('cit_id', $data))) {
+			// $this->Cmall_item_model->update_hit(element('cit_id', $data));
+		// 	$this->cb_jwt->set_userdata(
+		// 		'cmall_item_id_' . element('cit_id', $data),
+		// 		'1'
+		// 	);
+		// }
+		if ( ! $this->cb_jwt->userdata('brd_inlink_click_' . element('brd_id', $data))) {
+
+			$this->cb_jwt->set_userdata(
+				'brd_inlink_click_' . element('brd_id', $data),
+				'1'
+			);
+
+			
+			if($mem_id){
+				$insertdata = array(
+					'pln_id' => 0,
+					'post_id' => 0,
+					'brd_id' => element('brd_id', $data),
+					'cit_id' => 0,
+					'clc_datetime' => cdate('Y-m-d H:i:s'),
+					'clc_ip' => $this->input->ip_address(),
+					'clc_useragent' => $this->agent->agent_string(),
+					'mem_id' => $mem_id,
+				);
+				$this->load->model('Crawl_link_click_log_model');
+				$this->Crawl_link_click_log_model->insert($insertdata);
+			}
+			$this->load->model('Board_model');
+			$this->Board_model->update_plus(element('brd_id', $data), 'brd_hit', 1);
+			// $this->_stat_count_board(element('brd_id', $board));
+		}
+		
+		
+
+		// $data['header_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? display_html_content(element('mobile_header_content', element('meta', $data)), 1, $thumb_width)
+		// 	: display_html_content(element('header_content', element('meta', $data)), 1, $thumb_width);
+
+		// $data['footer_content'] = ($this->cbconfig->get_device_view_type() === 'mobile')
+		// 	? display_html_content(element('mobile_footer_content', element('meta', $data)), 1, $thumb_width)
+		// 	: display_html_content(element('footer_content', element('meta', $data)), 1, $thumb_width);
+
+		$where = array(
+				'brd_id' => element('brd_id',$data),
+			);
+		$view['view']['storewishcount'] = $this->Cmall_storewishlist_model->count_by($where);	
+
+		$view['view']['addstorewish_url'] = cmall_item_url('storewish/'.element('brd_id',$data));
+		$view['view']['storewishstatus'] = 0;
+		if(!empty($mem_id)){
+			$where = array(
+				'mem_id' => $mem_id,
+				'brd_id' => element('brd_id',$data),
+			);
+			$view['view']['storewishstatus'] = $this->Cmall_storewishlist_model->count_by($where);	
+		}
+		
+		
+
+		$view['view']['data'] = $this->board->convert_default_info(element('brd_id', $data));
+		$view['view']['data']['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $data),8);
+		$view['view']['data']['brd_attr'] = array();
+		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));
+
+		
+		
+
+		
+		
+		
+		return $view['view'];
+	}
+
+	public function store_get($brd_id = 0)
+	{
+
+		
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_item';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		
+
+		
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		
+
+		$view['view'] = $this->_store($brd_id);
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_cmall');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall');
+		$page_name = $this->cbconfig->item('site_page_name_cmall');
+
+		$searchconfig = array(
+			'{컨텐츠몰명}',
+		);
+		$replaceconfig = array(
+			$this->cbconfig->item('cmall_name'),
+		);
+
+		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
+
+		$layoutconfig = array(
+			'path' => 'cmall',
+			'layout' => 'layout',
+			'skin' => 'cmall',
+			'layout_dir' => $this->cbconfig->item('layout_cmall'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+			'skin_dir' => $this->cbconfig->item('skin_cmall'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+
+	/**
+	 * 방문로그를 남깁니다
+	 */
+	public function _stat_count_board($brd_id = 0)
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_board_post_stat_count_board';
+		$this->load->event($eventname);
+
+		if (empty($brd_id)) {
+			return false;
+		}
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('count_before', $eventname);
+
+		// 방문자 기록
+		if ( ! get_cookie('board_id_' . $brd_id.'cit_id_' . $cit_id)) {
+			$cookie_name = 'board_id_' . $brd_id;
+			$cookie_value = '1';
+			$cookie_expire = 86400; // 1일간 저장
+			set_cookie($cookie_name, $cookie_value, $cookie_expire);
+
+			$this->load->model('Stat_count_board_model');
+			$this->Stat_count_board_model->add_visit_board($brd_id);
+
+		}
+	}
+
+
+	// public function _get_cit_info($cit_id = 0,$cmall_item = array())
+	// {
+
+	// 	if (element('cit_id', $cmall_item) && $cit_id !== element('cit_id', $cmall_item)) {
+	// 		return false;
+	// 	}
+
+	// 	$cit_id = (int) $cit_id;
+	// 	if (empty($cit_id) OR $cit_id < 1) {
+	// 		return false;
+	// 	}
+	// 	$data = array();
+		
+	// 	$data['cit_image'] = cdn_url('cmallitem',element('cit_file_1',$cmall_item));
+	// 	$data['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
+	// 	$data['cit_inlink_url'] = cmall_item_url($cit_id);
+		
+	// 	if(empty(element('cit_price_sale',$cmall_item)))
+	// 		$data['cit_price_sale_percent'] = 0;
+	// 	else $data['cit_price_sale_percent'] = number_format((element('cit_price',$cmall_item) - element('cit_price_sale',$cmall_item)) / element('cit_price',$cmall_item) *100);
+
+	// 	return $data;
+	// }
 }
+

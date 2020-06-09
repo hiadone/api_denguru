@@ -18,7 +18,7 @@ class Profile extends CB_Controller
 	/**
 	 * 모델을 로딩합니다
 	 */
-	protected $models = array('Follow', 'Member_meta', 'Member_extra_vars');
+	protected $models = array('Follow', 'Member_meta', 'Member_extra_vars','Reviewer');
 
 	/**
 	 * 헬퍼를 로딩합니다
@@ -441,5 +441,194 @@ class Profile extends CB_Controller
 		$resutl['event']['after'] = Events::trigger('after', $eventname);
 
 		exit(json_encode($result));
+	}
+
+	public function reviewer_post($userid = '')
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_profile_add_follow';
+		$this->load->event($eventname);
+
+		if (empty($userid)) {
+			show_404();
+		}
+
+		$result = array();
+		
+
+		// 이벤트가 존재하면 실행합니다
+		$resutl['event']['after'] = Events::trigger('before', $eventname);
+
+		if ($this->member->is_member() === false) {
+			alert('로그인후 이용해주세요',403);
+			
+		}
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$select = 'mem_id, mem_nickname, mem_homepage, mem_receive_email, mem_use_note, mem_open_profile, mem_denied';
+		$target = $this->Member_model->get_by_userid($userid, $select);
+		if ( ! element('mem_id', $target)) {
+			alert('잘못된 접근입니다','',400);
+		}
+		if (element('mem_denied', $target)) {			
+			alert('탈퇴 또는 차단된 회원입니다','',403);
+		}
+		if ((int) element('mem_id', $target) === $mem_id) {
+			alert('자기자신을 Reviewer로 등록할 수 없습니다','',409);
+		}
+		$countwhere = array(
+			'mem_id' => $mem_id,
+			'target_mem_id' => element('mem_id', $target),
+		);
+		$reviewercount = $this->Reviewer_model
+		->count_by($countwhere);
+		if ($reviewercount > 0) {
+			$result = array('error' => '이미 Reviewer로 등록된 회원입니다');
+			exit(json_encode($result));
+		}
+		$insertdata = array(
+			'mem_id' => $mem_id,
+			'target_mem_id' => element('mem_id', $target),
+			'fol_datetime' => cdate('Y-m-d H:i:s'),
+		);
+		$rve_id = $this->Reviewer_model->insert($insertdata);
+
+		$countwhere = array(
+			'target_mem_id' => element('mem_id', $target),
+		);
+		$target_count = $this->Reviewer_model->count_by($countwhere);
+
+		$countwhere = array(
+			'mem_id' => $mem_id,
+		);
+		$my_count = $this->Reviewer_model->count_by($countwhere);
+
+		$updatedata = array(
+			'mem_reviewered' => $target_count,
+		);
+		$this->Member_model->update(element('mem_id', $target), $updatedata);
+
+		$updatedata = array(
+			'mem_reviewering' => $my_count,
+		);
+		$this->Member_model->update($this->member->item('mem_id'), $updatedata);
+
+		$result['success'] = html_escape(element('mem_nickname', $target)) . ' 님을 Reviewer 하셨습니다';
+		$result['my_count'] = $my_count;
+		$result['target_count'] = $target_count;
+
+		// 이벤트가 존재하면 실행합니다
+		$resutl['event']['after'] = Events::trigger('after', $eventname);
+
+		if ( $result['success'] && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_reviewer')) {
+
+        	$this->load->library('notificationlib');
+        	$not_message = $this->member->item('mem_nickname') . '님께서 회원님을 Reviewer 하셨습니다.';
+        	
+        	$this->notificationlib->set_noti(
+        		element('mem_id', $target),
+        		$mem_id,
+        		'reviewer',
+        		$rve_id,
+        		$not_message,
+        		
+        	);
+        }
+		
+
+		return $this->response($result, 201);
+	}
+
+
+	/**
+	 * 친구해제 관련 함수입니다
+	 */
+	public function reviewer_delete($userid = '')
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_profile_delete_follow';
+		$this->load->event($eventname);
+
+		if (empty($userid)) {
+			show_404();
+		}
+
+		$result = array();
+		$this->output->set_content_type('application/json');
+
+		// 이벤트가 존재하면 실행합니다
+		$resutl['event']['before'] = Events::trigger('before', $eventname);
+
+		if ($this->member->is_member() === false) {
+			alert('로그인후 이용해주세요','',403);
+		}
+		
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$select = 'mem_id, mem_nickname, mem_homepage, mem_receive_email,
+			mem_use_note, mem_open_profile, mem_denied';
+		$target = $this->Member_model->get_by_userid($userid, $select);
+		if ( ! element('mem_id', $target)) {
+			alert('잘못된 접근입니다','',400);
+		}
+		$countwhere = array(
+			'mem_id' => $mem_id,
+			'target_mem_id' => element('mem_id', $target),
+		);
+		$reviewercount = $this->Reviewer_model->count_by($countwhere);
+		if ($reviewercount === 0) {			
+			alert('아직 Reviewer로 등록되지 않은 회원입니다','',409);
+		}
+		$deletewhere = array(
+			'mem_id' => $mem_id,
+			'target_mem_id' => element('mem_id', $target),
+		);
+		$this->Reviewer_model->delete_where($deletewhere);
+
+		$countwhere = array(
+			'target_mem_id' => element('mem_id', $target),
+		);
+		$target_count = $this->Reviewer_model->count_by($countwhere);
+
+		$countwhere = array(
+			'mem_id' => $mem_id,
+		);
+		$my_count = $this->Reviewer_model->count_by($countwhere);
+
+		$updatedata = array(
+			'mem_reviewered' => $target_count,
+		);
+		$this->Member_model->update(element('mem_id', $target), $updatedata);
+
+		$updatedata = array(
+			'mem_reviewering' => $my_count,
+		);
+		$this->Member_model->update($mem_id, $updatedata);
+
+		$result['success'] = html_escape(element('mem_nickname', $target)) . ' 님이 Reviewer 해제되었습니다';
+		$result['my_count'] = $my_count;
+		$result['target_count'] = $target_count;
+
+		// 이벤트가 존재하면 실행합니다
+		$resutl['event']['after'] = Events::trigger('after', $eventname);
+
+		if ( $result['success'] && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_reviewer')) {
+
+        	$this->load->library('notificationlib');
+        	$not_message = $this->member->item('mem_nickname') . '님께서 회원님을 Reviewer 해제되었습니다.';
+        	
+        	$this->notificationlib->set_noti(
+        		element('mem_id', $target),
+        		$mem_id,
+        		'reviewer',
+        		9999,
+        		$not_message,
+        		
+        	);
+        }
+
+		return $this->response($result, 204);
 	}
 }

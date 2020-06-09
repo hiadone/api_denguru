@@ -43,8 +43,8 @@ class Notification extends CB_Controller
 	/**
 	 * 알림 페이지 입니다
 	 */
-	public function index()
-	{
+	protected function _index()
+	{	
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_notification_index';
 		$this->load->event($eventname);
@@ -93,7 +93,7 @@ class Notification extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 				$result['list'][$key]['num'] = $list_num--;
-				$result['list'][$key]['delete_url'] = site_url('notification/delete/' . element('not_id', $val) . '?' . $param->output());
+				$result['list'][$key]['delete_url'] = site_url('notification/notification_delete/' . element('not_id', $val) . '?' . $param->output());
 				$result['list'][$key]['read_url'] = site_url('notification/read/' . element('not_id', $val) . '?' . $param->output());
 				$result['list'][$key]['onClick'] = '';
 				if (element('not_type', $val) === 'note') {
@@ -103,8 +103,8 @@ class Notification extends CB_Controller
 			}
 		}
 		$view['view']['data'] = $result;
-		$view['view']['list_delete_url'] = site_url('notification/listdelete?' . $param->output());
-		$view['view']['list_update_url'] = site_url('notification/listupdate?' . $param->output());
+		// $view['view']['list_delete_url'] = site_url('notification/listdelete?' . $param->output());
+		// $view['view']['list_update_url'] = site_url('notification/listupdate?' . $param->output());
 
 		/**
 		 * 페이지네이션을 생성합니다
@@ -116,10 +116,28 @@ class Notification extends CB_Controller
 		$view['view']['paging'] = $this->pagination->create_links();
 		$view['view']['page'] = $page;
 
-		$view['view']['canonical'] = site_url('notification');
+		// $view['view']['canonical'] = site_url('notification');
+
+		
+
+		
+		return $view['view'];
+		
+	}
+
+	public function index_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_notification_index';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view['view'] = $this->_index();	
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -146,21 +164,21 @@ class Notification extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		$this->layout = element('layout_skin_file', element('layout', $view));
-		$this->view = element('view_skin_file', element('layout', $view));
+		// $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());	
+
+		$this->data = $view['view'];	
+
+
+		return $this->response($this->data, parent::HTTP_OK);
 	}
 
 
 	/**
 	 * 알림 읽기 입니다
 	 */
-	public function read($not_id = 0)
+	public function _read($not_id = 0)
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_read';
-		$this->load->event($eventname);
+	
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -169,8 +187,7 @@ class Notification extends CB_Controller
 
 		$mem_id = (int) $this->member->item('mem_id');
 
-		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		
 
 		$not_id = (int) $not_id;
 		if (empty($not_id) OR $not_id < 1) {
@@ -189,11 +206,26 @@ class Notification extends CB_Controller
 
 		$this->Notification_model->mark_read($not_id, $mem_id);
 
-		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		
 
-		$redirecturl = element('not_url', $notification);
-		redirect($redirecturl);
+		return true;
+	}
+
+	public function read_get($not_id = 0)
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_notification_read';
+		$this->load->event($eventname);
+
+		$view['view'] = array();
+
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+		$view['view'] = $this->_read($not_id);
+
+		return $this->response($view['view'], 201);
+		
 	}
 
 
@@ -316,7 +348,7 @@ class Notification extends CB_Controller
 
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
-				$result['list'][$key]['delete_url'] = site_url('notification/delete/' . element('not_id', $val) . '?' . $param->output());
+				$result['list'][$key]['delete_url'] = site_url('notification/notification_delete/' . element('not_id', $val) . '?' . $param->output());
 				$jsevent = '';
 				$read_url = site_url('notification/read/' . element('not_id', $val) . '?' . $param->output());
 				if (element('not_type', $val) === 'note') {
@@ -344,7 +376,7 @@ class Notification extends CB_Controller
 	/**
 	 * 알림삭제 입니다
 	 */
-	public function delete($not_id = 0)
+	public function notification_delete($not_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_notification_delete';
@@ -383,19 +415,21 @@ class Notification extends CB_Controller
 		/**
 		 * 삭제가 끝난 후 목록페이지로 이동합니다
 		 */
-		$this->session->set_flashdata(
-			'message',
-			'정상적으로 삭제되었습니다'
-		);
-		$param =& $this->querystring;
-		redirect('notification?' . $param->output());
+		// $this->session->set_flashdata(
+		// 	'message',
+		// 	'정상적으로 삭제되었습니다'
+		// );
+		// $param =& $this->querystring;
+		// redirect('notification?' . $param->output());
+
+		return $this->response('', 204);
 	}
 
 
 	/**
 	 * 알림 선택삭제입니다
 	 */
-	public function listdelete()
+	public function listdelete_delete()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_notification_listdelete';
@@ -430,12 +464,14 @@ class Notification extends CB_Controller
 		/**
 		 * 삭제가 끝난 후 목록페이지로 이동합니다
 		 */
-		$this->session->set_flashdata(
-			'message',
-			'정상적으로 삭제되었습니다'
-		);
-		$param =& $this->querystring;
-		redirect('notification?' . $param->output());
+		// $this->session->set_flashdata(
+		// 	'message',
+		// 	'정상적으로 삭제되었습니다'
+		// );
+		// $param =& $this->querystring;
+		// redirect('notification?' . $param->output());
+
+		return $this->response('', 204);
 	}
 
 

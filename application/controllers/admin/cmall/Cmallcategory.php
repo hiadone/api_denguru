@@ -188,7 +188,7 @@ class Cmallcategory extends CB_Controller
 	/**
 	 * 카테고리 삭제
 	 */
-	public function delete($cca_id = 0)
+	public function cmallcategory_delete($cca_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_admin_cmall_cmallcategory_delete';

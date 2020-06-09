@@ -1,4 +1,4 @@
-<?php
+]<?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
@@ -23,12 +23,12 @@ class Auth extends CB_Controller
     public function token_get()
     {
         $tokenData = array();
-        $tokenData['id'] = 'guest'; //TODO: Replace with data for token
+        $tokenData['mem_id'] = '2'; //TODO: Replace with data for token
         $output['token'] = AUTHORIZATION::generateToken($tokenData);
         $this->set_response($output, parent::HTTP_OK);
     }
 
-    /**
+    /*
      * URL: http://localhost/CodeIgniter-JWT-Sample/auth/token
      * Method: POST
      * Header Key: Authorization

@@ -82,6 +82,18 @@ class Notificationlib extends CI_Controller
 					return $result;
 				}
 				break;
+			case 'review_blame':
+				if ( ! $this->CI->cbconfig->item('notification_review_blame')) {
+					$result = json_encode( array('error' => '신고에 알림 기능을 사용하지 않습니다'));
+					return $result;
+				}
+				break;
+			case 'reviewer':
+				if ( ! $this->CI->cbconfig->item('notification_reviewer')) {
+					$result = json_encode( array('error' => 'reviewer에 알림 기능을 사용하지 않습니다'));
+					return $result;
+				}
+				break;
 			case 'note':
 				if ( ! $this->CI->cbconfig->item('notification_note')) {
 					$result = json_encode( array('error' => '쪽지에 알림 기능을 사용하지 않습니다'));

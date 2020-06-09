@@ -23,7 +23,7 @@ class Mypage extends CB_Controller
 	/**
 	 * 헬퍼를 로딩합니다
 	 */
-	protected $helpers = array('form', 'array');
+	protected $helpers = array('form', 'array','cmall');
 
 	function __construct()
 	{
@@ -32,7 +32,7 @@ class Mypage extends CB_Controller
 		/**
 		 * 라이브러리를 로딩합니다
 		 */
-		$this->load->library(array('pagination', 'querystring'));
+		$this->load->library(array('pagination', 'querystring','cmalllib','review'));
 
 	}
 
@@ -40,27 +40,24 @@ class Mypage extends CB_Controller
 	/**
 	 * 마이페이지입니다
 	 */
-	public function index()
+	protected function _index()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_index';
-		$this->load->event($eventname);
+		
 
 		/**
 		 * 로그인이 필요한 페이지입니다
 		 */
 		required_user_login();
 
-		$view = array();
+		$view = $data = array();
 		$view['view'] = array();
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
-
-		$registerform = $this->cbconfig->item('registerform');
-		$view['view']['memberform'] = json_decode($registerform, true);
-
-		$view['view']['member_group_name'] = '';
+		// $registerform = $this->cbconfig->item('registerform');
+		// $view['view']['memberform'] = json_decode($registerform, true);
+		$data['member'] = $this->member->get_default_info($this->member->item('mem_id'));					
+		
+		
+		$data['member_group_name'] = '';
 		$member_group = $this->member->group();
 		if ($member_group && is_array($member_group)) {
 
@@ -68,15 +65,35 @@ class Mypage extends CB_Controller
 
 			foreach ($member_group as $gkey => $gval) {
 				$item = $this->Member_group_model->item(element('mgr_id', $gval));
-				if ($view['view']['member_group_name']) {
-					$view['view']['member_group_name'] .= ', ';
+				if ($data['member_group_name']) {
+					$data['member_group_name'] .= ', ';
 				}
-				$view['view']['member_group_name'] .= element('mgr_title', $item);
+				$data['member_group_name'] .= element('mgr_title', $item);
 			}
 		}
 
+
+		$view['view']['data'] = $data;
+		
+		return $view['view'];
+		
+	}
+
+	public function index_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_index';
+		$this->load->event($eventname);
+
+		
+
+		$view = array();
+		$view['view'] = array();
+
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view['view'] = $this->_index();
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -103,17 +120,24 @@ class Mypage extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		$this->layout = element('layout_skin_file', element('layout', $view));
-		$this->view = element('view_skin_file', element('layout', $view));
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view['view'];
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
+
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $this->response($this->data, parent::HTTP_OK);
 	}
 
 
 	/**
 	 * 마이페이지>나의작성글 입니다
 	 */
-	public function post()
+	public function post_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_mypage_post';
@@ -1167,4 +1191,1217 @@ class Mypage extends CB_Controller
 		$this->layout = element('layout_skin_file', element('layout', $view));
 		$this->view = element('view_skin_file', element('layout', $view));
 	}
+
+	protected function _review()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$this->load->model(array( 'Cmall_review_model'));
+
+		
+        
+        
+        
+        
+        /**
+         * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+         */
+        $param =& $this->querystring;
+        $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+        $findex = $this->input->get('findex', null, 'cre_like');
+        $forder = $this->input->get('forder', null, 'desc');
+        $sfield = '';
+        $skeyword = '';
+
+        $per_page = 10;
+        $offset = ($page - 1) * $per_page;
+
+        $is_admin = $this->member->is_admin();
+
+        /**
+         * 게시판 목록에 필요한 정보를 가져옵니다.
+         */
+        $where = array();
+        // $where['cre_status'] = 1;
+        // if($cit_id) $where['cit_id'] = $cit_id;
+
+        $where = array(
+			'cmall_review.mem_id' => $mem_id,
+			'cre_status' => 1,
+		);
+
+        $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+            : $this->cbconfig->item('cmall_product_review_thumb_width');
+        $autolink = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('use_cmall_product_review_mobile_auto_url')
+            : $this->cbconfig->item('use_cmall_product_review_auto_url');
+        $popup = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('cmall_product_review_mobile_content_target_blank')
+            : $this->cbconfig->item('cmall_product_review_content_target_blank');
+
+        $field = array(
+            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        );
+        
+        $select = get_selected($field);
+        
+        $this->Cmall_review_model->_select = $select;
+
+
+        $result = $this->Cmall_review_model
+            ->get_list($per_page, $offset, $where, '', $findex, $forder);
+        $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+                
+                
+
+                $result['list'][$key]['content'] = display_html_content(
+                    element('cre_content', $val),
+                    element('cre_content_html_type', $val),
+                    $thumb_width,
+                    $autolink,
+                    $popup
+                );
+
+                $result['list'][$key]['can_update'] = false;
+                $result['list'][$key]['can_delete'] = false;
+                if ($is_admin !== false
+                    OR (element('mem_id', $val) && $mem_id === (int) element('mem_id', $val))) {
+                    $result['list'][$key]['can_update'] = true;
+                    $result['list'][$key]['can_delete'] = true;
+                }
+
+                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
+                // $result['list'][$key] = $this->board->get_default_info($result['list'][$key]['brd_id'],$result['list'][$key]);                   
+                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);                   
+
+
+
+                $result['list'][$key]['num'] = $list_num--;
+                
+            }
+        }
+        $view['view']['data'] = $result;
+        
+
+        /**
+         * 페이지네이션을 생성합니다
+         */
+        $config['base_url'] = site_url('mypage/review/') . '?' . $param->replace('page');
+        $config['total_rows'] = $result['total_rows'];
+        $config['per_page'] = $per_page;
+
+        if ( ! $this->input->get('page')) {
+            $_GET['page'] = (string) $page;
+        }
+
+        
+        if ($this->cbconfig->get_device_view_type() === 'mobile') {
+            $config['num_links'] = 3;
+        } else {
+            $config['num_links'] = 5;
+        }
+        $this->pagination->initialize($config);
+        $view['view']['paging'] = $this->pagination->create_links();
+        $view['view']['page'] = $page;
+        
+   
+        return $view['view'];
+
+		
+	}
+
+	public function review_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view['view'] = $this->_review();
+
+		
+
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_mypage_post');
+		$meta_description = $this->cbconfig->item('site_meta_description_mypage_post');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_mypage_post');
+		$meta_author = $this->cbconfig->item('site_meta_author_mypage_post');
+		$page_name = $this->cbconfig->item('site_page_name_mypage_post');
+
+		$layoutconfig = array(
+			'path' => 'mypage',
+			'layout' => 'layout',
+			'skin' => 'review',
+			'layout_dir' => $this->cbconfig->item('layout_mypage'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_mypage'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_mypage'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_mypage'),
+			'skin_dir' => $this->cbconfig->item('skin_mypage'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_mypage'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		
+		$this->data = $view['view'];
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
+
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+	protected function _likereview()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$this->load->model(array('Like_model', 'Cmall_review_model'));
+
+		
+        
+        
+        
+        
+        /**
+         * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+         */
+        $param =& $this->querystring;
+        $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+        $findex = $this->Like_model->primary_key;
+		$forder = 'desc';
+        $sfield = '';
+        $skeyword = '';
+
+        $per_page = 10;
+        $offset = ($page - 1) * $per_page;
+
+        $is_admin = $this->member->is_admin();
+
+        /**
+         * 게시판 목록에 필요한 정보를 가져옵니다.
+         */
+        $where = array();
+        // $where['cre_status'] = 1;
+        // if($cit_id) $where['cit_id'] = $cit_id;
+
+        $where = array(
+			'like.mem_id' => $mem_id,
+			'lik_type' => 1,
+			'target_type' => 3,
+			// 'cre_status' => 1,
+		);
+
+        $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+            : $this->cbconfig->item('cmall_product_review_thumb_width');
+        $autolink = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('use_cmall_product_review_mobile_auto_url')
+            : $this->cbconfig->item('use_cmall_product_review_auto_url');
+        $popup = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('cmall_product_review_mobile_content_target_blank')
+            : $this->cbconfig->item('cmall_product_review_content_target_blank');
+
+
+        $field = array(
+        	'like' => array('lik_id,target_mem_id'),
+            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        );
+        
+        $select = get_selected($field);
+        
+        $this->Like_model->_select = $select;
+
+
+        $result = $this->Like_model
+            ->get_review_like_list($per_page, $offset, $where, '', $findex, $forder);
+        $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+
+                
+                
+
+                $result['list'][$key]['content'] = display_html_content(
+                    element('cre_content', $val),
+                    element('cre_content_html_type', $val),
+                    $thumb_width,
+                    $autolink,
+                    $popup
+                );
+
+                $result['list'][$key]['can_update'] = false;
+                $result['list'][$key]['can_delete'] = false;
+                if ($is_admin !== false
+                    OR (element('mem_id', $val) && $mem_id === (int) element('mem_id', $val))) {
+                    $result['list'][$key]['can_update'] = true;
+                    $result['list'][$key]['can_delete'] = true;
+                }
+                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
+                // $result['list'][$key] = $this->board->get_default_info($result['list'][$key]['brd_id'],$result['list'][$key]);
+                $result['list'][$key] = $this->member->get_default_info(element('target_mem_id', $val),$result['list'][$key]);
+                $result['list'][$key]['review_cnt'] = $this->Cmall_review_model->count_by(array('mem_id' => element('target_mem_id', $val)));
+
+                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);                   
+
+                $result['list'][$key]['num'] = $list_num--;
+                
+            }
+        }
+        $view['view'] = $result;
+        
+
+        /**
+         * 페이지네이션을 생성합니다
+         */
+        $config['base_url'] = site_url('mypage/likereview/') . '?' . $param->replace('page');
+        $config['total_rows'] = $result['total_rows'];
+        $config['per_page'] = $per_page;
+
+        if ( ! $this->input->get('page')) {
+            $_GET['page'] = (string) $page;
+        }
+
+        
+        if ($this->cbconfig->get_device_view_type() === 'mobile') {
+            $config['num_links'] = 3;
+        } else {
+            $config['num_links'] = 5;
+        }
+        $this->pagination->initialize($config);
+        $view['view']['paging'] = $this->pagination->create_links();
+        $view['view']['page'] = $page;
+        
+   
+        return $view['view'];
+
+		
+	}
+
+	public function likereview_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view['view'] = $this->_likereview();
+
+		
+
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_mypage_post');
+		$meta_description = $this->cbconfig->item('site_meta_description_mypage_post');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_mypage_post');
+		$meta_author = $this->cbconfig->item('site_meta_author_mypage_post');
+		$page_name = $this->cbconfig->item('site_page_name_mypage_post');
+
+		$layoutconfig = array(
+			'path' => 'mypage',
+			'layout' => 'layout',
+			'skin' => 'review',
+			'layout_dir' => $this->cbconfig->item('layout_mypage'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_mypage'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_mypage'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_mypage'),
+			'skin_dir' => $this->cbconfig->item('skin_mypage'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_mypage'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		
+		$this->data = $view['view'];
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
+
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+
+	protected function _applyevent()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$this->load->model(array('Event_model'));
+
+		
+        
+        
+        
+        
+        /**
+         * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+         */
+        $param =& $this->querystring;
+        $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+        $findex = '(CASE WHEN eve_order=0 THEN -999 ELSE eve_order END),eve_id';
+        $forder = 'desc';
+        $sfield = $this->input->get('sfield', null, '');
+        $skeyword = $this->input->get('skeyword', null, '');
+
+        $per_page = '';
+        $offset = '';
+
+        // $per_page = 10;
+        // $offset = ($page - 1) * $per_page;
+        
+
+        $is_admin = $this->member->is_admin();
+
+        /**
+         * 게시판 목록에 필요한 정보를 가져옵니다.
+         */
+        $where = array();
+        // $where['cre_status'] = 1;
+        // if($cit_id) $where['cit_id'] = $cit_id;
+
+        $where = array();
+        
+        $where['eve_activated'] = '1';
+
+        $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+            : $this->cbconfig->item('cmall_product_review_thumb_width');
+        
+
+        $result = $this->Event_model
+            ->get_admin_list($per_page, $offset, $where, '', $findex, $forder, $sfield, $skeyword);
+        $list_num = $result['total_rows'];
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+
+                $result['list'][$key]['post_url'] = base_url('event/post/'.element('eve_id', $val));
+
+                $result['list'][$key]['display_datetime'] = display_datetime(
+                    element('eve_datetime', $val),'full'
+                );
+
+                $result['list'][$key]['thumb_url'] = '';
+                $result['list'][$key]['origin_image_url'] = '';
+            
+                
+                if (element('eve_image', $val)) {
+                    
+                    $result['list'][$key]['thumb_url'] = thumb_url('event', element('eve_image', $val));
+                    $result['list'][$key]['origin_image_url'] = thumb_url('event', element('eve_image', $val));
+                } else {
+                    $thumb_url = get_post_image_url(element('eve_content', $val));
+                    $result['list'][$key]['thumb_url'] = $thumb_url
+                        ? $thumb_url
+                        : thumb_url('', '');
+
+                    $result['list'][$key]['origin_image_url'] = $thumb_url;
+                }
+              
+
+                if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
+                    $result['list'][$key]['eve_start_date'] = display_datetime(
+                                        element('eve_datetime', $val),'full'
+                                        );
+
+
+                }
+                if (empty($val['eve_end_date']) OR $val['eve_end_date'] === '0000-00-00') {
+                    $result['list'][$key]['eve_end_date'] = '지속';
+                }
+                // $result['list'][$key]['num'] = $list_num--;
+            }
+        }
+        $view['view'] = $result;
+        
+
+        /**
+         * 페이지네이션을 생성합니다
+         */
+        // $config['base_url'] = site_url('mypage/likereview/') . '?' . $param->replace('page');
+        // $config['total_rows'] = $result['total_rows'];
+        // $config['per_page'] = $per_page;
+
+        // if ( ! $this->input->get('page')) {
+        //     $_GET['page'] = (string) $page;
+        // }
+
+        
+        // if ($this->cbconfig->get_device_view_type() === 'mobile') {
+        //     $config['num_links'] = 3;
+        // } else {
+        //     $config['num_links'] = 5;
+        // }
+        // $this->pagination->initialize($config);
+        // $view['view']['paging'] = $this->pagination->create_links();
+        // $view['view']['page'] = $page;
+        
+   
+        return $view['view'];
+
+		
+	}
+
+	public function applyevent_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view['view'] = $this->_applyevent();
+
+		
+
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_mypage_post');
+		$meta_description = $this->cbconfig->item('site_meta_description_mypage_post');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_mypage_post');
+		$meta_author = $this->cbconfig->item('site_meta_author_mypage_post');
+		$page_name = $this->cbconfig->item('site_page_name_mypage_post');
+
+		$layoutconfig = array(
+			'path' => 'mypage',
+			'layout' => 'layout',
+			'skin' => 'review',
+			'layout_dir' => $this->cbconfig->item('layout_mypage'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_mypage'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_mypage'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_mypage'),
+			'skin_dir' => $this->cbconfig->item('skin_mypage'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_mypage'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		
+		$this->data = $view['view'];
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
+
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+
+	protected function _resultevent()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$this->load->model(array('Event_model'));
+
+		
+        
+        
+        
+        
+        /**
+         * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+         */
+        $param =& $this->querystring;
+        $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+        $findex = '(CASE WHEN eve_order=0 THEN -999 ELSE eve_order END),eve_id';
+        $forder = 'desc';
+        $sfield = $this->input->get('sfield', null, '');
+        $skeyword = $this->input->get('skeyword', null, '');
+
+        $per_page = '';
+        $offset = '';
+
+        // $per_page = 10;
+        // $offset = ($page - 1) * $per_page;
+        
+
+        $is_admin = $this->member->is_admin();
+
+        /**
+         * 게시판 목록에 필요한 정보를 가져옵니다.
+         */
+        $where = array();
+        // $where['cre_status'] = 1;
+        // if($cit_id) $where['cit_id'] = $cit_id;
+
+        $where = array();
+        
+        $where['eve_activated'] = '1';
+
+        $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+            ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+            : $this->cbconfig->item('cmall_product_review_thumb_width');
+        
+
+        $result = $this->Event_model
+            ->get_admin_list($per_page, $offset, $where, '', $findex, $forder, $sfield, $skeyword);
+        $list_num = $result['total_rows'];
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+
+                $result['list'][$key]['post_url'] = base_url('event/post/'.element('eve_id', $val));
+
+                $result['list'][$key]['display_datetime'] = display_datetime(
+                    element('eve_datetime', $val),'full'
+                );
+
+                $result['list'][$key]['thumb_url'] = '';
+                $result['list'][$key]['origin_image_url'] = '';
+            
+                
+                if (element('eve_image', $val)) {
+                    
+                    $result['list'][$key]['thumb_url'] = thumb_url('event', element('eve_image', $val));
+                    $result['list'][$key]['origin_image_url'] = thumb_url('event', element('eve_image', $val));
+                } else {
+                    $thumb_url = get_post_image_url(element('eve_content', $val));
+                    $result['list'][$key]['thumb_url'] = $thumb_url
+                        ? $thumb_url
+                        : thumb_url('', '');
+
+                    $result['list'][$key]['origin_image_url'] = $thumb_url;
+                }
+              
+
+                if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
+                    $result['list'][$key]['eve_start_date'] = display_datetime(
+                                        element('eve_datetime', $val),'full'
+                                        );
+
+
+                }
+                if (empty($val['eve_end_date']) OR $val['eve_end_date'] === '0000-00-00') {
+                    $result['list'][$key]['eve_end_date'] = '지속';
+                }
+                $result['list'][$key]['num'] = $list_num--;
+            }
+        }
+        $view['view'] = $result;
+        
+
+        /**
+         * 페이지네이션을 생성합니다
+         */
+        // $config['base_url'] = site_url('mypage/likereview/') . '?' . $param->replace('page');
+        // $config['total_rows'] = $result['total_rows'];
+        // $config['per_page'] = $per_page;
+
+        // if ( ! $this->input->get('page')) {
+        //     $_GET['page'] = (string) $page;
+        // }
+
+        
+        // if ($this->cbconfig->get_device_view_type() === 'mobile') {
+        //     $config['num_links'] = 3;
+        // } else {
+        //     $config['num_links'] = 5;
+        // }
+        // $this->pagination->initialize($config);
+        // $view['view']['paging'] = $this->pagination->create_links();
+        // $view['view']['page'] = $page;
+        
+   
+        return $view['view'];
+
+		
+	}
+
+	public function resultevent_get()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_mypage_post';
+		$this->load->event($eventname);
+
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view['view'] = $this->_resultevent();
+
+		
+
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_mypage_post');
+		$meta_description = $this->cbconfig->item('site_meta_description_mypage_post');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_mypage_post');
+		$meta_author = $this->cbconfig->item('site_meta_author_mypage_post');
+		$page_name = $this->cbconfig->item('site_page_name_mypage_post');
+
+		$layoutconfig = array(
+			'path' => 'mypage',
+			'layout' => 'layout',
+			'skin' => 'review',
+			'layout_dir' => $this->cbconfig->item('layout_mypage'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_mypage'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_mypage'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_mypage'),
+			'skin_dir' => $this->cbconfig->item('skin_mypage'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_mypage'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		
+		$this->data = $view['view'];
+		// $this->layout = element('layout_skin_file', element('layout', $view));
+		// $this->view = element('view_skin_file', element('layout', $view));
+
+		
+		
+
+		// redirect(site_url('/board/b-a-1'));
+
+		return $this->response($this->data, parent::HTTP_OK);
+	}
+
+	/**
+	 * 게시판 글쓰기 또는 수정 페이지를 가져오는 메소드입니다
+	 */
+	protected function _petwrite($pid = 0)
+	{
+	    
+
+	    
+
+	    // 이벤트 라이브러리를 로딩합니다
+        $eventname = 'event_admin_member_memberpet_write';
+        $this->load->event($eventname);
+
+        $view = array();
+        $view['view'] = array();
+
+        // 이벤트가 존재하면 실행합니다
+        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    /**
+	     * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
+	     */
+	    if ($pid) {
+	        $pid = (int) $pid;
+	        if (empty($pid) OR $pid < 1) {
+	            show_404();
+	        }
+	    }
+
+	    /**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+	    $this->load->model(array('Member_model','Member_pet_model'));
+	    $primary_key = $this->Member_pet_model->primary_key;
+
+	    /**
+	     * 수정 페이지일 경우 기존 데이터를 가져옵니다
+	     */
+	    $getdata = array();
+	    if ($pid) {
+	        $getdata = $this->Member_pet_model->get_one($pid);
+	        if(empty(element('pet_id',$getdata)))
+	        	alert('이 펫은 현재 존재하지 않습니다',"",406);
+
+	        $getdata['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$getdata));
+
+	        $is_admin = $this->member->is_admin();
+            if ($is_admin === false
+                && (int) element('mem_id', $getdata) !== $mem_id) {
+                alert_close('본인의 글 외에는 접근하실 수 없습니다');
+            }
+	    }
+	    
+
+	    
+	    /**
+	     * Validation 라이브러리를 가져옵니다
+	     */
+	    $this->load->library('form_validation');
+
+	     
+
+	    /**
+	     * 전송된 데이터의 유효성을 체크합니다
+	     */
+	    $config = array(
+	        
+	        array(
+                'field' => 'pet_name',
+                'label' => '펫 이름',
+                'rules' => 'trim|required|min_length[2]|max_length[20]',
+            ),
+            array(
+                'field' => 'pet_birthday',
+                'label' => '펫 생일',
+                'rules' => 'trim|required|exact_length[10]',
+            ),
+	        array(
+	            'field' => 'pet_sex',
+	            'label' => '성별',
+	            'rules' => 'trim|exact_length[1]',
+	        ),
+	        // array(
+	        //     'field' => 'pet_profile_content',
+	        //     'label' => '펫 자기소개',
+	        //     'rules' => 'trim',
+	        // ),
+	        
+	        
+	    );
+	    
+	    $this->form_validation->set_rules($config);
+	    $form_validation = $this->form_validation->run();
+	    $file_error = '';
+	    $updatephoto = '';
+	    $file_error2 = '';
+	    $updateicon = '';
+
+	    if ($form_validation) {
+	        $this->load->library('upload');
+	        $this->load->library('aws_s3');
+	        if (isset($_FILES) && isset($_FILES['pet_photo']) && isset($_FILES['pet_photo']['name']) && $_FILES['pet_photo']['name']) {
+	            $upload_path = config_item('uploads_dir') . '/member_photo/';
+	            if (is_dir($upload_path) === false) {
+	                mkdir($upload_path, 0707);
+	                $file = $upload_path . 'index.php';
+	                $f = @fopen($file, 'w');
+	                @fwrite($f, '');
+	                @fclose($f);
+	                @chmod($file, 0644);
+	            }
+	            $upload_path .= cdate('Y') . '/';
+	            if (is_dir($upload_path) === false) {
+	                mkdir($upload_path, 0707);
+	                $file = $upload_path . 'index.php';
+	                $f = @fopen($file, 'w');
+	                @fwrite($f, '');
+	                @fclose($f);
+	                @chmod($file, 0644);
+	            }
+	            $upload_path .= cdate('m') . '/';
+	            if (is_dir($upload_path) === false) {
+	                mkdir($upload_path, 0707);
+	                $file = $upload_path . 'index.php';
+	                $f = @fopen($file, 'w');
+	                @fwrite($f, '');
+	                @fclose($f);
+	                @chmod($file, 0644);
+	            }
+
+	            $uploadconfig = array();
+	            $uploadconfig['upload_path'] = $upload_path;
+	            $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif';
+	            $uploadconfig['max_size'] = '2000';
+	            // $uploadconfig['max_width'] = '2000';
+	            // $uploadconfig['max_height'] = '1000';
+	            $uploadconfig['encrypt_name'] = true;
+
+	            $this->upload->initialize($uploadconfig);
+
+	            if ($this->upload->do_upload('pet_photo')) {
+	                $img = $this->upload->data();
+	                $updatephoto = cdate('Y') . '/' . cdate('m') . '/' . element('file_name', $img);
+
+	                $upload = $this->aws_s3->upload_file($this->upload->upload_path,$this->upload->file_name,$upload_path);
+	            } else {
+	                $file_error = $this->upload->display_errors();
+
+	            }
+	        }
+
+	        if (isset($_FILES)
+	            && isset($_FILES['pet_backgroundimg'])
+	            && isset($_FILES['pet_backgroundimg']['name'])
+	            && $_FILES['pet_backgroundimg']['name']) {
+	            $upload_path = config_item('uploads_dir') . '/member_icon/';
+	            if (is_dir($upload_path) === false) {
+	                mkdir($upload_path, 0707);
+	                $file = $upload_path . 'index.php';
+	                $f = @fopen($file, 'w');
+	                @fwrite($f, '');
+	                @fclose($f);
+	                @chmod($file, 0644);
+	            }
+	            $upload_path .= cdate('Y') . '/';
+	            if (is_dir($upload_path) === false) {
+	                mkdir($upload_path, 0707);
+	                $file = $upload_path . 'index.php';
+	                $f = @fopen($file, 'w');
+	                @fwrite($f, '');
+	                @fclose($f);
+	                @chmod($file, 0644);
+	            }
+	            $upload_path .= cdate('m') . '/';
+	            if (is_dir($upload_path) === false) {
+	                mkdir($upload_path, 0707);
+	                $file = $upload_path . 'index.php';
+	                $f = @fopen($file, 'w');
+	                @fwrite($f, '');
+	                @fclose($f);
+	                @chmod($file, 0644);
+	            }
+	            $uploadconfig = array();
+	            $uploadconfig['upload_path'] = $upload_path;
+	            $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif';
+	            $uploadconfig['max_size'] = '2000';
+	            // $uploadconfig['max_width'] = '2000';
+	            // $uploadconfig['max_height'] = '1000';
+	            $uploadconfig['encrypt_name'] = true;
+
+	            $this->upload->initialize($uploadconfig);
+
+	            if ($this->upload->do_upload('pet_backgroundimg')) {
+	                $img = $this->upload->data();
+	                $updateicon = cdate('Y') . '/' . cdate('m') . '/' . element('file_name', $img);
+	                $upload = $this->aws_s3->upload_file($this->upload->upload_path,$this->upload->file_name,$upload_path);
+	            } else {
+	                $file_error2 = $this->upload->display_errors();
+
+	            }
+	        }
+	    }
+
+	    /**
+	     * 유효성 검사를 하지 않는 경우, 또는 유효성 검사에 실패한 경우입니다.
+	     * 즉 글쓰기나 수정 페이지를 보고 있는 경우입니다
+	     */
+	    if ($form_validation === false OR $file_error !== '' OR $file_error2 !== '') {
+
+	        // 이벤트가 존재하면 실행합니다
+	        $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+
+	        $view['view']['msg'] = $file_error . $file_error2.validation_errors();
+
+	        
+
+	        $view['view']['data'] = $getdata;
+
+	        
+
+	        $view['view']['config']['pet_form'] = config_item('pet_form');
+	        $view['view']['config']['pet_kind'] = array();
+	        $view['view']['config']['pet_attr'] = config_item('pet_attr');
+	        
+
+	        /**
+	         * primary key 정보를 저장합니다
+	         */
+	        $view['view']['primary_key'] = $primary_key;
+
+	        /**
+	         * 어드민 레이아웃을 정의합니다
+	         */
+	        // $layoutconfig = array('layout' => 'layout', 'skin' => 'write');
+	        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+	        
+	        
+	        return $view['view'];
+	    } else {
+	        /**
+	         * 유효성 검사를 통과한 경우입니다.
+	         * 즉 데이터의 insert 나 update 의 process 처리가 필요한 상황입니다
+	         */
+
+	        // 이벤트가 존재하면 실행합니다
+	        $view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
+	        
+	        $pet_sex = $this->input->post('pet_sex') ? $this->input->post('pet_sex') : 0;
+	        $pet_neutral = $this->input->post('pet_neutral') ? $this->input->post('pet_neutral') : 0;
+	        $pet_weight = $this->input->post('pet_weight') ? $this->input->post('pet_weight') : 0;
+	        $pet_attr = $this->input->post('pet_attr') ? implode(",",$this->input->post('pet_attr')) : '';
+	        $pet_allergy = $this->input->post('pet_allergy') ? $this->input->post('pet_allergy') : 0;
+
+	        $updatedata = array(
+	            'mem_id' => $mem_id,
+	            'pet_name' => $this->input->post('pet_name', null, ''),
+	            'pet_birthday' => $this->input->post('pet_birthday', null, ''),
+	            'pet_sex' => $pet_sex,
+	            'pet_neutral' => $pet_neutral,
+	            'pet_weight' => $pet_weight,                
+	            'pet_attr' => $pet_attr,
+	            'pet_allergy' => $pet_allergy,
+	            'pet_profile_content' => $this->input->post('pet_profile_content', null, ''),
+	            
+	        );
+
+	        
+	        
+	        $metadata = array();
+
+	       
+	        if (element('pet_nickname', $getdata) !== $this->input->post('pet_nickname')) {
+	            $updatedata['pet_nickname'] = $this->input->post('pet_nickname', null, '');
+	        }
+	        
+
+	        if ($this->input->post('pet_photo_del')) {
+	            $updatedata['pet_photo'] = '';
+	        } elseif ($updatephoto) {
+	            $updatedata['pet_photo'] = $updatephoto;
+	        }
+	        if (element('pet_photo', $getdata) && ($this->input->post('pet_photo_del') OR $updatephoto)) {
+	            // 기존 파일 삭제
+	            @unlink(config_item('uploads_dir') . '/member_photo/' . element('pet_photo', $getdata));
+	            $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/member_photo/' . element('pet_photo', $getdata));
+	        }
+	        if ($this->input->post('pet_backgroundimg_del')) {
+	            $updatedata['pet_backgroundimg'] = '';
+	        } elseif ($updateicon) {
+	            $updatedata['pet_backgroundimg'] = $updateicon;
+	        }
+	        if (element('pet_backgroundimg', $getdata) && ($this->input->post('pet_backgroundimg_del') OR $updateicon)) {
+	            // 기존 파일 삭제
+	            @unlink(config_item('uploads_dir') . '/member_icon/' . element('pet_backgroundimg', $getdata));
+	            $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/member_icon/' . element('pet_backgroundimg', $getdata));
+	        }
+
+	        /**
+	         * 게시물을 수정하는 경우입니다
+	         */
+	        if ($this->input->post($primary_key)) {
+	            $pet_id = $this->input->post($primary_key);
+	            $this->Member_pet_model->update($pet_id, $updatedata);
+	            
+	            $view['view']['msg'] = '정상적으로 수정되었습니다';
+	            
+	                
+	                
+	            
+	        } else {
+	            /**
+	             * 게시물을 새로 입력하는 경우입니다
+	             */
+	            $updatedata['pet_register_datetime'] = cdate('Y-m-d H:i:s');
+
+	            $pet_id = $this->Member_pet_model->insert($updatedata);
+
+	            $view['view']['msg'] = '정상적으로 입력되었습니다';
+	            
+	        }
+
+	        if($pet_id && $this->input->post('pet_main', null, '')){
+
+	            $this->Member_pet_model->update($pet_id,array('pet_main' => 1));
+	        }
+
+	        // 이벤트가 존재하면 실행합니다
+	        Events::trigger('after', $eventname);
+
+	        return $view['view'];
+	    }
+	}
+
+	public function petwrite_get($pid = 0)
+	{
+	    // 이벤트 라이브러리를 로딩합니다
+	    $eventname = 'event_admin_member_memberpet_write';
+	    $this->load->event($eventname);
+
+	    $view = array();
+	    $view['view'] = array();
+
+	    // 이벤트가 존재하면 실행합니다
+	    $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    $view['view'] = $this->_petwrite($pid);
+	    
+	    $this->data = $view['view'];
+		
+		return $this->response($this->data, 200);
+	}
+
+	public function petwrite_post($pid = 0)
+	{
+	    // 이벤트 라이브러리를 로딩합니다
+	    $eventname = 'event_admin_member_memberpet_write';
+	    $this->load->event($eventname);
+
+	    $view = array();
+	    $view['view'] = array();
+
+	    // 이벤트가 존재하면 실행합니다
+	    $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    $view['view'] = $this->_petwrite($pid);
+	    
+	    $this->data = $view['view'];
+		
+		return $this->response($this->data, 201);
+	}
+
+	public function petwrite_put($pid = 0)
+	{
+	    // 이벤트 라이브러리를 로딩합니다
+	    $eventname = 'event_admin_member_memberpet_write';
+	    $this->load->event($eventname);
+
+	    $view = array();
+	    $view['view'] = array();
+
+	    // 이벤트가 존재하면 실행합니다
+	    $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    $view['view'] = $this->_petwrite($pid);
+	    
+	    $this->data = $view['view'];
+		
+		return $this->response($this->data, 201);
+	}
+
+	
+
+	public function pet_delete($pid = 0)
+    {
+        // 이벤트 라이브러리를 로딩합니다
+        $eventname = 'event_admin_member_memberpet_listdelete';
+        $this->load->event($eventname);
+
+        // 이벤트가 존재하면 실행합니다
+        Events::trigger('before', $eventname);
+
+        /**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$pid = (int) $pid;
+		if (empty($pid) OR $pid < 1) {
+		    show_404();
+		}
+
+		$getdata = $this->Member_pet_model->get_one($pid);
+		if(empty(element('pet_id',$getdata)))
+			alert('이 펫은 현재 존재하지 않습니다',"",406);
+        /**
+         * 체크한 게시물의 삭제를 실행합니다
+         */
+
+        $this->member->delete_pet($pid);
+        
+
+        // 이벤트가 존재하면 실행합니다
+        Events::trigger('after', $eventname);
+
+        /**
+         * 삭제가 끝난 후 목록페이지로 이동합니다
+         */
+        
+            
+        
+        return $this->response(array('msg' => '정상적으로 삭제되었습니다'),204);
+    }
 }
+

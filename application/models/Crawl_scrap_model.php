@@ -31,7 +31,7 @@ class Crawl_scrap_model extends CB_Model
     public function get_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
     {
         $select = 'crawl_scrap.*, crawl_scrap.mem_id as crawl_scrap_mem_id,  crawl.post_id, crawl.brd_id,
-            crawl.crawl_datetime, crawl.crawl_hit,  crawl.crawl_title crawl.crawl_image';
+            crawl.crawl_datetime, crawl.crawl_hit,  crawl.crawl_title, crawl.crawl_is_image';
         $join[] = array('table' => 'crawl', 'on' => 'crawl_scrap.crawl_id = crawl.crawl_id', 'type' => 'inner');
 
         $result = $this->_get_list_common($select, $join, $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);

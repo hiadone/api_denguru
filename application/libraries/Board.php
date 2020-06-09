@@ -114,6 +114,9 @@ class Board extends CI_Controller
 		if ( ! isset($this->board_id[$brd_id])) {
 			$this->get_board($brd_id, '');
 		}
+		if ( ! isset($this->board_id[$brd_id][$column])) {
+            $this->get_review($brd_id, '');
+        }
 		if ( ! isset($this->board_id[$brd_id])) {
 			return false;
 		}
@@ -644,6 +647,45 @@ class Board extends CI_Controller
 	}
 
 
+	public function cit_latest($config)
+	{	
+
+		$this->CI->load->model('Board_model');
+			
+		$cache_minute = element('cache_minute', $config);
+		$where['cit_status'] = 1;
+		if (element('cit_type1', $config)) {
+			$where['cit_type1'] = 1;
+		}
+		if (element('cit_type2', $config)) {
+			$where['cit_type2'] = 1;
+		}
+		if (element('cit_type3', $config)) {
+			$where['cit_type3'] = 1;
+		}
+		if (element('cit_type4', $config)) {
+			$where['cit_type4'] = 1;
+		}
+		$limit = element('limit', $config) ? element('limit', $config) : 4;
+		$select = element('select', $config) ? element('select', $config) : $this->CI->Board_model->_select;
+
+		$cachename = 'cmall/main-' . element('cit_type1', $config) . '-' . $limit . '-' . cdate('Y-m-d');
+
+		if ( ! $result = $this->CI->cache->get($cachename)) {
+			$this->CI->db->select($select);
+			$this->CI->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
+			$this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'left');
+			$this->CI->db->where($where);
+			$this->CI->db->limit($limit);
+			$this->CI->db->order_by('cit_order', 'asc');
+			$qry = $this->CI->db->get('board');
+			$result = $qry->result_array();
+			$this->CI->cache->save($cachename, $result, $cache_minute);
+		}
+		return $result;
+	}
+
+
 	/**
 	 * 최근 댓글을 가져옵니다
 	 */
@@ -832,5 +874,94 @@ class Board extends CI_Controller
 			$this->admin = false;
 		}
 		return $this->admin;
+	}
+
+
+	
+	public function convert_default_info($board = array())
+	{
+
+		// if (element('brd_id', $board)) {
+		// 	$board_meta = $this->get_all_meta(element('brd_id', $board));
+		// 	if (is_array($board_meta)) {
+		// 		$board = array_merge($board, $board_meta);
+		// 	}
+		// }
+
+		// if (element('brd_id', $board) && $brd_id === element('brd_id', $board)) {
+		// 	$this->board_id[element('brd_id', $board)] = $board;
+		// }
+		// if (element('brd_key', $board)) {
+		// 	$this->board_key[element('brd_key', $board)] = $board;
+		// }
+		
+		$brd_id = (int) element('brd_id',$board);
+		if (empty($brd_id) OR $brd_id < 1) {
+			return false;
+		}
+		
+		
+		$board['brd_image'] = cdn_url('board',element('brd_image',$board,''));
+		$board['brd_outlink_url'] = base_url('postact/brd_link/'.$brd_id);
+		$board['brd_inlink_url'] = base_url('cmall/store/'.$brd_id);
+
+		
+
+		return $board;
+	}
+
+	public function get_default_info($brd_id = 0,$arr = array())
+	{	
+		if (empty($brd_id) OR $brd_id < 1) {
+			return false;
+		}
+		$board = array();
+		$board['brd_id'] = $brd_id;
+		$board['brd_name'] = $this->item_id('brd_name',$brd_id);
+		$board['brd_image'] = cdn_url('board',$this->item_id('brd_image',$brd_id));
+		$board['brd_outlink_url'] = base_url('postact/brd_link/'.$brd_id);
+		$board['brd_inlink_url'] = base_url('cmall/store/'.$brd_id);
+
+		$board = array_merge($board, $arr);
+
+		return $board;
+	}
+
+	public function get_popular_brd_tags($brd_id = 0, $limit = '')
+	{
+		$cachename = 'latest/get_popular_brd_tags' . $brd_id . '_' . $limit;
+		$data = array();
+
+		if ( ! $data = $this->CI->cache->get($cachename)) {
+
+			$this->CI->load->model( array('Crawl_tag_model'));
+			$result = $this->CI->Crawl_tag_model->get_popular_tags($brd_id, $limit);
+
+			$data['result'] = $result;
+			$data['cached'] = '1';
+			check_cache_dir('latest');
+			$this->CI->cache->save($cachename, $data, 60);
+
+		}
+		return isset($data['result']) ? $data['result'] : array();
+	}
+
+	public function get_popular_brd_attr($brd_id = 0, $limit = '')
+	{
+		$cachename = 'latest/get_popular_brd_attr' . $brd_id . '_' . $limit;
+		$data = array();
+
+		if ( ! $data = $this->CI->cache->get($cachename)) {
+
+			$this->CI->load->model( array('Cmall_attr_model'));
+			$result = $this->CI->Cmall_attr_model->get_popular_attr($brd_id, $limit);
+
+			$data['result'] = $result;
+			$data['cached'] = '1';
+			check_cache_dir('latest');
+			$this->CI->cache->save($cachename, $data, 60);
+
+		}
+		return isset($data['result']) ? $data['result'] : array();
 	}
 }

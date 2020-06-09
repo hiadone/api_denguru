@@ -39,7 +39,7 @@ class Postact extends CB_Controller
 	/**
 	 * 게시물 삭제하기
 	 */
-	public function delete($post_id = 0)
+	public function post_delete($post_id = 0)
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -3294,5 +3294,781 @@ class Postact extends CB_Controller
 		$xml .= "</feed>";
 
 		echo $xml;
+	}
+
+
+	/**
+	 * 게시물 추천/비추천 하기
+	 */
+	public function reviewlike_post($cre_id = 0, $like_type = 0)
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_post_like';
+		$this->load->event($eventname);
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$target_type = 3; //리뷰
+
+		$result = array();
+
+		if ($this->member->is_member() === false) {
+			alert('로그인 후 이용해주세요','',403);
+		}
+		$cre_id = (int) $cre_id;
+		if (empty($cre_id) OR $cre_id < 1) {			
+			show_404();
+		}
+
+		$like_type = (int) $like_type;
+		if ($like_type !== 1 AND $like_type !== 2) {
+			show_404();
+		}
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Cmall_review_model', 'Like_model','Cmall_item_model'));
+
+		
+		$review = $this->Cmall_review_model->get_one($cre_id);
+
+		$cmall_item = $this->Cmall_item_model->get_one(element('cit_id',$review));
+
+		$board = $this->board->item_all(element('brd_id',$cmall_item));
+
+		if ( ! element('cre_id', $review)) {			
+			alert('존재하지 않는 게시물입니다','',406);
+		}
+
+		if (abs(element('mem_id', $review)) === $mem_id) {			
+			alert('본인의 글에는 추천/비추천 기능을 사용할 수 없습니다','',409);
+		}
+
+		$select = 'lik_id, lik_type';
+		$where = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'mem_id' => $mem_id,
+		);
+		$exist = $this->Like_model->get_one('', $select, $where);
+
+		if (element('lik_id', $exist)) {
+			$status = element('lik_type', $exist) === '1' ? '추천' : '비추천';			
+			alert('이미 이 글을 ' . $status . '하셨습니다','',409);
+		}
+
+		$insertdata = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'brd_id' => element('brd_id',$cmall_item),
+			'mem_id' => $mem_id,
+			'target_mem_id' => abs(element('mem_id', $review)),
+			'lik_type' => $like_type,
+			'lik_datetime' => cdate('Y-m-d H:i:s'),
+			'lik_ip' => $this->input->ip_address(),
+		);
+		$this->Like_model->insert($insertdata);
+		if (element('use_point', $board)) {
+			if ($like_type === 1) {
+				$this->point->insert_point(
+					$mem_id,
+					element('point_post_like', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 추천',
+					'review-like',
+					$cre_id,
+					'추천'
+				);
+				$this->point->insert_point(
+					abs(element('mem_id', $post)),
+					element('point_post_liked', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 추천받음',
+					'review-liked',
+					$cre_id,
+					'추천받음'
+				);
+			}
+			if ($like_type === 2) {
+				$this->point->insert_point(
+					$mem_id,
+					element('point_post_dislike', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 추천',
+					'review-like',
+					$cre_id,
+					'추천'
+				);
+				$this->point->insert_point(
+					abs(element('mem_id', $post)),
+					element('point_post_disliked', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 비추천받음',
+					'review-disliked',
+					$cre_id,
+					'비추천받음'
+				);
+			}
+		}
+
+		$where = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'lik_type' => $like_type,
+		);
+		$count = $this->Like_model->count_by($where);
+
+
+		if ($like_type === 1) {
+			$field = 'cre_like';
+		}
+		elseif ($like_type === 2) {
+			$field = 'cre_dislike';
+		}
+
+		$updata = array(
+			$field => $count,
+		);
+		$this->Cmall_review_model->update($cre_id, $updata);
+
+		$status = $like_type === 1 ? '추천' : '비추천';
+		$success = '이 글을 ' . $status . ' 하셨습니다';
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('after', $eventname);
+
+		$result = array('msg' => $success, 'count' => $count);
+		
+		return $this->response($result, 201);
+	}
+
+	public function reviewlike_delete($cre_id = 0, $like_type = 0)
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_post_like';
+		$this->load->event($eventname);
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$target_type = 3; //리뷰
+
+		$result = array();
+
+		if ($this->member->is_member() === false) {
+			alert('로그인 후 이용해주세요','',403);
+		}
+		$cre_id = (int) $cre_id;
+		if (empty($cre_id) OR $cre_id < 1) {			
+			show_404();
+		}
+
+		$like_type = (int) $like_type;
+		if ($like_type !== 1 AND $like_type !== 2) {
+			show_404();
+		}
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Cmall_review_model', 'Like_model','Cmall_item_model'));
+
+		
+		$review = $this->Cmall_review_model->get_one($cre_id);
+
+		$cmall_item = $this->Cmall_item_model->get_one(element('cit_id',$review));
+
+		$board = $this->board->item_all(element('brd_id',$cmall_item));
+
+		if ( ! element('cre_id', $review)) {			
+			// alert('존재하지 않는 게시물입니다','',406);
+		}
+
+		if (abs(element('mem_id', $review)) === $mem_id) {			
+			alert('본인의 글에는 추천/비추천 기능을 사용할 수 없습니다','',409);
+		}
+		
+		$deletewhere = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'mem_id' => $mem_id,
+		);
+		$exist = $this->Like_model->delete_where($deletewhere);
+
+		
+
+
+		if (element('use_point', $board)) {
+			if ($like_type === 1) {
+				$this->point->insert_point(
+					$mem_id,
+					element('point_post_like', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 추천',
+					'review-like',
+					$cre_id,
+					'추천'
+				);
+				$this->point->insert_point(
+					abs(element('mem_id', $post)),
+					element('point_post_liked', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 추천받음',
+					'review-liked',
+					$cre_id,
+					'추천받음'
+				);
+			}
+			if ($like_type === 2) {
+				$this->point->insert_point(
+					$mem_id,
+					element('point_post_dislike', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 추천',
+					'review-like',
+					$cre_id,
+					'추천'
+				);
+				$this->point->insert_point(
+					abs(element('mem_id', $post)),
+					element('point_post_disliked', $board),
+					element('board_name', $board) . ' ' . $cre_id . ' 비추천받음',
+					'review-disliked',
+					$cre_id,
+					'비추천받음'
+				);
+			}
+		}
+
+		$where = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'lik_type' => $like_type,
+		);
+		$count = $this->Like_model->count_by($where);
+
+
+		if ($like_type === 1) {
+			$field = 'cre_like';
+		}
+		elseif ($like_type === 2) {
+			$field = 'cre_dislike';
+		}
+
+		$updata = array(
+			$field => $count,
+		);
+		$this->Cmall_review_model->update($cre_id, $updata);
+
+		$status = $like_type === 1 ? '추천' : '비추천';
+		$success = '이 글의 ' . $status . '삭제 하셨습니다';
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('after', $eventname);
+
+		$result = array('msg' => $success, 'count' => $count);
+		
+		return $this->response($result, 204);
+	}
+
+	public function cit_link($cit_id = 0)
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_link';
+		$this->load->event($eventname);
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$cit_id = (int) $cit_id;
+		$mem_id = (int) $this->member->item('mem_id');
+		if (empty($cit_id) OR $cit_id < 1) {
+			show_404();
+		}
+
+		
+
+		$this->load->model(array('Cmall_item_model'));
+
+		$link = $this->Cmall_item_model->get_one($cit_id);
+
+
+		if ( ! element('post_id', $link)) {
+			alert('이 상품은 존재하지 않습니다',"",406);
+		}
+		
+		if ( ! element('cit_status', $link)) {
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
+
+		$post = $this->Post_model->get_one(element('post_id', $link));
+		$board = $this->board->item_all(element('brd_id', $post));
+		
+		if ( ! $this->session->userdata('cit_outlink_click_' . element('cit_id', $link))) {
+
+			$this->session->set_userdata(
+				'cit_outlink_click_' . element('cit_id', $link),
+				'1'
+			);
+
+			if (element('use_link_click_log', $board)) {
+				if($mem_id){
+					$insertdata = array(
+						'pln_id' => element('pln_id', $link),
+						'post_id' => element('post_id', $link),
+						'brd_id' => element('brd_id', $link),
+						'cit_id' => element('cit_id', $link),
+						'clc_datetime' => cdate('Y-m-d H:i:s'),
+						'clc_ip' => $this->input->ip_address(),
+						'clc_useragent' => $this->agent->agent_string(),
+						'mem_id' => $mem_id,
+					);
+					$this->load->model('Crawl_link_click_log_model');
+					$this->Crawl_link_click_log_model->insert($insertdata);
+				}
+				
+			}
+			$this->Cmall_item_model->update_plus(element('cit_id', $link), 'cit_hit', 1);
+		}
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('after', $eventname);
+
+		redirect(prep_url(strip_tags(element('cit_post_url', $link))));
+
+	}
+
+	public function brd_link($brd_id = 0)
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_link';
+		$this->load->event($eventname);
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$brd_id = (int) $brd_id;
+		$mem_id = (int) $this->member->item('mem_id');
+		if (empty($brd_id) OR $brd_id < 1) {
+			show_404();
+		}
+
+		
+		
+		$board = $this->board->item_all(element('brd_id', $post));
+
+		if ( ! element('brd_id', $board)) {
+			alert('이 스토어는 현재 존재하지 않습니다',"",406);
+		}
+		
+		if ( element('brd_blind', $board)) {
+			alert('이 스토어는 현재 판매하지 않습니다',"",406);
+		}
+		
+		if ( ! $this->session->userdata('brd_outlink_click_' . element('brd_id', $board))) {
+
+			$this->session->set_userdata(
+				'brd_outlink_click_' . element('brd_id', $board),
+				'1'
+			);
+
+			if (element('use_link_click_log', $board)) {
+				if($mem_id){
+					$insertdata = array(
+						'pln_id' => 0,
+						'post_id' => 0,
+						'brd_id' => element('brd_id', $board),
+						'cit_id' => 0,
+						'clc_datetime' => cdate('Y-m-d H:i:s'),
+						'clc_ip' => $this->input->ip_address(),
+						'clc_useragent' => $this->agent->agent_string(),
+						'mem_id' => $mem_id,
+					);
+					$this->load->model('Crawl_link_click_log_model');
+					$this->Crawl_link_click_log_model->insert($insertdata);
+				}
+				
+			}
+			$this->load->model('Board_model');
+			$this->Board_model->update_plus(element('brd_id', $board), 'brd_hit', 1);
+		}
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('after', $eventname);
+
+		redirect(prep_url(strip_tags(element('brd_url', $board))));
+
+	}
+
+	/**
+	 * 리뷰 신고 하기
+	 */
+	public function review_blame_post($cre_id = 0)
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_comment_blame';
+		$this->load->event($eventname);
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$result = array();
+		$target_type = 3; // 리뷰
+		
+
+		if ($this->member->is_member() === false) {
+			alert('로그인 후 이용해주세요','',403);
+		}
+
+		$cre_id = (int) $cre_id;
+		if (empty($cre_id) OR $cre_id < 1) {
+			show_404();
+		}
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Cmall_review_model', 'Blame_model','Cmall_item_model'));
+		
+
+		$review = $this->Cmall_review_model->get_one($cre_id);
+
+		$cmall_item = $this->Cmall_item_model->get_one(element('cit_id',$review));
+
+        $board = $this->board->item_all(element('brd_id',$cmall_item));
+
+		if ( ! element('cre_id', $review)) {
+			alert('존재하지 않는 게시물입니다','',406);
+		}
+
+		if (abs(element('mem_id', $review)) === $mem_id) {          
+            alert('본인의 글에는 신고 기능을 사용할 수 없습니다','',409);
+        }
+
+		// $board = $this->board->item_all(element('brd_id', $post));
+
+        
+		if ( ! element('use_blame', $board)) {
+			alert('이 글은 신고 기능을 사용하지 않습니다','',409);
+		}
+
+		$check = array(
+			'group_id' => element('bgr_id', $board),
+			'board_id' => element('brd_id', $board),
+		);
+		$can_blame = $this->accesslevel->is_accessable(
+			element('access_blame', $board),
+			element('access_blame_level', $board),
+			element('access_blame_group', $board),
+			$check
+		);
+
+		if ($can_blame === false) {
+			alert('회원님은 신고할 수 있는 권한이 없습니다','',403);
+			
+		}
+
+		$where = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'mem_id' => $mem_id,
+		);
+		$this->load->model('Blame_model');
+		$exist = $this->Blame_model->get_one('', 'bla_id', $where);
+
+		if (element('bla_id', $exist)) {
+			alert('이미 이 글을  신고 하셨습니다','',409);
+		}
+
+		$insertdata = array(
+			'target_id' => $cre_id,
+			'target_type' => $target_type,
+			'brd_id' => element('brd_id', $cmall_item),
+			'mem_id' => $mem_id,
+			'target_mem_id' => abs(element('mem_id', $review)),
+			'bla_datetime' => cdate('Y-m-d H:i:s'),
+			'bla_ip' => $this->input->ip_address(),
+		);
+		$this->Blame_model->insert($insertdata);
+
+		$this->Cmall_review_model->update_plus($cre_id, 'cre_blame', 1);
+
+		$count = element('cre_blame', $review) + 1;
+
+		// $emailsendlistadmin = array();
+  //       $notesendlistadmin = array();
+  //       $smssendlistadmin = array();
+  //       $emailsendlistpostwriter = array();
+  //       $notesendlistpostwriter = array();
+  //       $smssendlistpostwriter = array();
+
+  //       $writer = $this->Member_model->get_one(abs(element('mem_id', $review)));
+
+  //       if (element('send_email_blame_super_admin', $board)
+  //           OR element('send_note_blame_super_admin', $board)
+  //           OR element('send_sms_blame_super_admin', $board)) {
+  //           $mselect = 'mem_id, mem_email, mem_nickname, mem_phone';
+  //           $superadminlist = $this->Member_model
+  //               ->get_superadmin_list($mselect);
+  //       }
+  //       if (element('send_email_blame_group_admin', $board)
+  //           OR element('send_note_blame_group_admin', $board)
+  //           OR element('send_sms_blame_group_admin', $board)) {
+  //           $this->load->model('Board_group_admin_model');
+  //           $groupadminlist = $this->Board_group_admin_model
+  //               ->get_board_group_admin_member(element('bgr_id', $board));
+  //       }
+  //       if (element('send_email_blame_board_admin', $board)
+  //           OR element('send_note_blame_board_admin', $board)
+  //           OR element('send_sms_blame_board_admin', $board)) {
+  //           $this->load->model('Board_admin_model');
+  //           $boardadminlist = $this->Board_admin_model
+  //               ->get_board_admin_member(element('brd_id', $board));
+  //       }
+
+  //       if (element('send_email_blame_super_admin', $board) && $superadminlist) {
+  //           foreach ($superadminlist as $key => $value) {
+  //               $emailsendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_email_blame_group_admin', $board) && $groupadminlist) {
+  //           foreach ($groupadminlist as $key => $value) {
+  //               $emailsendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_email_blame_board_admin', $board) && $boardadminlist) {
+  //           foreach ($boardadminlist as $key => $value) {
+  //               $emailsendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_email_blame_post_writer', $board)
+  //           && element('mem_receive_email', $writer)) {
+  //           $emailsendlistpostwriter['mem_email'] = element('post_email', $review);
+  //       }
+  //       if (element('send_note_blame_super_admin', $board) && $superadminlist) {
+  //           foreach ($superadminlist as $key => $value) {
+  //               $notesendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_note_blame_group_admin', $board) && $groupadminlist) {
+  //           foreach ($groupadminlist as $key => $value) {
+  //               $notesendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_note_blame_board_admin', $board) && $boardadminlist) {
+  //           foreach ($boardadminlist as $key => $value) {
+  //               $notesendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_note_blame_post_writer', $board) && element('mem_use_note', $writer)) {
+  //           $notesendlistpostwriter = $writer;
+  //       }
+  //       if (element('send_sms_blame_super_admin', $board) && $superadminlist) {
+  //           foreach ($superadminlist as $key => $value) {
+  //               $smssendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_sms_blame_group_admin', $board) && $groupadminlist) {
+  //           foreach ($groupadminlist as $key => $value) {
+  //               $smssendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_sms_blame_board_admin', $board) && $boardadminlist) {
+  //           foreach ($boardadminlist as $key => $value) {
+  //               $smssendlistadmin[$value['mem_id']] = $value;
+  //           }
+  //       }
+  //       if (element('send_sms_blame_post_writer', $board)
+  //           && element('mem_phone', $writer)
+  //           && element('mem_receive_sms', $writer)) {
+  //           $smssendlistpostwriter = $writer;
+  //       }
+
+  //       $searchconfig = array(
+  //           '{홈페이지명}',
+  //           '{회사명}',
+  //           '{홈페이지주소}',
+  //           '{게시글제목}',
+  //           '{게시글내용}',
+  //           '{게시글작성자닉네임}',
+  //           '{게시글작성자아이디}',
+  //           '{게시글작성시간}',
+  //           '{게시글주소}',
+  //           '{게시판명}',
+  //           '{게시판주소}',
+  //       );
+  //       $autolink = element('use_auto_url', $board) ? true : false;
+  //       $popup = element('content_target_blank', $board) ? true : false;
+  //       $replaceconfig = array(
+  //           $this->cbconfig->item('site_title'),
+  //           $this->cbconfig->item('company_name'),
+  //           site_url(),
+  //           element('cre_title', $review),
+  //           display_html_content(element('post_content', $review), element('post_html', $review), element('post_image_width', $board), $autolink, $popup),
+  //           element('post_nickname', $review),
+  //           element('post_userid', $review),
+  //           element('post_datetime', $review),
+  //           post_url(element('brd_key', $board), element('post_id', $review)),
+  //           element('brd_name', $board),
+  //           board_url(element('brd_key', $board)),
+  //       );
+  //       $replaceconfig_escape = array(
+  //           html_escape($this->cbconfig->item('site_title')),
+  //           html_escape($this->cbconfig->item('company_name')),
+  //           site_url(),
+  //           html_escape(element('post_title', $post)),
+  //           display_html_content(element('post_content', $post), element('post_html', $post), element('post_image_width', $board), $autolink, $popup),
+  //           html_escape(element('post_nickname', $post)),
+  //           element('post_userid', $post),
+  //           element('post_datetime', $post),
+  //           post_url(element('brd_key', $board), element('post_id', $post)),
+  //           html_escape(element('brd_name', $board)),
+  //           board_url(element('brd_key', $board)),
+  //       );
+        // if ($emailsendlistadmin) {
+        //     $title = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig,
+        //         $this->cbconfig->item('send_email_blame_admin_title')
+        //     );
+        //     $content = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig_escape,
+        //         $this->cbconfig->item('send_email_blame_admin_content')
+        //     );
+        //     foreach ($emailsendlistadmin as $akey => $aval) {
+        //         $this->email->clear(true);
+        //         $this->email->from($this->cbconfig->item('webmaster_email'), $this->cbconfig->item('webmaster_name'));
+        //         $this->email->to(element('mem_email', $aval));
+        //         $this->email->subject($title);
+        //         $this->email->message($content);
+        //         $this->email->send();
+        //     }
+        // }
+        // if ($emailsendlistpostwriter) {
+        //     $title = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig,
+        //         $this->cbconfig->item('send_email_blame_post_writer_title')
+        //     );
+        //     $content = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig_escape,
+        //         $this->cbconfig->item('send_email_blame_post_writer_content')
+        //     );
+        //     $this->email->clear(true);
+        //     $this->email->from($this->cbconfig->item('webmaster_email'), $this->cbconfig->item('webmaster_name'));
+        //     $this->email->to(element('mem_email', $emailsendlistpostwriter));
+        //     $this->email->subject($title);
+        //     $this->email->message($content);
+        //     $this->email->send();
+        // }
+        // if ($notesendlistadmin) {
+        //     $title = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig,
+        //         $this->cbconfig->item('send_note_blame_admin_title')
+        //     );
+        //     $content = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig_escape,
+        //         $this->cbconfig->item('send_note_blame_admin_content')
+        //     );
+        //     foreach ($notesendlistadmin as $akey => $aval) {
+        //         $note_result = $this->notelib->send_note(
+        //             $sender = 0,
+        //             $receiver = element('mem_id', $aval),
+        //             $title,
+        //             $content,
+        //             1
+        //         );
+        //     }
+        // }
+        // if ($notesendlistpostwriter && element('mem_id', $notesendlistpostwriter)) {
+        //     $title = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig,
+        //         $this->cbconfig->item('send_note_blame_post_writer_title')
+        //     );
+        //     $content = str_replace(
+        //         $searchconfig,
+        //         $replaceconfig_escape,
+        //         $this->cbconfig->item('send_note_blame_post_writer_content')
+        //     );
+        //     $note_result = $this->notelib->send_note(
+        //         $sender = 0,
+        //         $receiver = element('mem_id', $notesendlistpostwriter),
+        //         $title,
+        //         $content,
+        //         1
+        //     );
+        // }
+        // if ($smssendlistadmin) {
+        //     if (file_exists(APPPATH . 'libraries/Smslib.php')) {
+        //         $this->load->library(array('smslib'));
+        //         $content = str_replace(
+        //             $searchconfig,
+        //             $replaceconfig,
+        //             $this->cbconfig->item('send_sms_blame_admin_content')
+        //         );
+        //         $sender = array(
+        //             'phone' => $this->cbconfig->item('sms_admin_phone'),
+        //         );
+        //         $receiver = array();
+        //         foreach ($smssendlistadmin as $akey => $aval) {
+        //             $receiver[] = array(
+        //                 'mem_id' => element('mem_id', $aval),
+        //                 'name' => element('mem_nickname', $aval),
+        //                 'phone' => element('mem_phone', $aval),
+        //             );
+        //         }
+        //         $smsresult = $this->smslib->send($receiver, $sender, $content, $date = '', '게시글 신고 알림');
+        //     }
+        // }
+        // if ($smssendlistpostwriter) {
+        //     if (file_exists(APPPATH . 'libraries/Smslib.php')) {
+        //         $this->load->library(array('smslib'));
+        //         $content = str_replace(
+        //             $searchconfig,
+        //             $replaceconfig,
+        //             $this->cbconfig->item('send_sms_blame_post_writer_content')
+        //         );
+        //         $sender = array(
+        //             'phone' => $this->cbconfig->item('sms_admin_phone'),
+        //         );
+        //         $receiver = array();
+        //         $receiver[] = $smssendlistpostwriter;
+        //         $smsresult = $this->smslib->send($receiver, $sender, $content, $date = '', '게시글 신고 알림');
+        //     }
+        // }
+
+        // 이벤트가 존재하면 실행합니다
+        Events::trigger('after', $eventname);
+
+
+        if ( $review && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_review_blame')) {
+
+        	$this->load->library('notificationlib');
+        	$not_message = $this->member->item('mem_nickname') . '님께서 회원님의 리뷰 [' . element('cre_title', $review) . '] 을 신고 하셨습니다.';
+        	$not_url = base_url('cmall_review/itemreviewpost/'.element('cit_id',$review).'/'.element('cre_id',$review));
+        	$this->notificationlib->set_noti(
+        		element('mem_id', $review),
+        		$mem_id,
+        		'review_blame',
+        		element('cre_id',$review),
+        		$not_message,
+        		$not_url
+        	);
+        }
+
+
+        $result = array(
+            'success' => '이 글을 신고 하셨습니다',
+            'count' => $count,
+        );
+
+        
+        
+        return $this->response($result, 201);
+
+        
+
 	}
 }

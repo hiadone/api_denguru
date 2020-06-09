@@ -22,6 +22,10 @@ class Like_model extends CB_Model
 	 */
 	public $primary_key = 'lik_id'; // 사용되는 테이블의 프라이머리키
 
+	public $_select = 'like.*, cmall_review.*'; 
+
+
+
 	function __construct()
 	{
 		parent::__construct();
@@ -108,4 +112,17 @@ class Like_model extends CB_Model
 
 		return $result;
 	}
+
+	public function get_review_like_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
+	{
+
+
+		$select = $this->_select;
+		$join[] = array('table' => 'cmall_review', 'on' => 'like.target_id = cmall_review.cre_id', 'type' => 'inner');
+		$result = $this->_get_list_common($select, $join, $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);
+		return $result;
+	}
 }
+
+
+

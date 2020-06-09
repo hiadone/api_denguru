@@ -143,6 +143,12 @@ class CB_Input extends CI_Input
 		return $this->_fetch_from_array($_POST, $index, $xss_clean, $default_value);
 	}
 
+	public function put($index = NULL, $xss_clean = NULL, $default_value = NULL)
+	{	
+		$_PUT = $this->input_stream();
+		return $this->_fetch_from_array($_PUT, $index, $xss_clean, $default_value);
+	}
+
 	// --------------------------------------------------------------------
 
 	/**
@@ -173,6 +179,13 @@ class CB_Input extends CI_Input
 		return isset($_GET[$index])
 			? $this->get($index, $xss_clean, $default_value)
 			: $this->post($index, $xss_clean, $default_value);
+	}
+
+	public function post_put($index, $xss_clean = NULL, $default_value = NULL)
+	{
+		return isset($_POST[$index])
+			? $this->post($index, $xss_clean, $default_value)
+			: $this->put($index, $xss_clean, $default_value);
 	}
 
 	// --------------------------------------------------------------------

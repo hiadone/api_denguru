@@ -29,21 +29,30 @@ if ( ! function_exists('print_r2')) {
  * Alert 띄우기
  */
 if ( ! function_exists('alert')) {
-	function alert($msg = '', $url = '')
-	{
+	function alert($msg = '', $url = '',$status=403)
+	{	
+		$CI =& get_instance();
 		if (empty($msg)) {
 			$msg = '잘못된 접근입니다';
 		}
-		echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-		echo '<script type="text/javascript">alert("' . $msg . '");';
-		if (empty($url)) {
-			echo 'history.go(-1);';
-		}
-		if ($url) {
-			echo 'document.location.href="' . $url . '"';
-		}
-		echo '</script>';
-		exit;
+
+		log_message('error', 'msg:'.$msg .' pointer:'.current_url());
+
+		$CI->output->set_content_type('application/json');
+		$response = [ 'msg' => $msg ,'pointer' => current_url()];
+		set_status_header($status);
+		exit(json_encode($response,JSON_UNESCAPED_UNICODE));
+		
+		// echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
+		// echo '<script type="text/javascript">alert("' . $msg . '");';
+		// if (empty($url)) {
+		// 	echo 'history.go(-1);';
+		// }
+		// if ($url) {
+		// 	echo 'document.location.href="' . $url . '"';
+		// }
+		// echo '</script>';
+		// exit;
 	}
 }
 
@@ -53,13 +62,22 @@ if ( ! function_exists('alert')) {
  */
 if ( ! function_exists('alert_close')) {
 	function alert_close($msg = '')
-	{
+	{	
+		$CI = & get_instance();
 		if (empty($msg)) {
 			$msg = '잘못된 접근입니다';
 		}
-		echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-		echo '<script type="text/javascript"> alert("' . $msg . '"); window.close(); </script>';
-		exit;
+
+		log_message('error', 'msg:'.$msg .' pointer:'.current_url());
+		$CI->output->set_content_type('application/json');
+		$status = 403;
+		// $response = ['status' => $status, 'msg' => $msg ,'pointer' => current_url()];
+		$response = [ 'msg' => $msg ,'pointer' => current_url()];
+		set_status_header($status);
+		exit(json_encode($response,JSON_UNESCAPED_UNICODE));
+		// echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
+		// echo '<script type="text/javascript"> alert("' . $msg . '"); window.close(); </script>';
+		// exit;
 	}
 }
 
@@ -379,15 +397,15 @@ if ( ! function_exists('required_user_login')) {
 	{
 		$CI =& get_instance();
 		if ($CI->member->is_member() === false) {
-			if ($type === 'alert') {
+			// if ($type === 'alert') {
 				alert_close('로그인 후 이용이 가능합니다');
-			} else {
-				$CI->session->set_flashdata(
-					'message',
-					'로그인 후 이용이 가능합니다'
-				);
-				redirect('login?url=' . urlencode(current_full_url()));
-			}
+			// } else {
+			// 	$CI->session->set_flashdata(
+			// 		'message',
+			// 		'로그인 후 이용이 가능합니다'
+			// 	);
+			// 	redirect('login?url=' . urlencode(current_full_url()));
+			// }
 		}
 		return true;
 	}
@@ -1071,11 +1089,15 @@ if ( ! function_exists('get_post_image_url')) {
 		$p = parse_url($src);
 		if (isset($p['host']) && $p['host'] === $CI->input->server('HTTP_HOST')
 			&& strpos($p['path'], '/' . config_item('uploads_dir') . '/editor/') !== false) {
-			$src = thumb_url(
+			// $src = thumb_url(
+			// 	'editor',
+			// 	str_replace(site_url(config_item('uploads_dir') . '/editor') . '/', '', $src),
+			// 	$thumb_width,
+			// 	$thumb_height
+			// );
+			$src = cnd_url(
 				'editor',
-				str_replace(site_url(config_item('uploads_dir') . '/editor') . '/', '', $src),
-				$thumb_width,
-				$thumb_height
+				str_replace(site_url(config_item('uploads_dir') . '/editor') . '/', '', $src)
 			);
 		}
 		return $src;
@@ -1539,4 +1561,37 @@ if ( ! function_exists('check_cache_dir')) {
 		}
 		return true;
 	}
+}
+
+/**
+ * 이벤트 이미지 가져오기
+ */
+if ( ! function_exists('event_image_url')) {
+    function event_image_url($img = '', $width = '', $height = '')
+    {
+        if (empty($img)) {
+            return false;
+        }
+        is_numeric($width) OR $width = '';
+        is_numeric($height) OR $height = '';
+
+        return thumb_url('event', $img, $width, $height);
+    }
+}
+
+if ( ! function_exists('get_selected')) {
+    function get_selected($selected = array())
+    {
+        if (empty($selected)) {
+            return false;
+        }
+        $select='';
+        foreach($selected as $key => $value){
+        	foreach($value as $val)
+        		$select.=$key.'.'.$val.',';
+        }
+        
+        
+        return rtrim($select,',');
+    }
 }

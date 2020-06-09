@@ -35,8 +35,8 @@ class Member extends CI_Controller
 	 */
 	public function is_member()
 	{
-		if ($this->CI->jwt->userdata('mem_id')) {
-			return $this->CI->jwt->userdata('mem_id');
+		if ($this->CI->cb_jwt->userdata('mem_id')) {
+			return $this->CI->cb_jwt->userdata('mem_id');
 		} else {
 			return false;
 		}
@@ -77,6 +77,7 @@ class Member extends CI_Controller
 		if ($this->is_member()) {
 			if (empty($this->mb)) {
 				$member = $this->CI->Member_model->get_by_memid($this->is_member());
+				
 				$extras = $this->get_all_extras(element('mem_id', $member));
 				if (is_array($extras)) {
 					$member = array_merge($member, $extras);
@@ -86,7 +87,20 @@ class Member extends CI_Controller
 					$member = array_merge($member, $metas);
 				}
 				$member['social'] = $this->get_all_social_meta(element('mem_id', $member));
+
+				$this->CI->load->model(
+					array(
+						'Member_pet_model',
+					)
+				);
+				$pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
+				
+				if (is_array($pet)) {
+					$member = array_merge($member, $pet);
+				}
+
 				$this->mb = $member;
+
 			}
 			return $this->mb;
 		} else {
@@ -244,9 +258,19 @@ class Member extends CI_Controller
 				'Member_level_history_model', 'Member_login_log_model', 'Member_meta_model',
 				'Member_register_model', 'Notification_model', 'Point_model',
 				'Scrap_model', 'Social_meta_model',
-				'Tempsave_model', 'Member_userid_model',
+				'Tempsave_model', 'Member_userid_model','Member_pet_model'
 			)
 		);
+
+
+		$getdata = $this->Member_pet_model->get('','pet_id',array('mem_id' => $mem_id));
+		if ($getdata && is_array($getdata)) {
+			foreach ($getdata as $pval) {
+				if (element('pet_id', $pval)) {
+					$this->delete_pet(element('pet_id', $pval));
+				}
+			}
+		}
 
 		$deletewhere = array(
 			'mem_id' => $mem_id,
@@ -270,6 +294,7 @@ class Member extends CI_Controller
 		$this->CI->Scrap_model->delete_where($deletewhere);
 		$this->CI->Social_meta_model->delete_where($deletewhere);
 		$this->CI->Tempsave_model->delete_where($deletewhere);
+		
 
 		$this->CI->Member_userid_model->update($mem_id, array('mem_status' => 1));
 
@@ -336,4 +361,225 @@ class Member extends CI_Controller
 		return true;
 	}
 
+	public function delete_pet($pet_id = 0)
+	{
+		$pet_id = (int) $pet_id;
+		if (empty($pet_id) OR $pet_id < 1) {
+			return false;
+		}
+
+		$this->CI->load->model(
+			array(
+				'Member_pet_model',
+			)
+		);
+		$this->CI->load->library('aws_s3');
+		$getdata = $this->CI->Member_pet_model->get_one($pet_id);
+		
+
+		if (element('pet_photo', $getdata)) {
+			// 기존 파일 삭제
+			@unlink(config_item('uploads_dir') . '/member_photo/' . element('pet_photo', $getdata));
+			$deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/member_photo/' . element('pet_photo', $getdata));
+		}
+
+		if (element('pet_backgroundimg', $getdata)) {
+			// 기존 파일 삭제
+			@unlink(config_item('uploads_dir') . '/member_icon/' . element('pet_backgroundimg', $getdata));
+			$deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/member_icon/' . element('pet_backgroundimg', $getdata));
+		}
+
+		$deletewhere = array(
+			'pet_id' => $pet_id,
+		);
+		
+
+
+		$this->CI->Member_pet_model->delete_where($deletewhere);
+
+		return true;
+	}
+
+
+	public function get_default_info($_mem_id = 0,$arr = array())
+	{
+		
+		
+		
+		if (empty($_mem_id) OR $_mem_id < 1) {
+			return false;
+		}
+
+
+
+
+		
+		
+
+		$this->CI->load->model(
+			array(
+				'Member_pet_model','Reviewer_model',
+			)
+		);
+
+		$data = array();
+
+
+		$data['member_reviewer_url']= base_url('/profile/reviewer/'.$_mem_id);
+
+		
+		$data['reviewerstatus'] = 0; //리뷰어로 선정했는지 여부 
+
+		if(!empty($this->is_member())){
+		    $countwhere = array(
+		    'mem_id' => $this->is_member(),
+		    'target_mem_id' => $_mem_id,
+		    );
+		    $data['reviewerstatus'] = $this->CI->Reviewer_model
+		    ->count_by($countwhere);  
+		}
+
+		$member = $this->CI->Member_model->get_by_memid($_mem_id);
+		
+		$pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
+		
+		if (is_array($pet)) {
+			$member = array_merge($member, $pet);
+		}
+
+		$data['mem_id'] = element('mem_id',$member);
+		$data['mem_userid'] = element('mem_userid',$member);
+		$data['mem_email'] = element('mem_email',$member);
+		$data['mem_username'] = element('mem_username',$member);
+		$data['mem_nickname'] = element('mem_nickname',$member);
+		$data['pet_id'] = element('pet_id',$member);
+		$data['pet_name'] = element('pet_name',$member);
+		$data['pet_birthday'] = element('pet_birthday',$member);
+		$data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
+		$data['pet_sex'] = element('pet_sex',$member);
+		$data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
+		$data['pet_neutral'] = element('pet_neutral',$member);
+		$data['pet_weight'] = element('pet_weight',$member);
+		$data['pet_form'] = element(element('pet_form',$member),config_item('pet_form'),'');
+		$data['pet_kind'] = element('pet_kind',$member);
+
+		$data['pet_attr'] = array();
+		if(element('pet_attr',$member)){
+			foreach(explode(",",element('pet_attr',$member)) as $value){
+				$data['pet_attr'][]= element($value,config_item('pet_attr'),'');
+			}
+		}
+		
+		
+		$data['pet_allergy'] = element('pet_allergy',$member);
+			
+
+		$data = array_merge($arr, $data);
+
+		return $data;
+	}
+
+	public function convert_default_info($_mem_id = 0)
+	{
+		
+		
+		$_mem_id = (int) $_mem_id;
+		if (empty($_mem_id) OR $_mem_id < 1) {
+			return false;
+		}
+
+
+
+
+		// if($this->is_member() === $_mem_id){
+		// 	$data = array();
+		// 	$data['mem_id'] = $this->item('mem_id');
+		// 	$data['mem_userid'] = $this->item('mem_userid');
+		// 	$data['mem_email'] = $this->item('mem_email');
+		// 	$data['mem_username'] = $this->item('mem_username');
+		// 	$data['mem_nickname'] = $this->item('mem_nickname');
+		// 	$data['social'] = $this->item('social');
+		// 	$data['pet_id'] = $this->item('pet_id');
+		// 	$data['pet_name'] = $this->item('pet_name');
+		// 	$data['pet_birthday'] = $this->item('pet_birthday');
+		// 	$data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
+		// 	$data['pet_sex'] = $this->item('pet_sex');
+		// 	$data['pet_photo_url'] = cdn_url('member_photo',$this->item('pet_photo'));
+		// 	$data['pet_neutral'] = $this->item('pet_neutral');
+		// 	$data['pet_weight'] = $this->item('pet_weight');
+		// 	$data['pet_form'] = element($this->item('pet_form'),config_item('pet_form'),'');
+		// 	$data['pet_kind'] = $this->item('pet_kind');
+
+		// 	if($this->item('pet_attr')){
+		// 		foreach(explode(",",$this->item('pet_attr')) as $value){
+		// 			$data['pet_attr'][]= element($value,config_item('pet_attr'),'');
+		// 		}
+		// 	}
+			
+			
+		// 	$data['pet_allergy'] = $this->item('pet_allergy');
+		// }else{
+
+			$this->CI->load->model(
+				array(
+					'Member_pet_model','Reviewer_model',
+				)
+			);
+
+			$data = array();
+
+
+			$data['member_reviewer_url']= base_url('/profile/reviewer/'.$_mem_id);
+
+			
+			$data['reviewerstatus'] = 0; //리뷰어로 선정했는지 여부 
+
+			if(!empty($this->is_member())){
+			    $countwhere = array(
+			    'mem_id' => $this->is_member(),
+			    'target_mem_id' => $_mem_id,
+			    );
+			    $data['reviewerstatus'] = $this->CI->Reviewer_model
+			    ->count_by($countwhere);  
+			}
+
+			$member = $this->CI->Member_model->get_by_memid($_mem_id);
+			
+			$pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
+			
+			if (is_array($pet)) {
+				$member = array_merge($member, $pet);
+			}
+
+			$data['mem_id'] = element('mem_id',$member);
+			$data['mem_userid'] = element('mem_userid',$member);
+			$data['mem_email'] = element('mem_email',$member);
+			$data['mem_username'] = element('mem_username',$member);
+			$data['mem_nickname'] = element('mem_nickname',$member);
+			$data['pet_id'] = element('pet_id',$member);
+			$data['pet_name'] = element('pet_name',$member);
+			$data['pet_birthday'] = element('pet_birthday',$member);
+			$data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
+			$data['pet_sex'] = element('pet_sex',$member);
+			$data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
+			$data['pet_neutral'] = element('pet_neutral',$member);
+			$data['pet_weight'] = element('pet_weight',$member);
+			$data['pet_form'] = element(element('pet_form',$member),config_item('pet_form'),'');
+			$data['pet_kind'] = element('pet_kind',$member);
+
+			if(element('pet_attr',$member)){
+				foreach(explode(",",element('pet_attr',$member)) as $value){
+					$data['pet_attr'][]= element($value,config_item('pet_attr'),'');
+				}
+			}
+			
+			
+			$data['pet_allergy'] = element('pet_allergy',$member);
+		
+
+			return $data;
+	}
 }
+
+
+

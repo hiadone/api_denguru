@@ -34,9 +34,9 @@ class Board_crawl_model extends CB_Model
     }
 
 
-    public function get_board_list($where = '')
+    public function get_board_list($where = '',$select = '')
     {
-        $result = $this->get('', '', $where, '', 0);
+        $result = $this->get('', $select, $where, '', 0);
         return $result;
     }
 

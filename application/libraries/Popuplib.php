@@ -49,16 +49,7 @@ class Popuplib extends CI_Controller
 		$pagetitle = '팝업알림';
 		$skin_file = 'popup';
 
-		$skindir = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
-			? $this->CI->cbconfig->item('mobile_skin_popup')
-			: $this->CI->cbconfig->item('skin_popup');
-		if (empty($skindir)) {
-			$skindir = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
-				? $this->CI->cbconfig->item('mobile_skin_default')
-				: $this->CI->cbconfig->item('skin_default');
-		}
-
-		$view_skin_file = 'popup/' . $skindir . '/' . $skin_file;
+		
 
 		$view = array();
 		$view['view'] = array();
@@ -67,9 +58,7 @@ class Popuplib extends CI_Controller
 		$list = array();
 		if (element('list', element('view', $view))) {
 			foreach (element('list', element('view', $view)) as $key => $value) {
-				if (get_cookie('popup_layer_' . element('pop_id', $value))) {
-					continue;
-				}
+				
 				if ($this->CI->cbconfig->get_device_view_type() === 'mobile'
 					&& element('pop_device', $value) === 'pc') {
 					continue;
@@ -78,9 +67,10 @@ class Popuplib extends CI_Controller
 					&& element('pop_device', $value) === 'mobile') {
 					continue;
 				}
+
 				if ( ! element('pop_page', $value)
 					&& $this->CI->uri->segment(1)) {
-					continue;
+					// continue;
 				}
 
 				$content = element('pop_content', $value);
@@ -103,12 +93,10 @@ class Popuplib extends CI_Controller
 					$writer_is_admin = true
 				);
 
-				$list[] = $value;
+				$list['list'][] = $value;
 			}
 		}
-		$view['view']['popup'] = $list;
-		if ($list) {
-			return $this->CI->load->view($view_skin_file, $view, true);
-		}
+		return $list;
+		
 	}
 }

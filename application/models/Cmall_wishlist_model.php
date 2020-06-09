@@ -41,9 +41,8 @@ class Cmall_wishlist_model extends CB_Model
 
 	public function get_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
 	{
-		$select = 'cmall_wishlist.*, cmall_item.cit_name, cmall_item.cit_key, cmall_item.cit_file_1';
-		$join[] = array('table' => 'cmall_item', 'on' => 'cmall_wishlist.cit_id = cmall_item.cit_id', 'type' => 'inner');
-		$result = $this->_get_list_common($select, $join, $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);
+		$select = 'cmall_wishlist.*';
+		$result = $this->_get_list_common($select, $join ='', $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);
 		return $result;
 	}
 

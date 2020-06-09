@@ -107,13 +107,15 @@ class Crawl_tag_model extends CB_Model
     }
 
 
-    public function get_popular_tags($start_date = '', $limit = '')
+    public function get_popular_tags($brd_id = 0, $limit = '')
     {
         $this->db->select('count(*) as cnt, cta_tag ', false);
         $this->db->from('crawl_tag');
-        $this->db->join('crawl', 'crawl.crawl_id = crawl_tag.crawl_id', 'left');
-        $this->db->where('left(crawl_datetime, 10) >=', $start_date);
-        $this->db->where('crawl_del', 0);
+        $this->db->join('cmall_item', 'cmall_item.cit_id = crawl_tag.cit_id', 'inner');
+        // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
+        if($brd_id)
+            $this->db->where('crawl_tag.brd_id', $brd_id);
+        $this->db->where('cit_status', 1);
         $this->db->group_by('cta_tag');
         $this->db->order_by('cnt', 'desc');
         if ($limit) {

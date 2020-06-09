@@ -273,7 +273,7 @@ class Posthistory extends CB_Controller
 	/**
 	 * 상세페이지에서 선택삭제를 하는 경우 실행되는 메소드입니다
 	 */
-	public function delete($phi_id = 0)
+	public function posthistory_delete($phi_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_admin_board_posthistory_delete';

@@ -80,4 +80,21 @@ class Cmall_category_model extends CB_Model
 
 		return $result;
 	}
+
+	public function get_category_child($cca_parent = 0)
+	{
+		$cca_parent = (int) $cca_parent;
+		// if (empty($cca_id) OR $cca_id < 1) {
+		// 	return;
+		// }
+		
+		$where = array(
+			'cca_parent' => $cca_parent
+		);
+		$return = $this->get($primary_value = '', $select = '', $where, $limit = '', $offset = 0, $findex = 'cca_order', $forder = 'asc');
+
+		
+		
+		return isset($return) ? $return : '';
+	}
 }
