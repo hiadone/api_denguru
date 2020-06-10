@@ -1255,13 +1255,13 @@ class Mypage extends CB_Controller
             ? $this->cbconfig->item('cmall_product_review_mobile_content_target_blank')
             : $this->cbconfig->item('cmall_product_review_content_target_blank');
 
-        $field = array(
-            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
-        );
+        // $field = array(
+        //     'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        // );
         
-        $select = get_selected($field);
+        // $select = get_selected($field);
         
-        $this->Cmall_review_model->_select = $select;
+        // $this->Cmall_review_model->_select = $select;
 
 
         $result = $this->Cmall_review_model
@@ -1319,7 +1319,8 @@ class Mypage extends CB_Controller
             $config['num_links'] = 5;
         }
         $this->pagination->initialize($config);
-        $view['view']['paging'] = $this->pagination->create_links();
+        // $view['view']['paging'] = $this->pagination->create_links();
+        $view['view']['next_link'] = $this->pagination->get_next_link();
         $view['view']['page'] = $page;
         
    
@@ -1517,7 +1518,8 @@ class Mypage extends CB_Controller
             $config['num_links'] = 5;
         }
         $this->pagination->initialize($config);
-        $view['view']['paging'] = $this->pagination->create_links();
+        // $view['view']['paging'] = $this->pagination->create_links();
+        $view['view']['next_link'] = $this->pagination->get_next_link();
         $view['view']['page'] = $page;
         
    

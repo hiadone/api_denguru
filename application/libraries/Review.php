@@ -141,6 +141,11 @@ class Review extends CI_Controller
         $review['cre_title'] = html_escape(element('cre_title',$review));
 
         // $review['itemreviewpost_url'] = base_url('cmall_review/itemreviewpost/'.element('cit_id',$review));
+
+        $review['reviewupdate_url'] = base_url('cmall_review/reviewwrite/'.element('cit_id',$review).'/'.element('cre_id',$review));
+
+        $review['reviewdelete_url'] = base_url('cmall_review/review/'.element('cre_id',$review));
+
         $review['userreviewpost_url'] = base_url('cmall_review/userreviewpost/'.element('mem_id',$review));
         
 
@@ -170,6 +175,11 @@ class Review extends CI_Controller
             );
 
             $review['reviewblamestatus'] = $this->CI->Like_model->count_by($where);  
+        }
+
+        for ($k = 1; $k <= 10; $k++) {
+            
+            
         }
 
         return $review;

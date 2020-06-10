@@ -17,7 +17,7 @@ class Cmall_review_model extends CB_Model
 	 */
 	public $_table = 'cmall_review';
 
-	public $_select = 'cmall_review.*';
+	public $_select = 'cre_id,cit_id,cre_good,cre_bad,cre_tip,cre_file_1,cre_file_2,cre_file_3,cre_file_4,cre_file_5,cre_file_6,cre_file_7,cre_file_8,cre_file_9,cre_file_10,mem_id,cre_score,cre_datetime,cre_like,cre_update_datetime';
 	/**
 	 * 사용되는 테이블의 프라이머리키
 	 */

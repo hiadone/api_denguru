@@ -53,6 +53,8 @@ class Cmall_review extends CB_Controller
         $view = array();
         $view['view'] = array();
 
+        $view['view']['reviewwrite_url'] = base_url('cmall_review/reviewwrite');
+
         $this->load->model(array('Cmall_item_model', 'Cmall_review_model'));
 
         if($cit_id){
@@ -63,13 +65,13 @@ class Cmall_review extends CB_Controller
         }
         $mem_id = (int) $this->member->item('mem_id');
 
-        $field = array(
-            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
-        );
+        // $field = array(
+        //     'cmall_review' => array('cre_id','cit_id','cre_good','cre_bad','cre_tip','cre_file_1','cre_file_2','cre_file_3','cre_file_4','cre_file_5','cre_file_6','cre_file_7','cre_file_8','cre_file_9','cre_file_10','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        // );
         
-        $select = get_selected($field);
+        // $select = get_selected($field);
         
-        $this->Cmall_review_model->_select = $select;
+        // $this->Cmall_review_model->_select = $select;
 
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
@@ -234,6 +236,7 @@ class Cmall_review extends CB_Controller
         $view = $data = array();
         $view['view'] = array();
 
+        $view['view']['reviewwrite_url'] = base_url('cmall_review/reviewwrite/'.$cit_id);
     
         $this->load->model(array('Cmall_item_model', 'Cmall_review_model', 'Cmall_attr_model'));
 
@@ -318,13 +321,13 @@ class Cmall_review extends CB_Controller
             $this->Cmall_review_model->order_by('cre_id='.$cre_id,'',false);   
         }
 
-        $field = array(
-            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
-        );
+        // $field = array(
+        //     'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        // );
         
-        $select = get_selected($field);
+        // $select = get_selected($field);
         
-        $this->Cmall_review_model->_select = $select;
+        // $this->Cmall_review_model->_select = $select;
 
         $result = $this->Cmall_review_model
             ->get_list($per_page, $offset, $where, '', $findex, $forder);
@@ -508,6 +511,7 @@ class Cmall_review extends CB_Controller
          */
         $where = array();
         $where['cre_status'] = 1;
+        $where['mem_id'] = $_mem_id;
         // if($cit_id) $where['cit_id'] = $cit_id;
 
         $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
@@ -522,13 +526,13 @@ class Cmall_review extends CB_Controller
 
         
 
-        $field = array(
-            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
-        );
+        // $field = array(
+        //     'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        // );
         
-        $select = get_selected($field);
+        // $select = get_selected($field);
         
-        $this->Cmall_review_model->_select = $select;
+        // $this->Cmall_review_model->_select = $select;
 
 
         $result = $this->Cmall_review_model
@@ -680,7 +684,7 @@ class Cmall_review extends CB_Controller
 
 
 
-        $this->load->model(array('Cmall_item_model', 'Cmall_review_model'));
+        $this->load->model(array('Cmall_item_model', 'Cmall_review_model', 'Review_file_model'));
         $primary_key = $this->Cmall_review_model->primary_key;
         /**
          * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
@@ -749,14 +753,19 @@ class Cmall_review extends CB_Controller
          */
         $config = array(
             array(
-                'field' => 'cre_title',
-                'label' => '제목',
+                'field' => 'cre_good',
+                'label' => '좋았던 점 ',
                 'rules' => 'trim|required',
             ),
             array(
-                'field' => 'cre_content',
-                'label' => '내용',
+                'field' => 'cre_bad',
+                'label' => '아쉬운 점',
                 'rules' => 'trim|required',
+            ),
+            array(
+                'field' => 'cre_tip',
+                'label' => '나만의 팁',
+                'rules' => 'trim',
             ),
             array(
                 'field' => 'cre_score',
@@ -765,13 +774,166 @@ class Cmall_review extends CB_Controller
             ),
         );
         $this->form_validation->set_rules($config);
+        $form_validation = $this->form_validation->run();
+        $file_error = '';
 
+        $uploadfiledata = array();
+        $uploadfiledata2 = array();
+        if ($form_validation) {
+            $this->load->library('upload');
+            $this->load->library('aws_s3');
+            
+            if (isset($_FILES) && isset($_FILES['cre_file']) && isset($_FILES['cre_file']['name']) && is_array($_FILES['cre_file']['name'])) {
+                $filecount = count($_FILES['cre_file']['name']);
+                $upload_path = config_item('uploads_dir') . '/cmall_review/';
+                if (is_dir($upload_path) === false) {
+                    mkdir($upload_path, 0707);
+                    $file = $upload_path . 'index.php';
+                    $f = @fopen($file, 'w');
+                    @fwrite($f, '');
+                    @fclose($f);
+                    @chmod($file, 0644);
+                }
+                $upload_path .= cdate('Y') . '/';
+                if (is_dir($upload_path) === false) {
+                    mkdir($upload_path, 0707);
+                    $file = $upload_path . 'index.php';
+                    $f = @fopen($file, 'w');
+                    @fwrite($f, '');
+                    @fclose($f);
+                    @chmod($file, 0644);
+                }
+                $upload_path .= cdate('m') . '/';
+                if (is_dir($upload_path) === false) {
+                    mkdir($upload_path, 0707);
+                    $file = $upload_path . 'index.php';
+                    $f = @fopen($file, 'w');
+                    @fwrite($f, '');
+                    @fclose($f);
+                    @chmod($file, 0644);
+                }
+
+                foreach ($_FILES['cre_file']['name'] as $i => $value) {
+                    if ($value) {
+                        $uploadconfig = array();
+                        $uploadconfig['upload_path'] = $upload_path;
+                        $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|mp4|m4v|f4v|mov|flv|webm';
+                        $uploadconfig['max_size'] = '100000';
+                        $uploadconfig['encrypt_name'] = true;
+
+                        $this->upload->initialize($uploadconfig);
+                        $_FILES['userfile']['name'] = $_FILES['cre_file']['name'][$i];
+                        $_FILES['userfile']['type'] = $_FILES['cre_file']['type'][$i];
+                        $_FILES['userfile']['tmp_name'] = $_FILES['cre_file']['tmp_name'][$i];
+                        $_FILES['userfile']['error'] = $_FILES['cre_file']['error'][$i];
+                        $_FILES['userfile']['size'] = $_FILES['cre_file']['size'][$i];
+                        if ($this->upload->do_upload()) {
+                            $filedata = $this->upload->data();
+
+                            $uploadfiledata[$i] = array();
+                            $uploadfiledata[$i]['rfi_filename'] = cdate('Y') . '/' . cdate('m') . '/' . element('file_name', $filedata);
+                            $uploadfiledata[$i]['rfi_originname'] = element('orig_name', $filedata);
+                            $uploadfiledata[$i]['rfi_filesize'] = intval(element('file_size', $filedata) * 1024);
+                            $uploadfiledata[$i]['rfi_width'] = element('image_width', $filedata) ? element('image_width', $filedata) : 0;
+                            $uploadfiledata[$i]['rfi_height'] = element('image_height', $filedata) ? element('image_height', $filedata) : 0;
+                            $uploadfiledata[$i]['rfi_type'] = str_replace('.', '', element('file_ext', $filedata));
+                            $uploadfiledata[$i]['is_image'] = element('is_image', $filedata) ? element('is_image', $filedata) : 0;
+
+                            $upload = $this->aws_s3->upload_file($this->upload->upload_path,$this->upload->file_name,$upload_path);
+                        } else {
+                            $file_error = $this->upload->display_errors();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (isset($_FILES) && isset($_FILES['cre_file_update'])
+                && isset($_FILES['cre_file_update']['name'])
+                && is_array($_FILES['cre_file_update']['name'])
+                && $file_error === '') {
+                $filecount = count($_FILES['cre_file_update']['name']);
+                $upload_path = config_item('uploads_dir') . '/cmall_review/';
+                if (is_dir($upload_path) === false) {
+                    mkdir($upload_path, 0707);
+                    $file = $upload_path . 'index.php';
+                    $f = @fopen($file, 'w');
+                    @fwrite($f, '');
+                    @fclose($f);
+                    @chmod($file, 0644);
+                }
+                $upload_path .= cdate('Y') . '/';
+                if (is_dir($upload_path) === false) {
+                    mkdir($upload_path, 0707);
+                    $file = $upload_path . 'index.php';
+                    $f = @fopen($file, 'w');
+                    @fwrite($f, '');
+                    @fclose($f);
+                    @chmod($file, 0644);
+                }
+                $upload_path .= cdate('m') . '/';
+                if (is_dir($upload_path) === false) {
+                    mkdir($upload_path, 0707);
+                    $file = $upload_path . 'index.php';
+                    $f = @fopen($file, 'w');
+                    @fwrite($f, '');
+                    @fclose($f);
+                    @chmod($file, 0644);
+                }
+
+                foreach ($_FILES['cre_file_update']['name'] as $i => $value) {
+                    if ($value) {
+                        $uploadconfig = array();
+                        $uploadconfig['upload_path'] = $upload_path;
+                        $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|mp4|m4v|f4v|mov|flv|webm';
+                        $uploadconfig['max_size'] = '100000';
+                        $uploadconfig['encrypt_name'] = true;
+                        $this->upload->initialize($uploadconfig);
+                        $_FILES['userfile']['name'] = $_FILES['cre_file_update']['name'][$i];
+                        $_FILES['userfile']['type'] = $_FILES['cre_file_update']['type'][$i];
+                        $_FILES['userfile']['tmp_name'] = $_FILES['cre_file_update']['tmp_name'][$i];
+                        $_FILES['userfile']['error'] = $_FILES['cre_file_update']['error'][$i];
+                        $_FILES['userfile']['size'] = $_FILES['cre_file_update']['size'][$i];
+                        if ($this->upload->do_upload()) {
+                            $filedata = $this->upload->data();
+
+                            $oldcrefile = $this->Review_file_model->get_one($i);
+                            if ((int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $post)) {
+                                alert('잘못된 접근입니다');
+                            }
+                            @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
+
+                            $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
+
+                            $uploadfiledata2[$i] = array();
+                            $uploadfiledata2[$i]['rfi_id'] = $i;
+                            $uploadfiledata2[$i]['rfi_filename'] = cdate('Y') . '/' . cdate('m') . '/' . element('file_name', $filedata);
+                            $uploadfiledata2[$i]['rfi_originname'] = element('orig_name', $filedata);
+                            $uploadfiledata2[$i]['rfi_filesize'] = intval(element('file_size', $filedata) * 1024);
+                            $uploadfiledata2[$i]['rfi_width'] = element('image_width', $filedata)
+                                ? element('image_width', $filedata) : 0;
+                            $uploadfiledata2[$i]['rfi_height'] = element('image_height', $filedata)
+                                ? element('image_height', $filedata) : 0;
+                            $uploadfiledata2[$i]['rfi_type'] = str_replace('.', '', element('file_ext', $filedata));
+                            $uploadfiledata2[$i]['is_image'] = element('is_image', $filedata)
+                                ? element('is_image', $filedata) : 0;
+
+                            $upload = $this->aws_s3->upload_file($this->upload->upload_path,$this->upload->file_name,$upload_path);
+                        } else {
+                            $file_error = $this->upload->display_errors();
+                            break;
+                        }
+                    }
+                }
+            }
+            
+        }
 
         /**
          * 유효성 검사를 하지 않는 경우, 또는 유효성 검사에 실패한 경우입니다.
          * 즉 글쓰기나 수정 페이지를 보고 있는 경우입니다
          */
-        if ($this->form_validation->run() === false) {
+        if ($form_validation === false OR $file_error !== '') {
 
             /**
              * primary key 정보를 저장합니다
@@ -807,20 +969,25 @@ class Cmall_review extends CB_Controller
             // // 이벤트가 존재하면 실행합니다
             // Events::trigger('formruntrue', $eventname);
 
-            $content_type = $this->cbconfig->item('use_cmall_product_review_dhtml') ? 1 : 0;
+            
             $updatedata = array(
                 'cit_id' => $cit_id,
-                'cre_title' => $this->input->post_put('cre_title', null, ''),
-                'cre_content' => $this->input->post_put('cre_content', null, ''),
-                'cre_content_html_type' => $content_type,
+                'brd_id' => element('brd_id',$item),
+                'cre_good' => $this->input->post_put('cre_good', null, ''),
+                'cre_bad' => $this->input->post_put('cre_bad', null, ''),
+                'cre_tip' => $this->input->post_put('cre_tip', null, ''),
                 'cre_score' => $this->input->post_put('cre_score', null, 0),
             );
+
+            
 
             /**
              * 게시물을 수정하는 경우입니다
              */
             $param =& $this->querystring;
             $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+
+
 
             if ($cre_id) {
 
@@ -836,7 +1003,7 @@ class Cmall_review extends CB_Controller
 
                 $view['view'] = array('msg' => '정상적으로 수정되었습니다.');
                 
-                return $this->response($view['view'], 201);
+                
 
             } else {
 
@@ -854,9 +1021,9 @@ class Cmall_review extends CB_Controller
                     $updatedata['cre_status'] = 1;
                 }
 
-                $_cre_id = $this->Cmall_review_model->insert($updatedata);
+                $cre_id = $this->Cmall_review_model->insert($updatedata);
 
-                $this->cmalllib->review_alarm($_cre_id);
+                // $this->cmalllib->review_alarm($_cre_id);
 
                 $cntresult = $this->cmalllib->update_review_count($cit_id);
                 // $jresult = json_decode($cntresult, true);
@@ -867,7 +1034,7 @@ class Cmall_review extends CB_Controller
 
                     $view['view'] = array('msg' => '정상적으로 입력되었습니다. 관리자의 승인 후 출력됩니다.');
                 
-                return $this->response($view['view'], 201);
+                
 
                 } else {
                     // echo '<script type="text/javascript">window.opener.view_cmall_review("viewitemreview", ' . $cit_id . ', ' . $page . ');window.opener.cmall_review_count_update(' . $cnt . ');</script>';
@@ -875,9 +1042,131 @@ class Cmall_review extends CB_Controller
 
                     $view['view'] = array('msg' => '정상적으로 입력되었습니다.');
                 
-                    return $this->response($view['view'], 201);
+
                 }
             }
+
+            $file_updated = false;
+            $file_changed = false;
+            if ($uploadfiledata
+                && is_array($uploadfiledata)
+                && count($uploadfiledata) > 0) {
+                foreach ($uploadfiledata as $pkey => $pval) {
+                    if ($pval) {
+                        $fileupdate = array(
+                            'cre_id' => $cre_id,
+                            'brd_id' => element('brd_id',$item),
+                            'mem_id' => $mem_id,
+                            'rfi_originname' => element('rfi_originname', $pval),
+                            'rfi_filename' => element('rfi_filename', $pval),
+                            'rfi_filesize' => element('rfi_filesize', $pval),
+                            'rfi_width' => element('rfi_width', $pval),
+                            'rfi_height' => element('rfi_height', $pval),
+                            'rfi_type' => element('rfi_type', $pval),
+                            'rfi_is_image' => element('is_image', $pval),
+                            'rfi_datetime' => cdate('Y-m-d H:i:s'),
+                            'rfi_ip' => $this->input->ip_address(),
+                        );
+                        $file_id = $this->Review_file_model->insert($fileupdate);
+                        // if ( ! element('is_image', $pval)) {
+                        //     if (element('use_point', $board)) {
+                        //         $point = $this->point->insert_point(
+                        //             $mem_id,
+                        //             element('point_fileupload', $board),
+                        //             element('board_name', $board) . ' ' . $post_id . ' 파일 업로드',
+                        //             'fileupload',
+                        //             $file_id,
+                        //             '파일 업로드'
+                        //         );
+                        //     }
+                        // }
+                        $file_updated = true;
+                    }
+                }
+                $file_changed = true;
+            }
+            if ($uploadfiledata2
+                && is_array($uploadfiledata2)
+                && count($uploadfiledata2) > 0) {
+                foreach ($uploadfiledata2 as $pkey => $pval) {
+                    if ($pval) {
+                        $fileupdate = array(
+                            'mem_id' => $mem_id,
+                            'rfi_originname' => element('rfi_originname', $pval),
+                            'rfi_filename' => element('rfi_filename', $pval),
+                            'rfi_filesize' => element('rfi_filesize', $pval),
+                            'rfi_width' => element('rfi_width', $pval),
+                            'rfi_height' => element('rfi_height', $pval),
+                            'rfi_type' => element('rfi_type', $pval),
+                            'rfi_is_image' => element('is_image', $pval),
+                            'rfi_datetime' => cdate('Y-m-d H:i:s'),
+                            'rfi_ip' => $this->input->ip_address(),
+                        );
+                        $this->Review_file_model->update($pkey, $fileupdate);
+                        // if ( ! element('is_image', $pval)) {
+                        //     if (element('use_point', $board)) {
+                        //         $point = $this->point->insert_point(
+                        //             $mem_id,
+                        //             element('point_fileupload', $board),
+                        //             element('board_name', $board) . ' ' . $post_id . ' 파일 업로드',
+                        //             'fileupload',
+                        //             $pkey,
+                        //             '파일 업로드'
+                        //         );
+                        //     }
+                        // } else {
+                        //     $this->point->delete_point(
+                        //         $mem_id,
+                        //         'fileupload',
+                        //         $pkey,
+                        //         '파일 업로드'
+                        //     );
+                        // }
+                        $file_changed = true;
+                    }
+                }
+            }
+            if ($this->input->post('cre_file_del')) {
+                foreach ($this->input->post('cre_file_del') as $key => $val) {
+                    if ($val === '1' && ! isset($uploadfiledata2[$key])) {
+                        $oldcrefile = $this->Review_file_model->get_one($key);
+                        if ( ! element('cre_id', $oldcrefile) OR (int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $item)) {
+                            alert('잘못된 접근입니다.');
+                        }
+                        @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
+
+                        $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
+                        $this->Review_file_model->delete($key);
+                        // $this->point->delete_point(
+                        //     $mem_id,
+                        //     'fileupload',
+                        //     $key,
+                        //     '파일 업로드'
+                        // );
+                        $file_changed = true;
+                    }
+                }
+            }
+
+            $updatedata['cre_image'] = 0;
+            $updatedata['cre_file'] = 0;
+            $result = $this->Review_file_model->get_review_file_count($cre_id);
+            if ($result && is_array($result)) {
+                $total_cnt = 0;
+                foreach ($result as $value) {
+                    if (element('rfi_is_image', $value)) {
+                        $updatedata['cre_image'] = element('cnt', $value);
+                        $total_cnt += element('cnt', $value);
+                    } else {
+                        $updatedata['cre_file'] = element('cnt', $value);
+                        $total_cnt += element('cnt', $value);
+                    }
+                }
+            }
+
+            $this->Cmall_review_model->update($cre_id, $updatedata);
+
+            return $this->response($view['view'], 201);
         }
         
     }
@@ -996,6 +1285,60 @@ class Cmall_review extends CB_Controller
         $this->_reviewwrite($cit_id, $cre_id);
     }
 
-    
+    public function review_delete($cre_id = 0)
+    {   
+         // 이벤트 라이브러리를 로딩합니다
+        $eventname = 'event_cmall_review_write';
+        $this->load->event($eventname);
+
+
+
+        $cre_id = (int) $cre_id;        
+        if (empty($cre_id) OR $cre_id < 1) {
+            show_404();
+        }
+
+        required_user_login();
+
+        $mem_id = (int) $this->member->item('mem_id');
+        
+        $this->load->model(array('Cmall_review_model'));
+
+        $review = $this->Cmall_review_model->get_one($cre_id);
+
+        if ( ! element('cre_id', $review)) {
+            alert('이 리뷰는 현재 존재하지 않습니다',"",406);
+        }
+
+        $is_admin = $this->member->is_admin();
+        if ($is_admin === false && (int) element('mem_id', $review) !== $mem_id) {
+            alert_close('본인의 글 외에는 접근하실 수 없습니다');
+        }
+
+        
+
+        $this->Cmall_review_model->delete($cre_id);
+        $cntresult = $this->cmalllib->update_review_count(element('cit_id', $review));
+
+        $result = array(
+            'msg' => '상품리뷰가 삭제되었습니다'
+        );
+
+        $this->data = $result;
+        
+        return $this->response($this->data, 204);
+    }
+
+    public function _reviewwrite_required($str)
+    {
+        if (!$this->input->post_put('cre_good') && ! $this->input->post_put('cre_bad') && ! $this->input->post_put('cre_tip')) {
+            $this->form_validation->set_message(
+                '_reviewwrite_required',
+                '리뷰 작성시 좋았던점 또는 아쉬운 점 또는 나만의 팁 중 하나는 입력하셔야 합니다'
+            );
+            return false;
+        }
+        return true;
+    }
 }
 
