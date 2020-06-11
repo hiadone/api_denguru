@@ -948,19 +948,19 @@ class Cmall_review extends CB_Controller
 
             $view['view']['msg'] = validation_errors().$file_error;
 
-            // $view['view']['wishlist_url'] = base_url('cmall/wishlist');
-            // $view['view']['itemlists_url'] = base_url('cmall/itemlists');
-            // $view['view']['data']['review'] = $getdata;
-            // $view['view']['data']['item'] = $item;
+            $view['view']['wishlist_url'] = base_url('cmall/wishlist');
+            $view['view']['itemlists_url'] = base_url('cmall/itemlists');
+            $view['view']['data']['review'] = $getdata;
+            $view['view']['data']['item'] = $item;
 
-            // /**
-            //  * primary key 정보를 저장합니다
-            //  */
-            // $view['view']['primary_key'] = $primary_key;
+            /**
+             * primary key 정보를 저장합니다
+             */
+            $view['view']['primary_key'] = $primary_key;
 
             
-
-            return $this->response($view['view'], parent::HTTP_OK);
+            return $view['view'];
+            // return $this->response($view['view'], parent::HTTP_OK);
 
             
 
@@ -1231,11 +1231,11 @@ class Cmall_review extends CB_Controller
             'meta_author' => $meta_author,
             'page_name' => $page_name,
         );
-        $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
         $this->data = $view['view'];
         
         
-       
+        return $this->response($view['view'], parent::HTTP_OK);
     }
 
     public function reviewwrite_post($cit_id = 0)
@@ -1257,10 +1257,10 @@ class Cmall_review extends CB_Controller
 
         // 이벤트가 존재하면 실행합니다
         $view['view']['event']['before'] = Events::trigger('before', $eventname);
-        $this->_reviewwrite($cit_id);
+        $view['view'] = $this->_reviewwrite($cit_id);
 
 
-
+        return $this->response(array('msg' => $view['view']['msg']), parent::HTTP_OK);
        
     }
 
@@ -1287,7 +1287,10 @@ class Cmall_review extends CB_Controller
 
         // 이벤트가 존재하면 실행합니다
         $view['view']['event']['before'] = Events::trigger('before', $eventname);
-        $this->_reviewwrite($cit_id, $cre_id);
+        $view['view'] = $this->_reviewwrite($cit_id, $cre_id);
+
+
+        return $this->response(array('msg' => $view['view']['msg']), parent::HTTP_OK);
     }
 
     public function review_delete($cre_id = 0)

@@ -1985,9 +1985,6 @@ class Mypage extends CB_Controller
         $view = array();
         $view['view'] = array();
 
-        // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
-
 	    /**
 	     * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
 	     */
@@ -2055,6 +2052,16 @@ class Mypage extends CB_Controller
 	            'label' => '성별',
 	            'rules' => 'trim|exact_length[1]',
 	        ),
+	        array(
+	            'field' => 'pet_attr',
+	            'label' => '우리 아이 특성',
+	            'rules' => 'trim|required',
+	        ),
+	        array(
+	            'field' => 'pet_weight',
+	            'label' => '몸무게',
+	            'rules' => 'trim|numeric',
+	        ),
 	        // array(
 	        //     'field' => 'pet_profile_content',
 	        //     'label' => '펫 자기소개',
@@ -2106,7 +2113,7 @@ class Mypage extends CB_Controller
 	            $uploadconfig = array();
 	            $uploadconfig['upload_path'] = $upload_path;
 	            $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif';
-	            $uploadconfig['max_size'] = '2000';
+	            $uploadconfig['max_size'] = '10000';
 	            // $uploadconfig['max_width'] = '2000';
 	            // $uploadconfig['max_height'] = '1000';
 	            $uploadconfig['encrypt_name'] = true;
@@ -2182,35 +2189,13 @@ class Mypage extends CB_Controller
 	     */
 	    if ($form_validation === false OR $file_error !== '' OR $file_error2 !== '') {
 
-	        // 이벤트가 존재하면 실행합니다
-	        $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+	        
+	        
 
 	        $view['view']['msg'] = $file_error . $file_error2.validation_errors();
-
-	        
-
-	        $view['view']['data'] = $getdata;
-
-	        
-
-	        $view['view']['config']['pet_form'] = config_item('pet_form');
-	        $view['view']['config']['pet_kind'] = array();
-	        $view['view']['config']['pet_attr'] = config_item('pet_attr');
-	        
-
-	        /**
-	         * primary key 정보를 저장합니다
-	         */
-	        $view['view']['primary_key'] = $primary_key;
-
-	        /**
-	         * 어드민 레이아웃을 정의합니다
-	         */
-	        // $layoutconfig = array('layout' => 'layout', 'skin' => 'write');
-	        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
 	        
 	        
-	        return $view['view'];
+	        return $this->response($view['view'], parent::HTTP_OK);
 	    } else {
 	        /**
 	         * 유효성 검사를 통과한 경우입니다.
@@ -2299,10 +2284,10 @@ class Mypage extends CB_Controller
 	            $this->Member_pet_model->update($pet_id,array('pet_main' => 1));
 	        }
 
-	        // 이벤트가 존재하면 실행합니다
-	        Events::trigger('after', $eventname);
+	        
+	        
 
-	        return $view['view'];
+	        return $this->response($view['view'], 201);
 	    }
 	}
 
@@ -2322,7 +2307,7 @@ class Mypage extends CB_Controller
 	    
 	    $this->data = $view['view'];
 		
-		return $this->response($this->data, 200);
+		// return $this->response($this->data, 200);
 	}
 
 	public function petwrite_post($pid = 0)
@@ -2341,7 +2326,7 @@ class Mypage extends CB_Controller
 	    
 	    $this->data = $view['view'];
 		
-		return $this->response($this->data, 201);
+		// return $this->response($this->data, 201);
 	}
 
 	public function petwrite_put($pid = 0)
@@ -2360,7 +2345,7 @@ class Mypage extends CB_Controller
 	    
 	    $this->data = $view['view'];
 		
-		return $this->response($this->data, 201);
+		// return $this->response($this->data, 201);
 	}
 
 	

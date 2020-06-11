@@ -478,7 +478,7 @@ class Denguruapi extends CI_Controller
 
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_image'][$fkey] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
+                    $review['review_image'][] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
                 }
             }
             
@@ -493,7 +493,7 @@ class Denguruapi extends CI_Controller
             $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_file'][$fkey] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
+                    $review['review_file'][] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
                 }
             }
         } 
@@ -567,7 +567,7 @@ class Denguruapi extends CI_Controller
                         );
                         $file = $this->CI->Review_file_model->get_one('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
                         if (element('rfi_filename', $file)) {
-                            $view['view']['list'][$key]['review_image'] = cdn_url('cmall_review', element('rfi_filename', $file));
+                            $view['view']['list']['review_image'][] = cdn_url('cmall_review', element('rfi_filename', $file));
                         }
                     } 
 
@@ -578,7 +578,7 @@ class Denguruapi extends CI_Controller
                         );
                         $file = $this->CI->Review_file_model->get_one('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
                         if (element('rfi_filename', $file)) {
-                            $view['view']['list'][$key]['review_file'] = cdn_url('cmall_review', element('rfi_filename', $file));
+                            $view['view']['list']['review_file'][] = cdn_url('cmall_review', element('rfi_filename', $file));
                         }
                     } 
                 
