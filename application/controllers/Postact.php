@@ -3692,8 +3692,8 @@ class Postact extends CB_Controller
 		Events::trigger('after', $eventname);
 
 		
-
-		$board_crawl = $this->board->get_all_crawl($brd_id);
+		$this->load->library(array('denguruapi'));
+		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
 		if ( ! element('brd_id', $board_crawl)) {
 		    alert('이 스토어는 현재 존재하지 않습니다',"",406);
 		}
