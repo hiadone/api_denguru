@@ -946,7 +946,7 @@ class Cmall_review extends CB_Controller
             // $view['view']['primary_key'] = $primary_key;
             
 
-            $view['view']['msg'] = validation_errors();
+            $view['view']['msg'] = validation_errors().$file_error;
 
             $view['view']['wishlist_url'] = base_url('cmall/wishlist');
             $view['view']['itemlists_url'] = base_url('cmall/itemlists');
