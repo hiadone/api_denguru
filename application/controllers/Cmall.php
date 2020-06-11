@@ -256,7 +256,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_index';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -266,7 +266,7 @@ class Cmall extends CB_Controller
 		$view['view'] = $this->_main();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		/**
 		 * 레이아웃을 정의합니다
 		 */
@@ -539,7 +539,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_lists';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -547,7 +547,7 @@ class Cmall extends CB_Controller
 		$view['view']['data'] = $this->_itemlists($category_id,$brd_id);	
 			
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -752,7 +752,7 @@ class Cmall extends CB_Controller
 		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_item';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -761,7 +761,7 @@ class Cmall extends CB_Controller
 
 		
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		
 
@@ -816,7 +816,7 @@ class Cmall extends CB_Controller
 		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_item';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -824,7 +824,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
 		if (empty($cit_id) || empty($this->input->post('stype'))) {
 			show_404();
@@ -923,7 +923,7 @@ class Cmall extends CB_Controller
 		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_item';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -931,7 +931,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
 		if (empty($cit_id) || empty($this->input->post('stype'))) {
 			show_404();
@@ -1030,7 +1030,7 @@ class Cmall extends CB_Controller
 		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_store';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -1038,7 +1038,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		
 		if (empty($brd_id ) || empty($this->input->post('stype'))) {
@@ -1111,7 +1111,7 @@ class Cmall extends CB_Controller
 		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_store';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -1119,7 +1119,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		
 		if (empty($brd_id ) || empty($this->input->post('stype'))) {
@@ -1190,13 +1190,13 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_cartoption';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$cit_id = (int) $this->input->post('cit_id');
 		if (empty($cit_id) OR $cit_id < 1) {
@@ -1231,7 +1231,7 @@ class Cmall extends CB_Controller
 		$view['view']['detail'] = $detail;
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -1258,13 +1258,13 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_itemimage';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		if (empty($cit_id)) {
 			show_404();
@@ -1282,7 +1282,7 @@ class Cmall extends CB_Controller
 		$view['view']['data'] = $data;
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -1311,7 +1311,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_cart';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1324,7 +1324,7 @@ class Cmall extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Cmall_cart_model'));
 
@@ -1377,7 +1377,7 @@ class Cmall extends CB_Controller
 		$view['view']['list_delete_url'] = site_url('cmallact/cart_delete/?' . $param->output());
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -1431,7 +1431,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_order';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1444,7 +1444,7 @@ class Cmall extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$alertmessage = $this->member->is_member()
 			? '회원님은 상품을 구매할 수 있는 권한이 없습니다'
@@ -1556,7 +1556,7 @@ class Cmall extends CB_Controller
 		$view['view']['form4name'] = ($this->cbconfig->get_device_type() === 'mobile') ? 'mform_4' : 'form_4';
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -1607,7 +1607,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_orderresult';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1621,7 +1621,7 @@ class Cmall extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		if (empty($cor_id) OR $cor_id < 1) {
 			show_404();
@@ -1731,7 +1731,7 @@ class Cmall extends CB_Controller
 
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -1782,10 +1782,10 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_payment_inicis_pc_pay';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$this->load->library(array('paymentlib'));
 		$init = $this->paymentlib->inicis_init();
@@ -1827,7 +1827,7 @@ class Cmall extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$this->orderupdate();
 	}
@@ -1844,7 +1844,7 @@ class Cmall extends CB_Controller
 
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_orderupdate';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1854,7 +1854,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		if ('bank' != $this->input->post('pay_type') && $this->cbconfig->item('use_payment_pg') === 'lg'
 			&& ! $this->input->post('LGD_PAYKEY')) {
@@ -2070,7 +2070,7 @@ class Cmall extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('step1', $eventname);
+		// Events::trigger('step1', $eventname);
 
 		//실제로 결제된 금액
 		$real_total_price = $total_price_sum - $order_deposit;
@@ -2088,7 +2088,7 @@ class Cmall extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('step2', $eventname);
+		// Events::trigger('step2', $eventname);
 
 		// 정보 입력
 		$cor_id = $this->cb_jwt->userdata('unique_id');
@@ -2167,7 +2167,7 @@ class Cmall extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$this->cb_jwt->set_userdata('unique_id', '');
 		$this->cb_jwt->set_userdata('order_cct_id', '');
@@ -2180,7 +2180,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_orderlist';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -2191,7 +2191,7 @@ class Cmall extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Cmall_order_model'));
 		/**
@@ -2229,7 +2229,7 @@ class Cmall extends CB_Controller
 
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -2338,14 +2338,14 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_wishlist';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
 		$view['view'] = $this->_wishlist();
 		
@@ -2483,14 +2483,14 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_wishlist';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
 		$view['view'] = $this->_storewishlist();
 		
@@ -2661,14 +2661,14 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_wishlist';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
 		$view['view'] = $this->_storeranklist();
 		
@@ -2725,7 +2725,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_qnalist';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$cit_id = (int) $cit_id;
 		if (empty($cit_id) OR $cit_id < 1) {
@@ -2738,7 +2738,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Cmall_item_model', 'Cmall_qna_model'));
 
@@ -2852,7 +2852,7 @@ class Cmall extends CB_Controller
 
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -2879,7 +2879,7 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_qna_write';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -2892,7 +2892,7 @@ class Cmall extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Cmall_item_model', 'Cmall_qna_model'));
 
@@ -2983,7 +2983,7 @@ class Cmall extends CB_Controller
 		if ($this->form_validation->run() === false) {
 
 			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+			// $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
 
 			/**
 			 * primary key 정보를 저장합니다
@@ -2993,7 +2993,7 @@ class Cmall extends CB_Controller
 			$view['view']['item'] = $item;
 
 			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+			// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
 			/**
 			 * 레이아웃을 정의합니다
@@ -3051,7 +3051,7 @@ class Cmall extends CB_Controller
 			 */
 
 			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
+			// $view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
 
 			$content_type = $this->cbconfig->item('use_cmall_product_qna_dhtml') ? 1 : 0;
 			$cqa_secret = $this->input->post('cqa_secret') ? 1 : 0;
@@ -3162,13 +3162,13 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_index';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		$view['view']['data'] = $this->_cit_type1_lists();
 
 		/**
@@ -3254,13 +3254,13 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_index';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		$view['view'] = $this->_categorylists();
 
 		/**
@@ -3434,7 +3434,7 @@ class Cmall extends CB_Controller
 		
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_item';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
@@ -3443,7 +3443,7 @@ class Cmall extends CB_Controller
 
 		
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		
 
@@ -3500,14 +3500,14 @@ class Cmall extends CB_Controller
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_board_post_stat_count_board';
-		$this->load->event($eventname);
+		//$this->load->event($eventname);
 
 		if (empty($brd_id)) {
 			return false;
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('count_before', $eventname);
+		// Events::trigger('count_before', $eventname);
 
 		// 방문자 기록
 		if ( ! get_cookie('board_id_' . $brd_id.'cit_id_' . $cit_id)) {
