@@ -238,7 +238,7 @@ class Cmallact extends CB_Controller
 			alert_close('본인외에는 접근하실 수 없습니다');
 		}
 
-		$this->cmalllib->_wishlist_delete($csi_id);
+		$this->cmalllib->_wishlist_delete($cwi_id);
 
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('after', $eventname);

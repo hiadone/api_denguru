@@ -948,15 +948,15 @@ class Cmall_review extends CB_Controller
 
             $view['view']['msg'] = validation_errors().$file_error;
 
-            $view['view']['wishlist_url'] = base_url('cmall/wishlist');
-            $view['view']['itemlists_url'] = base_url('cmall/itemlists');
-            $view['view']['data']['review'] = $getdata;
-            $view['view']['data']['item'] = $item;
+            // $view['view']['wishlist_url'] = base_url('cmall/wishlist');
+            // $view['view']['itemlists_url'] = base_url('cmall/itemlists');
+            // $view['view']['data']['review'] = $getdata;
+            // $view['view']['data']['item'] = $item;
 
-            /**
-             * primary key 정보를 저장합니다
-             */
-            $view['view']['primary_key'] = $primary_key;
+            // /**
+            //  * primary key 정보를 저장합니다
+            //  */
+            // $view['view']['primary_key'] = $primary_key;
 
             
 

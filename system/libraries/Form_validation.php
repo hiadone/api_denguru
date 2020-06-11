@@ -382,12 +382,12 @@ class CI_Form_validation {
 
 		if ($prefix === '')
 		{
-			$prefix = $this->_error_prefix;
+			// $prefix = $this->_error_prefix;
 		}
 
 		if ($suffix === '')
 		{
-			$suffix = $this->_error_suffix;
+			// $suffix = $this->_error_suffix;
 		}
 
 		// Generate the error string

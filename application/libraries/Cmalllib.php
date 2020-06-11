@@ -1469,7 +1469,7 @@ class Cmalllib extends CI_Controller
 		
 		$wishlist = $this->CI->Cmall_wishlist_model->get_one($cwi_id);
 
-		$this->CI->Cmall_wishlist_model->delete($csi_id);
+		$this->CI->Cmall_wishlist_model->delete($cwi_id);
 
 		$where = array(
 			'cit_id' => element('cit_id', $wishlist),
