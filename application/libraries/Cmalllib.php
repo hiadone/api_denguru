@@ -16,8 +16,6 @@ class Cmalllib extends CI_Controller
 {
 
 	private $CI;
-	private $cmall_item_id;
-	private $cmall_item_key;
 
 	public $paymethodtype = array(
 			'point' => '포인트결제',
@@ -1439,161 +1437,90 @@ class Cmalllib extends CI_Controller
 		}
 	}
 
-	
-
-
-	public function get_cmall_item($cit_id = 0, $cit_key = '')
-	{
-		if (empty($cit_id) && empty($cit_key)) {
-			return false;
-		}
-
-		if ($cit_id) {
-			$this->CI->load->model('Cmall_item_model');
-			$cmall_item = $this->CI->Cmall_item_model->get_one($cit_id);
-		} elseif ($cit_key) {
-			$where = array(
-				'cit_key' => $cit_key,
-			);
-			$this->CI->load->model('Cmall_item_model');
-			$cmall_item = $this->CI->Cmall_item_model->get_one('', '', $where);
-		} else {
-			return false;
-		}
-
-		if (element('cit_id', $cmall_item)) {
-			$this->cmall_item_id[element('cit_id', $cmall_item)] = $cmall_item;
-		}
-		if (element('cit_key', $cmall_item)) {
-			$this->cmall_item_key[element('cit_key', $cmall_item)] = $cmall_item;
-		}
-	}
-
-	public function item_id($column = '', $cit_id = 0)
-	{
-		if (empty($column)) {
-			return false;
-		}
-		$cit_id = (int) $cit_id;
-		if (empty($cit_id) OR $cit_id < 1) {
-			return false;
-		}
-		if ( ! isset($this->cmall_item_id[$cit_id])) {
-			$this->get_cmall_item($cit_id, '');
-		}
-		
-		if ( ! isset($this->cmall_item_id[$cit_id])) {
-			return false;
-		}
-		$cmall_item = $this->cmall_item_id[$cit_id];
-
-		return isset($cmall_item[$column]) ? $cmall_item[$column] : false;
-	}
-
-	public function convert_default_info($cmall_item = array())
+	public function _storewishlist_delete($csi_id = 0)
 	{
 		
-		
+		$this->CI->load->model(array( 'Cmall_storewishlist_model','Board_model'));
 
 		
-		$cit_id = (int) element('cit_id',$cmall_item);
-		if (empty($cit_id) OR $cit_id < 1) {
-			return false;
-		}
+		$wishlist = $this->CI->Cmall_storewishlist_model->get_one($csi_id);
 		
-		
-		$cmall_item['cit_image'] = cdn_url('cmallitem',element('cit_file_1',$cmall_item));
-		$cmall_item['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
-		$cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
-		if(empty(element('cit_price_sale',$cmall_item)))
-			$cmall_item['cit_price_sale_percent'] = 0;
-		else $cmall_item['cit_price_sale_percent'] = number_format((element('cit_price',$cmall_item) - $element('cit_price_sale',$cmall_item)) / element('cit_price',$cmall_item) * 100);
-		$cmall_item['cit_brand'] = element('cbr_value_kr',$cmall_item,element('cbr_value_en',$cmall_item,''));
 
-		return $cmall_item;
+		$this->CI->Cmall_storewishlist_model->delete($csi_id);
+
+		$where = array(
+			'brd_id' => element('brd_id', $wishlist),
+		);
+		$count = $this->CI->Cmall_storewishlist_model->count_by($where);
+
+		$updatedata = array(
+			'brd_storewish_count' => $count,
+		);
+		$this->CI->Board_model->update(element('brd_id', $wishlist), $updatedata);
+
+		return true;
 	}
 
-	public function get_default_info($cit_id = 0,$arr = array())
+	public function _wishlist_delete($cwi_id = 0)
 	{
 		
+
+		$this->CI->load->model(array('Cmall_item_model', 'Cmall_wishlist_model'));
 		
+		$wishlist = $this->CI->Cmall_wishlist_model->get_one($cwi_id);
 
-		
-		
-		if (empty($cit_id) OR $cit_id < 1) {
-			return $arr;
-		}
-		
-		$cmall_item = array();
-		$this->CI->load->model('Board_model');
-		$cit_info = $this->CI->Board_model->get_cit_one($cit_id);
+		$this->CI->Cmall_wishlist_model->delete($csi_id);
 
-		$cmall_item = $this->convert_default_info($cit_info);
-		// $cmall_item['cit_id'] = $cit_id;
-		// $cmall_item['cit_name'] = $this->item_id('cit_name',$cit_id);
-		// $cmall_item['cit_review_average'] = $this->item_id('cit_review_average',$cit_id);
-		// $cmall_item['cit_price'] = $this->item_id('cit_price',$cit_id);
-		// $cmall_item['cit_price_sale'] = $this->item_id('cit_price_sale',$cit_id);
-		// $cmall_item['cit_name'] = $this->item_id('cit_name',$cit_id);
+		$where = array(
+			'cit_id' => element('cit_id', $wishlist),
+		);
+		$count = $this->CI->Cmall_wishlist_model->count_by($where);
 
-		// $cmall_item['cit_image'] = cdn_url('cmallitem',$this->item_id('cit_file_1',$cit_id));
-		// $cmall_item['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
-		// $cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
-		// if(empty($this->item_id('cit_price_sale',$cit_id)))
-		// 	$cmall_item['cit_price_sale_percent'] = 0;
-		// else $cmall_item['cit_price_sale_percent'] = number_format(($this->item_id('cit_price',$cit_id) - $this->item_id('cit_price_sale',$cit_id)) / $this->item_id('cit_price',$cit_id) * 100);
+		$updatedata = array(
+			'cit_wish_count' => $count,
+		);
+		$this->CI->Cmall_item_model->update(element('cit_id', $wishlist), $updatedata);
 
-		// $cmall_item['cit_brand'] = $this->item_id('cbr_value_kr',$cit_id) ? $this->item_id('cbr_value_kr',$cit_id) : $this->item_id('cbr_value_en',$cit_id);
-
-		$cmall_item = array_merge($arr, $cmall_item);
-
-		return $cmall_item;
+		return true;
 	}
 
+	public function _review_delete($cre_id = 0)
+    {
+        $cre_id = (int) $cre_id;
+        if (empty($cre_id) OR $cre_id < 1) {
+            return;
+        }
 
-	public function get_child_category($cca_parent_id = 0)
-	{
-		
-		$this->CI->load->model('Cmall_category_model');
+        $view['view'] = array();
+        $this->CI->load->model(array('Cmall_review_model','Review_file_model'));
+        $this->CI->load->library(array('aws_s3'));
+        
+        $review = $this->CI->Cmall_review_model->get_one($cre_id);
+        
+        
+        $this->CI->Cmall_review_model->delete($cre_id);
+        $cntresult = $this->update_review_count(element('cit_id', $review));
+        
+        $deletewhere = array(
+           'cre_id' => $cre_id,
+        );
 
-		$my_category = $cca_parent_id;
+        // 첨부 파일 삭제
+        $crefiles = $this->CI->Review_file_model->get('', '', $deletewhere);
+        if ($crefiles) {
+           foreach ($crefiles as $crefiles) {
+               @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $crefiles));
 
-		$result = array();
-		
-		$result = $this->CI->Cmall_category_model->get_category_child($my_category);		
+               $deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/cmall_review/' . element('rfi_filename', $crefiles));
 
-		return $result;
-	}
+               $this->CI->Review_file_model->delete(element('rfi_id', $crefiles));
+           }
+        }
 
-	public function get_wish_info($data = array())
-	{
-		
-		$this->CI->load->model(array( 'Cmall_storewishlist_model','Cmall_wishlist_model'));
-
-		$data['addstorewish_url'] = cmall_item_url('storewish/'.element('brd_id',$data));
-		$data['storewishstatus'] = 0;
-		if(!empty($this->CI->member->is_member())){
-			$where = array(
-				'mem_id' => $this->CI->member->is_member(),
-				'brd_id' => element('brd_id',$data),
-			);
-			$data['storewishstatus'] = $this->CI->Cmall_storewishlist_model->count_by($where);	
-		}
-		
-		
-		$data['additemwish_url'] = cmall_item_url('itemwish/'.element('cit_id',$data));		
-		$data['itemwishstatus'] = 0;
-
-		if(!empty($this->CI->member->is_member())){
-			$where = array(
-				'mem_id' => $this->CI->member->is_member(),
-				'cit_id' => element('cit_id',$data),
-			);
-			$data['itemwishstatus'] = $this->CI->Cmall_wishlist_model->count_by($where);	
-		}
-
-		return $data;
-	}
+        
+        return true;
+        
+    }
 
 	
 }

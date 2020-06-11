@@ -32,7 +32,7 @@ class Cmall extends CB_Controller
 		/**
 		 * 라이브러리를 로딩합니다
 		 */
-		$this->load->library(array('pagination', 'querystring', 'accesslevel', 'cmalllib','review'));
+		$this->load->library(array('pagination', 'querystring', 'accesslevel', 'cmalllib','denguruapi'));
 
 		if ( ! $this->cbconfig->item('use_cmall')) {
 			alert('이 웹사이트는 ' . html_escape($this->cbconfig->item('cmall_name')) . ' 기능을 사용하지 않습니다',"",406);
@@ -81,7 +81,7 @@ class Cmall extends CB_Controller
 			'cache_minute' => 10,
 			// 'select' => $select,
 		);
-		$result_1 = $this->board->cit_latest($config);
+		$result_1 = $this->denguruapi->cit_latest($config);
 		
 		// print_r2($result_1);
 		if ($result_1) {
@@ -107,8 +107,8 @@ class Cmall extends CB_Controller
 				// $view['list'][$key]['post_url'] = post_url(element('post_id',$val));
 				// $view['list'][$key]['cit_post_url'] = element('cit_post_url',$val);
 				// $view['list'][$key]['cit_attr'] = element('cit_attr',$val);
-				$result_1[$key] = $this->cmalllib->convert_default_info($result_1[$key]);
-				$result_1[$key] = $this->board->convert_default_info($result_1[$key]);
+				$result_1[$key] = $this->denguruapi->convert_cit_info($result_1[$key]);
+				$result_1[$key] = $this->denguruapi->convert_brd_info($result_1[$key]);
 			}
 			
 			$view['view']['data']['type1']['list'] = $result_1;
@@ -135,7 +135,7 @@ class Cmall extends CB_Controller
 			// 'select' => $select,
 		);
 
-		$result_2 = $this->board->cit_latest($config);
+		$result_2 = $this->denguruapi->cit_latest($config);
 
 		if ($result_2) {
 			foreach ($result_2 as $key => $val) {
@@ -163,8 +163,8 @@ class Cmall extends CB_Controller
 				// $view['view']['data']['type2']['middle']['list'][$key]['cit_attr'] = element('cit_attr',$val);
 				// $view['view']['data']['type2']['middle']['list'][$key]['cit_brand'] = element('cbr_value_kr',$val,element('cbr_value_en',$val));
 				
-				$result_2[$key] = $this->cmalllib->convert_default_info($result_2[$key]);
-				$result_2[$key] = $this->board->convert_default_info($result_2[$key]);
+				$result_2[$key] = $this->denguruapi->convert_cit_info($result_2[$key]);
+				$result_2[$key] = $this->denguruapi->convert_brd_info($result_2[$key]);
 				
 			}
 
@@ -360,8 +360,8 @@ class Cmall extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 
-				$result['list'][$key] = $this->cmalllib->convert_default_info($result['list'][$key]);
-				$result['list'][$key] = $this->board->convert_default_info($result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
 				// $result['list'][$key]['num'] = $list_num--;
 			}
 		}
@@ -415,8 +415,8 @@ class Cmall extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 				
-				$result['list'][$key] = $this->cmalllib->convert_default_info($result['list'][$key]);
-				$result['list'][$key] = $this->board->convert_default_info($result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
 				// $result['list'][$key]['num'] = $list_num--;
 			}
 		}
@@ -502,8 +502,8 @@ class Cmall extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 
-				$result['list'][$key] = $this->cmalllib->convert_default_info($result['list'][$key]);
-				$result['list'][$key] = $this->board->convert_default_info($result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
 				$result['list'][$key]['num'] = $list_num--;
 			}
 		}
@@ -625,8 +625,8 @@ class Cmall extends CB_Controller
 
 		$data = $this->Board_model->get_cit_one($cit_id);
 
-		$data = $this->cmalllib->convert_default_info($data);
-		$data = $this->board->convert_default_info($data);
+		$data = $this->denguruapi->convert_cit_info($data);
+		$data = $this->denguruapi->convert_brd_info($data);
 
 
 		if ( ! element('cit_id', $data)) {
@@ -727,12 +727,12 @@ class Cmall extends CB_Controller
 		// 	? display_html_content(element('mobile_footer_content', element('meta', $data)), 1, $thumb_width)
 		// 	: display_html_content(element('footer_content', element('meta', $data)), 1, $thumb_width);
 
-		$data = $this->cmalllib->get_wish_info($data);
+		$data = $this->denguruapi->get_wish_info($data);
 
 		$data['reviewlist_url'] = base_url('cmall_review/reviewlist/'.element('cit_id',$data));
 		$data['cit_review_count'] = $this->Cmall_review_model->count_by(array('cit_id' => element('cit_id',$data)));	
 		// $data['reviewscore'] = $this->Cmall_review_model->get_review_count(element('cit_id',$data));
-		$data['popularreview'] = $this->review->get_popular_item_review(element('cit_id',$data));
+		$data['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$data));
 
 		$data['ai_keyword'] = array();
 		$data['similaritemlist'] = $this->_itemlists('',element('brd_id',$data));
@@ -1024,7 +1024,7 @@ class Cmall extends CB_Controller
 		return $this->response($this->data, 204);
 	}
 
-	public function storewish_post($brd_id = '')
+	public function storewish_post($brd_id = 0)
 	{
 
 		
@@ -1139,8 +1139,8 @@ class Cmall extends CB_Controller
 		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
 
 		$alertmessage = $this->member->is_member()
-			? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
-			: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+			? '회원님은 페이지를 볼 수 있는 권한이 없습니다'
+			: '비회원은 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
 		$check = array(
 			'group_id' => element('bgr_id', $board),
 			'board_id' => element('brd_id', $board),
@@ -2311,7 +2311,7 @@ class Cmall extends CB_Controller
 		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
-				$result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id',$val),$result['list'][$key]);
+				$result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id',$val),$result['list'][$key]);
 				$result['list'][$key]['delete_url'] = site_url('cmallact/wishlist/' . element('cwi_id', $val) . '?' . $param->output());
 				$result['list'][$key]['num'] = $list_num--;
 			}
@@ -2453,8 +2453,8 @@ class Cmall extends CB_Controller
 		
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
-				$result['list'][$key] = $this->board->get_default_info(element('brd_id', $val),$result['list'][$key]);
-				$result['list'][$key]['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $val),8);
+				$result['list'][$key] = $this->denguruapi->get_brd_info(element('brd_id', $val),$result['list'][$key]);
+				$result['list'][$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
 				
 				$result['list'][$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
@@ -2609,8 +2609,8 @@ class Cmall extends CB_Controller
 		if ($result) {
 			foreach ($result as $key => $val) {
 
-				$result[$key] = $this->board->convert_default_info($result[$key]);
-				$result[$key]['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $val),8);
+				$result[$key] = $this->denguruapi->convert_brd_info($result[$key]);
+				$result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
 				
 				$result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
@@ -2626,8 +2626,8 @@ class Cmall extends CB_Controller
 		if ($result) {
 			foreach ($result as $key => $val) {
 
-				$result[$key] = $this->board->convert_default_info($result[$key]);
-				$result[$key]['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $val),8);
+				$result[$key] = $this->denguruapi->convert_brd_info($result[$key]);
+				$result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
 				
 				$result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
@@ -3121,7 +3121,7 @@ class Cmall extends CB_Controller
 			'cache_minute' => 10
 		);
 
-		$result_1 = $this->board->cit_latest($config);
+		$result_1 = $this->denguruapi->cit_latest($config);
 
 		if ($result_1) {
 			foreach ($result_1 as $key => $val) {
@@ -3148,7 +3148,7 @@ class Cmall extends CB_Controller
 				// $view['view']['list'][$key]['cit_attr'] = element('cit_attr',$val);
 				// $view['view']['list'][$key]['cit_brand'] = element('cbr_value_kr',$val,element('cbr_value_en',$val));
 				
-				$result_1[$key] = $this->cmalllib->convert_default_info($result_1[$key]);
+				$result_1[$key] = $this->denguruapi->convert_cit_info($result_1[$key]);
 				
 			}
 		}
@@ -3414,8 +3414,8 @@ class Cmall extends CB_Controller
 		
 		
 
-		$view['view']['data'] = $this->board->convert_default_info(element('brd_id', $data));
-		$view['view']['data']['brd_tag'] = $this->board->get_popular_brd_tags(element('brd_id', $data),8);
+		$view['view']['data'] = $this->denguruapi->convert_brd_info(element('brd_id', $data));
+		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $data),8);
 		$view['view']['data']['brd_attr'] = array();
 		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));
 

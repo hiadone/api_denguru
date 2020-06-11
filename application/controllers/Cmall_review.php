@@ -18,7 +18,7 @@ class Cmall_review extends CB_Controller
     /**
      * 모델을 로딩합니다
      */
-    protected $models = array();
+    protected $models = array('Cmall_item', 'Cmall_review','Review_file');
 
     /**
      * 헬퍼를 로딩합니다
@@ -32,7 +32,7 @@ class Cmall_review extends CB_Controller
         /**
          * 라이브러리를 로딩합니다
          */
-        $this->load->library(array('pagination', 'querystring', 'accesslevel', 'cmalllib','review'));
+        $this->load->library(array('pagination', 'querystring', 'accesslevel', 'cmalllib','denguruapi'));
 
         if ( ! $this->cbconfig->item('use_cmall')) {
             alert('이 웹사이트는 ' . html_escape($this->cbconfig->item('cmall_name')) . ' 기능을 사용하지 않습니다');
@@ -55,7 +55,7 @@ class Cmall_review extends CB_Controller
 
         $view['view']['reviewwrite_url'] = base_url('cmall_review/reviewwrite');
 
-        $this->load->model(array('Cmall_item_model', 'Cmall_review_model'));
+        
 
         if($cit_id){
             $item = $this->Cmall_item_model->get_one($cit_id);
@@ -111,13 +111,13 @@ class Cmall_review extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
                 
-                $result['list'][$key]['display_content'] = display_html_content(
-                    element('cre_content', $val),
-                    element('cre_content_html_type', $val),
-                    $thumb_width,
-                    $autolink,
-                    $popup
-                );
+                // $result['list'][$key]['display_content'] = display_html_content(
+                //     element('cre_content', $val),
+                //     element('cre_content_html_type', $val),
+                //     $thumb_width,
+                //     $autolink,
+                //     $popup
+                // );
                 
 
                 
@@ -131,9 +131,12 @@ class Cmall_review extends CB_Controller
                     $result['list'][$key]['can_update'] = true;
                     $result['list'][$key]['can_delete'] = true;
                 }
-                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
-                $result['list'][$key] = $this->member->get_default_info(element('mem_id', $val),$result['list'][$key]);                   
-                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->get_mem_info(element('mem_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->convert_review_info($result['list'][$key]);    
+
+                
+
                 $result['list'][$key]['num'] = $list_num--;
                 
             }
@@ -251,11 +254,11 @@ class Cmall_review extends CB_Controller
             }
         // }
         $mem_id = (int) $this->member->item('mem_id');
-        $data['item'] = $this->cmalllib->get_default_info(element('cit_id', $item));
+        $data['item'] = $this->denguruapi->get_cit_info(element('cit_id', $item));
         $data['item']['item_attr'] = $this->Cmall_attr_model->get_attr(element('cit_id', $item));
         
 
-        $data['item']['popularreview'] = $this->review->get_popular_item_review(element('cit_id',$item));
+        $data['item']['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$item));
 
         $view['view']['data'] = $data;
         /**
@@ -318,7 +321,7 @@ class Cmall_review extends CB_Controller
             : $this->cbconfig->item('cmall_product_review_content_target_blank');
 
         if(empty(!$cre_id)){
-            $this->Cmall_review_model->order_by('cre_id='.$cre_id,'',false);   
+            $this->Cmall_review_model->order_by('cre_id='.$cre_id,'desc',false);   
         }
 
         // $field = array(
@@ -360,9 +363,9 @@ class Cmall_review extends CB_Controller
                     $result['list'][$key]['can_update'] = true;
                     $result['list'][$key]['can_delete'] = true;
                 }
-                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
-                $result['list'][$key] = $this->member->get_default_info(element('mem_id', $val),$result['list'][$key]);                   
-                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);  
+                $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->get_mem_info(element('mem_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->convert_review_info($result['list'][$key]);  
                                    
                 $result['list'][$key]['num'] = $list_num--;
                 
@@ -488,7 +491,7 @@ class Cmall_review extends CB_Controller
             show_404();
         }
 
-       $data = $this->member->get_default_info($_mem_id);
+       $data = $this->denguruapi->get_mem_info($_mem_id);
         
        $view['view']['mem_info'] = $data;
         /**
@@ -562,9 +565,9 @@ class Cmall_review extends CB_Controller
                     $result['list'][$key]['can_update'] = true;
                     $result['list'][$key]['can_delete'] = true;
                 }
-                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id', $val),$result['list'][$key]);                   
                 // $result['list'][$key] = $this->member->get_default_info(element('mem_id', $val),$result['list'][$key]);                   
-                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);    
+                $result['list'][$key] = $this->denguruapi->convert_review_info($result['list'][$key]);    
                 
                 $result['list'][$key]['num'] = $list_num--;
                 
@@ -714,7 +717,7 @@ class Cmall_review extends CB_Controller
                 alert('이 상품은 현재 판매하지 않습니다',"",406);
             
 
-            $item = $this->cmalllib->get_default_info($cit_id);
+            $item = $this->denguruapi->get_cit_info($cit_id);
         }
         /**
          * 수정 페이지일 경우 기존 데이터를 가져옵니다
@@ -1303,6 +1306,7 @@ class Cmall_review extends CB_Controller
         $mem_id = (int) $this->member->item('mem_id');
         
         $this->load->model(array('Cmall_review_model'));
+        
 
         $review = $this->Cmall_review_model->get_one($cre_id);
 
@@ -1317,9 +1321,7 @@ class Cmall_review extends CB_Controller
 
         
 
-        $this->Cmall_review_model->delete($cre_id);
-        $cntresult = $this->cmalllib->update_review_count(element('cit_id', $review));
-
+        $this->cmalllib->_review_delete($cre_id);
         $result = array(
             'msg' => '상품리뷰가 삭제되었습니다'
         );

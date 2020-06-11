@@ -3314,9 +3314,8 @@ class Postact extends CB_Controller
 
 		$result = array();
 
-		if ($this->member->is_member() === false) {
-			alert('로그인 후 이용해주세요','',403);
-		}
+		required_user_login();
+		
 		$cre_id = (int) $cre_id;
 		if (empty($cre_id) OR $cre_id < 1) {			
 			show_404();
@@ -3454,9 +3453,8 @@ class Postact extends CB_Controller
 
 		$result = array();
 
-		if ($this->member->is_member() === false) {
-			alert('로그인 후 이용해주세요','',403);
-		}
+		required_user_login();
+
 		$cre_id = (int) $cre_id;
 		if (empty($cre_id) OR $cre_id < 1) {			
 			show_404();
@@ -3507,7 +3505,7 @@ class Postact extends CB_Controller
 					'추천'
 				);
 				$this->point->insert_point(
-					abs(element('mem_id', $post)),
+					abs(element('mem_id', $review)),
 					element('point_post_liked', $board),
 					element('board_name', $board) . ' ' . $cre_id . ' 추천받음',
 					'review-liked',
@@ -3525,7 +3523,7 @@ class Postact extends CB_Controller
 					'추천'
 				);
 				$this->point->insert_point(
-					abs(element('mem_id', $post)),
+					abs(element('mem_id', $review)),
 					element('point_post_disliked', $board),
 					element('board_name', $board) . ' ' . $cre_id . ' 비추천받음',
 					'review-disliked',

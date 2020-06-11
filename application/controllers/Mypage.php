@@ -32,7 +32,7 @@ class Mypage extends CB_Controller
 		/**
 		 * 라이브러리를 로딩합니다
 		 */
-		$this->load->library(array('pagination', 'querystring','cmalllib','review'));
+		$this->load->library(array('pagination', 'querystring','denguruapi'));
 
 	}
 
@@ -54,7 +54,7 @@ class Mypage extends CB_Controller
 
 		// $registerform = $this->cbconfig->item('registerform');
 		// $view['view']['memberform'] = json_decode($registerform, true);
-		$data['member'] = $this->member->get_default_info($this->member->item('mem_id'));					
+		$data['member'] = $this->denguruapi->get_mem_info($this->member->item('mem_id'));					
 		
 		
 		$data['member_group_name'] = '';
@@ -1288,9 +1288,9 @@ class Mypage extends CB_Controller
                     $result['list'][$key]['can_delete'] = true;
                 }
 
-                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id', $val),$result['list'][$key]);                   
                 // $result['list'][$key] = $this->board->get_default_info($result['list'][$key]['brd_id'],$result['list'][$key]);                   
-                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->convert_review_info($result['list'][$key]);                   
 
 
 
@@ -1486,12 +1486,12 @@ class Mypage extends CB_Controller
                     $result['list'][$key]['can_update'] = true;
                     $result['list'][$key]['can_delete'] = true;
                 }
-                $result['list'][$key] = $this->cmalllib->get_default_info(element('cit_id', $val),$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id', $val),$result['list'][$key]);                   
                 // $result['list'][$key] = $this->board->get_default_info($result['list'][$key]['brd_id'],$result['list'][$key]);
-                $result['list'][$key] = $this->member->get_default_info(element('target_mem_id', $val),$result['list'][$key]);
+                $result['list'][$key] = $this->denguruapi->get_mem_info(element('target_mem_id', $val),$result['list'][$key]);
                 $result['list'][$key]['review_cnt'] = $this->Cmall_review_model->count_by(array('mem_id' => element('target_mem_id', $val)));
 
-                $result['list'][$key] = $this->review->convert_default_info($result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->convert_review_info($result['list'][$key]);                   
 
                 $result['list'][$key]['num'] = $list_num--;
                 

@@ -56,10 +56,6 @@ class Board extends CI_Controller
 			if (is_array($board_meta)) {
 				$board = array_merge($board, $board_meta);
 			}
-			// $board_crawl = $this->get_all_crawl(element('brd_id', $board));
-			// if (is_array($board_crawl)) {
-			// 	$board = array_merge($board, $board_crawl);
-			// }
 		}
 
 		if (element('brd_id', $board)) {
@@ -118,9 +114,6 @@ class Board extends CI_Controller
 		if ( ! isset($this->board_id[$brd_id])) {
 			$this->get_board($brd_id, '');
 		}
-		if ( ! isset($this->board_id[$brd_id][$column])) {
-            $this->get_review($brd_id, '');
-        }
 		if ( ! isset($this->board_id[$brd_id])) {
 			return false;
 		}
@@ -206,14 +199,14 @@ class Board extends CI_Controller
 		if (empty($post_id) OR $post_id < 1) {
 			return false;
 		}
-
+		$this->CI->load->library('aws_s3');
 		$this->CI->load->model(
 			array(
 				'Post_model', 'Blame_model', 'Like_model',
 				'Post_extra_vars_model', 'Post_file_model', 'Post_file_download_log_model',
 				'Post_history_model', 'Post_link_model', 'Post_link_click_log_model',
 				'Post_meta_model', 'Post_tag_model', 'Scrap_model',
-				'Comment_model'
+				'Comment_model','Cmall_item_model'
 			)
 		);
 
@@ -243,6 +236,8 @@ class Board extends CI_Controller
 		if ($postfiles) {
 			foreach ($postfiles as $postfile) {
 				@unlink(config_item('uploads_dir') . '/post/' . element('pfi_filename', $postfile));
+
+				$deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/post/' . element('pfi_filename', $postfile));				
 			}
 		}
 
@@ -267,6 +262,26 @@ class Board extends CI_Controller
 				}
 			}
 		}
+
+
+
+		$crawlwhere = array(
+			'brd_id' => element('brd_id', $post),
+			'post_id' => $post_id,
+		);
+		
+		
+		$result = $this->CI->Cmall_item_model
+			->get_item_list('','', $crawlwhere);
+		
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+				$this->delete_cmall(element('cit_id', $val));
+			}
+		}
+
+
+
 		$this->CI->load->library('point');
 		$this->CI->point->delete_point(
 			abs(element('mem_id', $post)),
@@ -504,7 +519,7 @@ class Board extends CI_Controller
 		$view = array();
 		$view['view'] = array();
 
-		$this->CI->load->model( array('Board_category_model', 'Post_file_model'));
+		$this->CI->load->model( array('Board_category_model','Board_group_category_model', 'Post_file_model','Post_link_model','Cmall_item_model'));
 
 		$skin = element('skin', $config);
 		$brd_id = element('brd_id', $config);
@@ -542,6 +557,15 @@ class Board extends CI_Controller
 		}
 		$view['view']['config'] = $config;
 		$view['view']['length'] = $length;
+
+		$view['view']['cmallitem_count'] = '';
+
+		$itemwhere = array(
+					'brd_id' => $brd_id,
+				);
+
+		$view['view']['cmallitem_count'] = $this->CI->Cmall_item_model->count_by($itemwhere);;
+
 		if ($brd_key) {
 			if (is_array($brd_key)) {
 				foreach ($brd_key as $v) {
@@ -562,6 +586,17 @@ class Board extends CI_Controller
 		}
 		if ($brd_id && ! is_array($brd_id)) {
 			$view['view']['board'] = $this->CI->board->item_all($brd_id);
+			
+			for($s = 1;$s <8;$s++){
+				$linkwhere = array(
+						'brd_id' => $brd_id,
+						'pln_status' => $s,
+					);
+
+				$view['view']['pln_status'][$s] = $this->CI->Post_link_model
+					->count_by($linkwhere);
+			}
+
 		}
 		$where = array();
 		$where['post_del'] = 0;
@@ -607,6 +642,9 @@ class Board extends CI_Controller
 		$result = $this->CI->db->get();
 		$view['view']['latest'] = $latest = $result->result_array();
 
+
+		
+
 		$view['view']['latest_limit'] = $limit;
 		if ($latest && is_array($latest)) {
 			foreach ($latest as $key => $value) {
@@ -619,8 +657,17 @@ class Board extends CI_Controller
 				$view['view']['latest'][$key]['title'] = $length ? cut_str(element('post_title', $value), $length) : element('post_title', $value);
 				$view['view']['latest'][$key]['display_datetime'] = display_datetime(element('post_datetime', $value), '');
 				$view['view']['latest'][$key]['category'] = '';
+
+				
+
 				if (element('post_category', $value)) {
+						$cboard = $this->CI->board->item_all(element('brd_id', $value));
+						
 						$view['view']['latest'][$key]['category'] = $this->CI->Board_category_model->get_category_info(element('brd_id', $value), element('post_category', $value));
+						if(empty($view['view']['latest'][$key]['category']))
+						$view['view']['latest'][$key]['category'] = $this->CI->Board_group_category_model->get_category_info(1, element('post_category', $value));
+						
+
 				}
 				if ($is_gallery) {
 					if (element('post_image', $value)) {
@@ -648,45 +695,6 @@ class Board extends CI_Controller
 		}
 
 		return $html;
-	}
-
-
-	public function cit_latest($config)
-	{	
-
-		$this->CI->load->model('Board_model');
-			
-		$cache_minute = element('cache_minute', $config);
-		$where['cit_status'] = 1;
-		if (element('cit_type1', $config)) {
-			$where['cit_type1'] = 1;
-		}
-		if (element('cit_type2', $config)) {
-			$where['cit_type2'] = 1;
-		}
-		if (element('cit_type3', $config)) {
-			$where['cit_type3'] = 1;
-		}
-		if (element('cit_type4', $config)) {
-			$where['cit_type4'] = 1;
-		}
-		$limit = element('limit', $config) ? element('limit', $config) : 4;
-		$select = element('select', $config) ? element('select', $config) : $this->CI->Board_model->_select;
-
-		$cachename = 'cmall/main-' . element('cit_type1', $config) . '-' . $limit . '-' . cdate('Y-m-d');
-
-		if ( ! $result = $this->CI->cache->get($cachename)) {
-			$this->CI->db->select($select);
-			$this->CI->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
-			$this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'left');
-			$this->CI->db->where($where);
-			$this->CI->db->limit($limit);
-			$this->CI->db->order_by('cit_order', 'asc');
-			$qry = $this->CI->db->get('board');
-			$result = $qry->result_array();
-			$this->CI->cache->save($cachename, $result, $cache_minute);
-		}
-		return $result;
 	}
 
 
@@ -880,104 +888,113 @@ class Board extends CI_Controller
 		return $this->admin;
 	}
 
-
-	
-	public function convert_default_info($board = array())
+	/**
+	 * 게시글 삭제시 삭제되어야하는 모든 테이블데이터입니다
+	 */
+	public function delete_crawl($crawl_id = 0)
 	{
-
-		// if (element('brd_id', $board)) {
-		// 	$board_meta = $this->get_all_meta(element('brd_id', $board));
-		// 	if (is_array($board_meta)) {
-		// 		$board = array_merge($board, $board_meta);
-		// 	}
-		// }
-
-		// if (element('brd_id', $board) && $brd_id === element('brd_id', $board)) {
-		// 	$this->board_id[element('brd_id', $board)] = $board;
-		// }
-		// if (element('brd_key', $board)) {
-		// 	$this->board_key[element('brd_key', $board)] = $board;
-		// }
-		
-		$brd_id = (int) element('brd_id',$board);
-		if (empty($brd_id) OR $brd_id < 1) {
+		$crawl_id = (int) $crawl_id;
+		if (empty($crawl_id) OR $crawl_id < 1) {
 			return false;
 		}
-		
-		
-		$board['brd_image'] = cdn_url('board',element('brd_image',$board,''));
-		$board['brd_outlink_url'] = base_url('postact/brd_link/'.$brd_id);
-		$board['brd_inlink_url'] = base_url('cmall/store/'.$brd_id);
+		$this->CI->load->library('aws_s3');
+		$this->CI->load->model(
+			array(
+				'Crawl_model',
+				'Crawl_file_model',
+				'Crawl_link_model', 'Crawl_link_click_log_model',
+				'Crawl_tag_model', 'Crawl_scrap_model'
+				
+			)
+		);
 
-		
+		$crawl = $this->CI->Crawl_model->get_one($crawl_id);
 
-		return $board;
-	}
-
-	public function get_default_info($brd_id = 0,$arr = array())
-	{	
-		if (empty($brd_id) OR $brd_id < 1) {
+		if ( ! element('crawl_id', $crawl)) {
 			return false;
 		}
-		$board = array();
-		$board['brd_id'] = $brd_id;
-		$board['brd_name'] = $this->item_id('brd_name',$brd_id);
-		$board['brd_image'] = cdn_url('board',$this->item_id('brd_image',$brd_id));
-		$board['brd_outlink_url'] = base_url('postact/brd_link/'.$brd_id);
-		$board['brd_inlink_url'] = base_url('cmall/store/'.$brd_id);
 
-		$board = array_merge($board, $arr);
+		$board = $this->CI->board->item_all(element('brd_id', $crawl));
 
-		return $board;
-	}
+		$this->CI->Crawl_model->delete($crawl_id);
 
-	public function get_popular_brd_tags($brd_id = 0, $limit = '')
-	{
-		$cachename = 'latest/get_popular_brd_tags' . $brd_id . '_' . $limit;
-		$data = array();
+		$deletewhere = array(
+			'crawl_id' => $crawl_id,
+		);
 
-		if ( ! $data = $this->CI->cache->get($cachename)) {
+		// 첨부 파일 삭제
+		$crawlfiles = $this->CI->Crawl_file_model->get('', '', $deletewhere);
+		if ($crawlfiles) {
+			foreach ($crawlfiles as $crawlfile) {
+				@unlink(config_item('uploads_dir') . '/crawl/' . element('cfi_filename', $crawlfile));
 
-			$this->CI->load->model( array('Crawl_tag_model'));
-			$result = $this->CI->Crawl_tag_model->get_popular_tags($brd_id, $limit);
-
-			$data['result'] = $result;
-			$data['cached'] = '1';
-			check_cache_dir('latest');
-			$this->CI->cache->save($cachename, $data, 60);
-
+				$deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/crawl/' . element('cfi_filename', $crawlfile));
+				
+			}
 		}
-		return isset($data['result']) ? $data['result'] : array();
+
+		
+		$this->CI->Crawl_file_model->delete_where($deletewhere);
+		$this->CI->Crawl_link_click_log_model->delete_where($deletewhere);
+		$this->CI->Crawl_link_model->delete_where($deletewhere);
+		$this->CI->Crawl_tag_model->delete_where($deletewhere);
+		$this->CI->Crawl_scrap_model->delete_where($deletewhere);
+
+		
+		
+		return true;
 	}
 
-	public function get_popular_brd_attr($brd_id = 0, $limit = '')
+	public function delete_cmall($cit_id = 0)
 	{
-		$cachename = 'latest/get_popular_brd_attr' . $brd_id . '_' . $limit;
-		$data = array();
 
-		if ( ! $data = $this->CI->cache->get($cachename)) {
-
-			$this->CI->load->model( array('Cmall_attr_model'));
-			$result = $this->CI->Cmall_attr_model->get_popular_attr($brd_id, $limit);
-
-			$data['result'] = $result;
-			$data['cached'] = '1';
-			check_cache_dir('latest');
-			$this->CI->cache->save($cachename, $data, 60);
-
-		}
-		return isset($data['result']) ? $data['result'] : array();
-	}
-
-	public function get_all_crawl($brd_id = 0)
-	{
-		$brd_id = (int) $brd_id;
-		if (empty($brd_id) OR $brd_id < 1) {
+		$cit_id = (int) $cit_id;
+		if (empty($cit_id) OR $cit_id < 1) {
 			return false;
 		}
-		$this->CI->load->model('Board_crawl_model');
-		$result = $this->CI->Board_crawl_model->get_one('','',array('brd_id' => $brd_id));
+		$this->CI->load->library('aws_s3');
+		$this->CI->load->model(
+			array(
+				'Cmall_item_model',
+				'Crawl_link_click_log_model',
+				'Crawl_tag_model', 'Cmall_wishlist_model','Vision_api_label_model','Cmall_category_rel_model'
+				
+			)
+		);
 
-		return $result;
+		$getdata = $this->CI->Cmall_item_model->get_one($cit_id);
+
+		if ( ! element('cit_id', $getdata)) {
+			return false;
+		}
+
+		$board = $this->CI->board->item_all(element('brd_id', $getdata));
+
+		
+		
+		$this->CI->Cmall_item_model->delete($cit_id);
+
+		for ($i=1; $i <= 10; $i++)
+		{	
+			if($getdata['cit_file_'.$i]){
+				@unlink(config_item('uploads_dir') . '/cmallitem/' . $getdata['cit_file_'.$i]);	
+				$deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/cmallitem/' . $getdata['cit_file_'.$i]);
+			}
+		}
+
+		$deletewhere = array(
+			'cit_id' => $cit_id,
+		);
+		
+		$this->CI->Crawl_link_click_log_model->delete_where($deletewhere);
+		$this->CI->Crawl_tag_model->delete_where($deletewhere);
+		$this->CI->Cmall_wishlist_model->delete_where($deletewhere);
+		$this->CI->Vision_api_label_model->delete_where($deletewhere);
+		$this->CI->Cmall_category_rel_model->delete_where($deletewhere);
+
+		
+		
+		return true;
+
 	}
 }

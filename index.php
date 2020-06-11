@@ -236,6 +236,7 @@ switch (ENVIRONMENT)
 	// Name of the "system" directory
 	define('SYSDIR', basename(BASEPATH));
 
+	$_application_folder = $application_folder;
 	// The path to the "application" directory
 	if (is_dir($application_folder))
 	{
@@ -269,6 +270,7 @@ switch (ENVIRONMENT)
 
 	define('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
 
+	$view_dir = $view_folder;
 	// The path to the "views" directory
 	if ( ! isset($view_folder[0]) && is_dir(APPPATH.'views'.DIRECTORY_SEPARATOR))
 	{
@@ -305,7 +307,7 @@ switch (ENVIRONMENT)
 	}
 
 	define('VIEWPATH', $view_folder.DIRECTORY_SEPARATOR);
-
+	define('VIEW_DIR', $view_dir . '/');
 /*
  * --------------------------------------------------------------------
  * LOAD THE BOOTSTRAP FILE

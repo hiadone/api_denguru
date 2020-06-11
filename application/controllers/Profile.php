@@ -555,7 +555,6 @@ class Profile extends CB_Controller
 		}
 
 		$result = array();
-		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
 		$resutl['event']['before'] = Events::trigger('before', $eventname);
