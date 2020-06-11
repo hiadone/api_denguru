@@ -733,6 +733,8 @@ class Cmall_review extends CB_Controller
                 && (int) element('mem_id', $getdata) !== $mem_id) {
                 alert_close('본인의 글 외에는 접근하실 수 없습니다');
             }
+
+            $getdata = $this->denguruapi->convert_review_info($getdata);
         }
 
         /**
