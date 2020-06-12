@@ -430,7 +430,7 @@ class Denguruapi extends CI_Controller
 
         // $review['itemreviewpost_url'] = base_url('cmall_review/itemreviewpost/'.element('cit_id',$review));
 
-        $review['reviewupdate_url'] = base_url('cmall_review/reviewwrite/'.element('cit_id',$review).'/'.element('cre_id',$review));
+        $review['reviewmodify_url'] = base_url('cmall_review/reviewwrite/'.element('cit_id',$review).'/'.element('cre_id',$review));
 
         $review['reviewdelete_url'] = base_url('cmall_review/review/'.element('cre_id',$review));
 
@@ -668,12 +668,12 @@ class Denguruapi extends CI_Controller
         return $data;
     }
 
-    public function convert_mem_info($_mem_id = 0)
+    public function convert_mem_info($member = array())
     {
         
         
-        $_mem_id = (int) $_mem_id;
-        if (empty($_mem_id) OR $_mem_id < 1) {
+        $mem_id = (int) element('mem_id',$member);
+        if (empty($mem_id) OR $mem_id < 1) {
             return false;
         }
 
@@ -709,63 +709,42 @@ class Denguruapi extends CI_Controller
         //  $data['pet_allergy'] = $this->item('pet_allergy');
         // }else{
 
-            $this->CI->load->model(
-                array(
-                    'Member_pet_model','Reviewer_model',
-                )
-            );
-
-            $data = array();
-
-
-            $data['member_reviewer_url']= base_url('/profile/reviewer/'.$_mem_id);
-
-            
-            $data['reviewerstatus'] = 0; //리뷰어로 선정했는지 여부 
-
-            if(!empty($this->CI->member->is_member())){
-                $countwhere = array(
-                'mem_id' => $this->CI->member->is_member(),
-                'target_mem_id' => $_mem_id,
-                );
-                $data['reviewerstatus'] = $this->CI->Reviewer_model
-                ->count_by($countwhere);  
-            }
-
-            $member = $this->CI->Member_model->get_by_memid($_mem_id);
-            
-            $pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
-            
-            if (is_array($pet)) {
-                $member = array_merge($member, $pet);
-            }
+           
 
             $data['mem_id'] = element('mem_id',$member);
             $data['mem_userid'] = element('mem_userid',$member);
             $data['mem_email'] = element('mem_email',$member);
             $data['mem_username'] = element('mem_username',$member);
             $data['mem_nickname'] = element('mem_nickname',$member);
-            $data['pet_id'] = element('pet_id',$member);
-            $data['pet_name'] = element('pet_name',$member);
-            $data['pet_birthday'] = element('pet_birthday',$member);
-            $data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
-            $data['pet_sex'] = element('pet_sex',$member);
-            $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
-            $data['pet_neutral'] = element('pet_neutral',$member);
-            $data['pet_weight'] = element('pet_weight',$member);
-            $data['pet_form'] = element(element('pet_form',$member),config_item('pet_form'),'');
-            $data['pet_kind'] = element('pet_kind',$member);
 
-            if(element('pet_attr',$member)){
-                foreach(explode(",",element('pet_attr',$member)) as $value){
-                    $data['pet_attr'][]= element($value,config_item('pet_attr'),'');
+            $data['petwrite_url'] = base_url('mypage/petwrite');
+
+            if(element('pet',$member))
+                foreach(element('list',element('pet',$member)) as $key => $value){
+                    $data['pet']['list'][$key]['petmodify_url'] = base_url('mypage/petwrite/'.element('pet_id',$value));
+                    $data['pet']['list'][$key]['pet_id'] = element('pet_id',$value);
+                    $data['pet']['list'][$key]['pet_name'] = element('pet_name',$value);
+                    $data['pet']['list'][$key]['pet_birthday'] = element('pet_birthday',$value);
+                    $data['pet']['list'][$key]['pet_age'] = date('Y') - cdate('Y',strtotime(element('pet_birthday',$value)));
+                    $data['pet']['list'][$key]['pet_sex'] = element('pet_sex',$value);
+                    $data['pet']['list'][$key]['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$value));
+                    $data['pet']['list'][$key]['pet_neutral'] = element('pet_neutral',$value);
+                    $data['pet']['list'][$key]['pet_weight'] = element('pet_weight',$value);
+                    $data['pet']['list'][$key]['pet_form'] = element(element('pet_form',$value),config_item('pet_form'),'');
+                    $data['pet']['list'][$key]['pet_kind'] = element('pet_kind',$value);
+
+                    if(element('pet_attr',$value)){
+                        foreach(explode(",",element('pet_attr',$value)) as $val){
+                            $data['pet']['list'][$key]['pet_attr'][]= element($val,config_item('pet_attr'),'');
+                        }
+                    }
+                    
+                    
+                    $data['pet']['list'][$key]['pet_allergy'] = element('pet_allergy',$value);
                 }
-            }
             
-            
-            $data['pet_allergy'] = element('pet_allergy',$member);
         
-
+            
             return $data;
     }
 }

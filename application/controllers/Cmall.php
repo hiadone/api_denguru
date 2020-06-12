@@ -292,7 +292,7 @@ class Cmall extends CB_Controller
 		$layoutconfig = array(
 			'path' => 'cmall',
 			'layout' => 'layout',
-			'skin' => '_main',
+			'skin' => 'main',
 			'layout_dir' => $this->cbconfig->item('layout_cmall'),
 			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
 			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
@@ -628,6 +628,11 @@ class Cmall extends CB_Controller
 		$data = $this->denguruapi->convert_cit_info($data);
 		$data = $this->denguruapi->convert_brd_info($data);
 
+		$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$data));
+
+		$data['brd_register_url'] = element('brd_register_url',$board_crawl);	
+		$data['brd_order_url'] = element('brd_order_url',$board_crawl);
+		$data['brd_orderstatus_url'] = element('brd_orderstatus_url',$board_crawl);
 
 		if ( ! element('cit_id', $data)) {
 			alert('이 상품은 현재 존재하지 않습니다',"",406);
@@ -3326,6 +3331,12 @@ class Cmall extends CB_Controller
 		
 		
 		$data = $this->board->item_all($brd_id);
+		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
+
+		$view['view']['brd_register_url'] = element('brd_register_url',$board_crawl);	
+		$view['view']['brd_order_url'] = element('brd_order_url',$board_crawl);
+		$view['view']['brd_orderstatus_url'] = element('brd_orderstatus_url',$board_crawl);
+		
 
 		if ( ! element('brd_id', $data)) {
 			alert('이 스토어는 현재 존재하지 않습니다',"",406);

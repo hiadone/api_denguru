@@ -239,7 +239,7 @@ class Cmall_review extends CB_Controller
         $view = $data = array();
         $view['view'] = array();
 
-        $view['view']['reviewwrite_url'] = base_url('cmall_review/reviewwrite/'.$cit_id);
+        $view['view']['reviewmmodify_url'] = base_url('cmall_review/reviewwrite/'.$cit_id);
     
         $this->load->model(array('Cmall_item_model', 'Cmall_review_model', 'Cmall_attr_model'));
 

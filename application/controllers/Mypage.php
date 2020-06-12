@@ -2053,7 +2053,7 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|exact_length[1]',
 	        ),
 	        array(
-	            'field' => 'pet_attr',
+	            'field' => 'pet_attr[]',
 	            'label' => '우리 아이 특성',
 	            'rules' => 'trim|required',
 	        ),
@@ -2192,10 +2192,27 @@ class Mypage extends CB_Controller
 	        
 	        
 
-	        $view['view']['msg'] = $file_error . $file_error2.validation_errors();
+	        
+
+	        $view['msg'] = $file_error . $file_error2.validation_errors();
+            
+            $view['view']['data'] = $getdata;
+
+            
+	        $view['view']['config']['pet_form'] = config_item('pet_form');
+	        $view['view']['config']['pet_kind'] = array();
+	        $view['view']['config']['pet_attr'] = config_item('pet_attr');
+            
+
+            $view['view']['primary_key'] = $primary_key;
+
+            $view['http_status_codes'] = parent::HTTP_OK;
+
+            
+            return $view;
 	        
 	        
-	        return $this->response($view['view'], parent::HTTP_OK);
+	        
 	    } else {
 	        /**
 	         * 유효성 검사를 통과한 경우입니다.
@@ -2262,7 +2279,7 @@ class Mypage extends CB_Controller
 	            $pet_id = $this->input->post($primary_key);
 	            $this->Member_pet_model->update($pet_id, $updatedata);
 	            
-	            $view['view']['msg'] = '정상적으로 수정되었습니다';
+	            $view['msg'] = '정상적으로 수정되었습니다';
 	            
 	                
 	                
@@ -2275,7 +2292,7 @@ class Mypage extends CB_Controller
 
 	            $pet_id = $this->Member_pet_model->insert($updatedata);
 
-	            $view['view']['msg'] = '정상적으로 입력되었습니다';
+	            $view['msg'] = '정상적으로 입력되었습니다';
 	            
 	        }
 
@@ -2284,10 +2301,9 @@ class Mypage extends CB_Controller
 	            $this->Member_pet_model->update($pet_id,array('pet_main' => 1));
 	        }
 
-	        
-	        
+	        $view['http_status_codes'] = 201;
 
-	        return $this->response($view['view'], 201);
+            return $view;
 	    }
 	}
 
@@ -2295,57 +2311,55 @@ class Mypage extends CB_Controller
 	{
 	    // 이벤트 라이브러리를 로딩합니다
 	    $eventname = 'event_admin_member_memberpet_write';
-	    $this->load->event($eventname);
+	    // $this->load->event($eventname);
 
 	    $view = array();
-	    $view['view'] = array();
+	    
 
 	    // 이벤트가 존재하면 실행합니다
-	    $view['view']['event']['before'] = Events::trigger('before', $eventname);
+	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-	    $view['view'] = $this->_petwrite($pid);
+	    $view = $this->_petwrite($pid);
 	    
-	    $this->data = $view['view'];
+	    
 		
-		// return $this->response($this->data, 200);
+		return $this->response($view['view'], parent::HTTP_OK);
+		
 	}
 
 	public function petwrite_post($pid = 0)
 	{
 	    // 이벤트 라이브러리를 로딩합니다
 	    $eventname = 'event_admin_member_memberpet_write';
-	    $this->load->event($eventname);
+	    // $this->load->event($eventname);
 
 	    $view = array();
 	    $view['view'] = array();
 
 	    // 이벤트가 존재하면 실행합니다
-	    $view['view']['event']['before'] = Events::trigger('before', $eventname);
+	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-	    $view['view'] = $this->_petwrite($pid);
+	    $view = $this->_petwrite($pid);
 	    
-	    $this->data = $view['view'];
-		
-		// return $this->response($this->data, 201);
+	    return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
 	}
 
 	public function petwrite_put($pid = 0)
 	{
 	    // 이벤트 라이브러리를 로딩합니다
 	    $eventname = 'event_admin_member_memberpet_write';
-	    $this->load->event($eventname);
+	    // $this->load->event($eventname);
 
 	    $view = array();
 	    $view['view'] = array();
 
 	    // 이벤트가 존재하면 실행합니다
-	    $view['view']['event']['before'] = Events::trigger('before', $eventname);
+	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-	    $view['view'] = $this->_petwrite($pid);
-	    
-	    $this->data = $view['view'];
+	    $view = $this->_petwrite($pid);
 		
-		// return $this->response($this->data, 201);
+		return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
+		
 	}
 
 	

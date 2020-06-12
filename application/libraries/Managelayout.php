@@ -206,7 +206,9 @@ class Managelayout extends CI_Controller
 		if(element('path', $config) == 'cmall' && element('skin', $config) == 'main' ){
 
 			if ($CI->member->is_member()) {
+				$CI->load->library('denguruapi');
 				$data['member'] = $CI->member->get_member();					
+				$data['member'] = $CI->denguruapi->convert_mem_info($data['member']);
 			}
 			
 			$data['popup'] = $CI->popuplib->display_popup();
@@ -214,7 +216,7 @@ class Managelayout extends CI_Controller
 			$data['banner']['main_top'] =array();
 			$data['banner']['main_middle'] =array();
 			$data['banner']['main_bottom'] =array();
-			$result = $this->Banner_model->get_banner('main_top', "", 1);
+			$result = $CI->Banner_model->get_banner('main_top', "", 1);
 
 			if ($result) {
 				foreach ($result as $key => $val) {
@@ -224,7 +226,7 @@ class Managelayout extends CI_Controller
 				}
 			}
 
-			$result = $this->Banner_model->get_banner('main_middle', '', 1);
+			$result = $CI->Banner_model->get_banner('main_middle', '', 1);
 
 			if ($result) {
 				foreach ($result as $key => $val) {
@@ -234,7 +236,7 @@ class Managelayout extends CI_Controller
 				}
 			}
 
-			$result = $this->Banner_model->get_banner('main_bottom', '', 1);
+			$result = $CI->Banner_model->get_banner('main_bottom', '', 1);
 
 			if ($result) {
 				foreach ($result as $key => $val) {
