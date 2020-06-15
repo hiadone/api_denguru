@@ -787,7 +787,10 @@ class Cmall_review extends CB_Controller
         if ($form_validation) {
             $this->load->library('upload');
             $this->load->library('aws_s3');
-            
+            $file = json_encode($_FILES);
+            $post = json_encode($_POST);
+            log_message('error', $file);
+            log_message('error', $post);
             if (isset($_FILES) && isset($_FILES['cre_file']) && isset($_FILES['cre_file']['name']) && is_array($_FILES['cre_file']['name'])) {
                 $filecount = count($_FILES['cre_file']['name']);
                 $upload_path = config_item('uploads_dir') . '/cmall_review/';

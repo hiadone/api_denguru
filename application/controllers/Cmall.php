@@ -3425,7 +3425,7 @@ class Cmall extends CB_Controller
 		
 		
 
-		$view['view']['data'] = $this->denguruapi->convert_brd_info(element('brd_id', $data));
+		$view['view']['data'] = $this->denguruapi->get_brd_info(element('brd_id', $data));
 		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $data),8);
 		$view['view']['data']['brd_attr'] = array();
 		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));

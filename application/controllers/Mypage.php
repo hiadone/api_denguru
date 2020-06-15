@@ -2053,6 +2053,11 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|exact_length[1]',
 	        ),
 	        array(
+	            'field' => 'pet_neutral',
+	            'label' => '중성화 ',
+	            'rules' => 'trim|numeric',
+	        ),
+	        array(
 	            'field' => 'pet_attr[]',
 	            'label' => '우리 아이 특성',
 	            'rules' => 'trim|required',
@@ -2062,6 +2067,14 @@ class Mypage extends CB_Controller
 	            'label' => '몸무게',
 	            'rules' => 'trim|numeric',
 	        ),
+	        array(
+	            'field' => 'pet_main',
+	            'label' => '메인 펫',
+	            'rules' => 'trim|numeric',
+	        ),
+	        
+
+	        
 	        // array(
 	        //     'field' => 'pet_profile_content',
 	        //     'label' => '펫 자기소개',
@@ -2222,22 +2235,21 @@ class Mypage extends CB_Controller
 	        // 이벤트가 존재하면 실행합니다
 	        $view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
 	        
-	        $pet_sex = $this->input->post('pet_sex') ? $this->input->post('pet_sex') : 0;
-	        $pet_neutral = $this->input->post('pet_neutral') ? $this->input->post('pet_neutral') : 0;
-	        $pet_weight = $this->input->post('pet_weight') ? $this->input->post('pet_weight') : 0;
-	        $pet_attr = $this->input->post('pet_attr') ? implode(",",$this->input->post('pet_attr')) : '';
-	        $pet_allergy = $this->input->post('pet_allergy') ? $this->input->post('pet_allergy') : 0;
+	        $pet_sex = $this->input->post_put('pet_sex') ? $this->input->post_put('pet_sex') : 0;
+	        $pet_neutral = $this->input->post_put('pet_neutral') ? $this->input->post_put('pet_neutral') : 0;
+	        $pet_weight = $this->input->post_put('pet_weight') ? $this->input->post_put('pet_weight') : 0;
+	        $pet_attr = $this->input->post_put('pet_attr') ? implode(",",$this->input->post_put('pet_attr')) : '';
+	        $pet_allergy = $this->input->post_put('pet_allergy') ? $this->input->post_put('pet_allergy') : 0;
 
 	        $updatedata = array(
-	            'mem_id' => $mem_id,
-	            'pet_name' => $this->input->post('pet_name', null, ''),
-	            'pet_birthday' => $this->input->post('pet_birthday', null, ''),
+	            
+	            'pet_name' => $this->input->post_put('pet_name', null, ''),
+	            'pet_birthday' => $this->input->post_put('pet_birthday', null, ''),
 	            'pet_sex' => $pet_sex,
 	            'pet_neutral' => $pet_neutral,
 	            'pet_weight' => $pet_weight,                
 	            'pet_attr' => $pet_attr,
 	            'pet_allergy' => $pet_allergy,
-	            'pet_profile_content' => $this->input->post('pet_profile_content', null, ''),
 	            
 	        );
 
@@ -2246,27 +2258,27 @@ class Mypage extends CB_Controller
 	        $metadata = array();
 
 	       
-	        if (element('pet_nickname', $getdata) !== $this->input->post('pet_nickname')) {
-	            $updatedata['pet_nickname'] = $this->input->post('pet_nickname', null, '');
-	        }
+	        // if (element('pet_nickname', $getdata) !== $this->input->post('pet_nickname')) {
+	        //     $updatedata['pet_nickname'] = $this->input->post('pet_nickname', null, '');
+	        // }
 	        
 
-	        if ($this->input->post('pet_photo_del')) {
+	        if ($this->input->post_put('pet_photo_del')) {
 	            $updatedata['pet_photo'] = '';
 	        } elseif ($updatephoto) {
 	            $updatedata['pet_photo'] = $updatephoto;
 	        }
-	        if (element('pet_photo', $getdata) && ($this->input->post('pet_photo_del') OR $updatephoto)) {
+	        if (element('pet_photo', $getdata) && ($this->input->post_put('pet_photo_del') OR $updatephoto)) {
 	            // 기존 파일 삭제
 	            @unlink(config_item('uploads_dir') . '/member_photo/' . element('pet_photo', $getdata));
 	            $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/member_photo/' . element('pet_photo', $getdata));
 	        }
-	        if ($this->input->post('pet_backgroundimg_del')) {
+	        if ($this->input->post_put('pet_backgroundimg_del')) {
 	            $updatedata['pet_backgroundimg'] = '';
 	        } elseif ($updateicon) {
 	            $updatedata['pet_backgroundimg'] = $updateicon;
 	        }
-	        if (element('pet_backgroundimg', $getdata) && ($this->input->post('pet_backgroundimg_del') OR $updateicon)) {
+	        if (element('pet_backgroundimg', $getdata) && ($this->input->post_put('pet_backgroundimg_del') OR $updateicon)) {
 	            // 기존 파일 삭제
 	            @unlink(config_item('uploads_dir') . '/member_icon/' . element('pet_backgroundimg', $getdata));
 	            $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/member_icon/' . element('pet_backgroundimg', $getdata));
@@ -2275,9 +2287,19 @@ class Mypage extends CB_Controller
 	        /**
 	         * 게시물을 수정하는 경우입니다
 	         */
-	        if ($this->input->post($primary_key)) {
-	            $pet_id = $this->input->post($primary_key);
-	            $this->Member_pet_model->update($pet_id, $updatedata);
+	        // if ($this->input->post_put($primary_key)) {
+	        //     $pet_id = $this->input->post_put($primary_key);
+	        //     $this->Member_pet_model->update($pet_id, $updatedata);
+	            
+	        //     $view['msg'] = '정상적으로 수정되었습니다';
+	            
+	                
+	                
+	            
+	        // } else {
+	        if ($pid) {
+	            
+	            $this->Member_pet_model->update($pid, $updatedata);
 	            
 	            $view['msg'] = '정상적으로 수정되었습니다';
 	            
@@ -2289,16 +2311,21 @@ class Mypage extends CB_Controller
 	             * 게시물을 새로 입력하는 경우입니다
 	             */
 	            $updatedata['pet_register_datetime'] = cdate('Y-m-d H:i:s');
-
-	            $pet_id = $this->Member_pet_model->insert($updatedata);
+	            $updatedata['mem_id'] = $mem_id;
+	            
+	            $pid = $this->Member_pet_model->insert($updatedata);
 
 	            $view['msg'] = '정상적으로 입력되었습니다';
 	            
 	        }
 
-	        if($pet_id && $this->input->post('pet_main', null, '')){
+	        if($pid && $this->input->post_put('pet_main', null, '')){
 
-	            $this->Member_pet_model->update($pet_id,array('pet_main' => 1));
+	        	$petdata = $this->Member_pet_model->get_one($pid);
+
+	        	$this->Member_pet_model->update('',array('pet_main' => 0),array('mem_id' => element('mem_id',$petdata)));
+
+	            $this->Member_pet_model->update($pid,array('pet_main' => 1));
 	        }
 
 	        $view['http_status_codes'] = 201;
@@ -2368,15 +2395,19 @@ class Mypage extends CB_Controller
     {
         // 이벤트 라이브러리를 로딩합니다
         $eventname = 'event_admin_member_memberpet_listdelete';
-        $this->load->event($eventname);
+        // $this->load->event($eventname);
+
+        
 
         // 이벤트가 존재하면 실행합니다
-        Events::trigger('before', $eventname);
+        // Events::trigger('before', $eventname);
 
         /**
 		 * 로그인이 필요한 페이지입니다
 		 */
 		required_user_login();
+
+		$this->load->model(array('Member_pet_model'));
 
 		$pid = (int) $pid;
 		if (empty($pid) OR $pid < 1) {
@@ -2386,6 +2417,14 @@ class Mypage extends CB_Controller
 		$getdata = $this->Member_pet_model->get_one($pid);
 		if(empty(element('pet_id',$getdata)))
 			alert('이 펫은 현재 존재하지 않습니다',"",406);
+
+		$is_admin = $this->member->is_admin();
+        if ($is_admin === false 
+            && (int) element('mem_id', $getdata) !== $mem_id) {
+            alert_close('본인의 글 외에는 접근하실 수 없습니다');
+        }
+
+
         /**
          * 체크한 게시물의 삭제를 실행합니다
          */
