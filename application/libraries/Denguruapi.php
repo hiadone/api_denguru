@@ -426,7 +426,10 @@ class Denguruapi extends CI_Controller
         }
         
 
-        $review['cre_title'] = html_escape(element('cre_title',$review));
+        $review['cre_good'] = html_escape(element('cre_good',$review));
+        $review['cre_bad'] = html_escape(element('cre_bad',$review));
+        $review['cre_tip'] = html_escape(element('cre_tip',$review));
+
 
         // $review['itemreviewpost_url'] = base_url('cmall_review/itemreviewpost/'.element('cit_id',$review));
 

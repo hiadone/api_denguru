@@ -1273,8 +1273,11 @@ class Cmall_review extends CB_Controller
         $eventname = 'event_cmall_review_write';
         // $this->load->event($eventname);
         
-        
 
+
+        print_r($_FILES);
+
+        exit;
         $cit_id = (int) $cit_id;        
         if (empty($cit_id) OR $cit_id < 1) {
             show_404();

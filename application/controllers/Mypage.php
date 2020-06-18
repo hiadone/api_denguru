@@ -56,6 +56,7 @@ class Mypage extends CB_Controller
 		// $view['view']['memberform'] = json_decode($registerform, true);
 		$data['member'] = $this->denguruapi->get_mem_info($this->member->item('mem_id'));					
 		
+		$this->load->model(array('Cmall_order_model'));
 		
 		$data['member_group_name'] = '';
 		$member_group = $this->member->group();
@@ -72,6 +73,28 @@ class Mypage extends CB_Controller
 			}
 		}
 
+		
+
+
+
+		
+			$owhere = array(
+				'mem_id' => $this->member->item('mem_id'),
+				'cor_status' => 0,
+			);
+			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key', $owhere);
+			
+			
+
+			if ($order_crawl) {
+				foreach ($order_crawl as $okey => $oval) {
+					$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$oval));		
+
+					$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('brd_url_key',$board_crawl).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval));
+					
+				}
+			}
+		
 
 		$view['view']['data'] = $data;
 		
@@ -1454,7 +1477,7 @@ class Mypage extends CB_Controller
 
         $field = array(
         	'like' => array('lik_id,target_mem_id'),
-            'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+            'cmall_review' => array('cre_id','cit_id','cre_good','cre_bad','cre_tip','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
         );
         
         $select = get_selected($field);
@@ -1471,13 +1494,7 @@ class Mypage extends CB_Controller
                 
                 
 
-                $result['list'][$key]['content'] = display_html_content(
-                    element('cre_content', $val),
-                    element('cre_content_html_type', $val),
-                    $thumb_width,
-                    $autolink,
-                    $popup
-                );
+                
 
                 $result['list'][$key]['can_update'] = false;
                 $result['list'][$key]['can_delete'] = false;

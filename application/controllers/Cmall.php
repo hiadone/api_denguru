@@ -3326,22 +3326,21 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		
-		$this->load->model(array('Cmall_storewishlist_model'));
+		$this->load->model(array('Cmall_storewishlist_model','Board_model'));
 
 		
 		
-		$data = $this->board->item_all($brd_id);
+		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind');
 		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
 
 		$view['view']['brd_register_url'] = element('brd_register_url',$board_crawl);	
 		$view['view']['brd_order_url'] = element('brd_order_url',$board_crawl);
-		$view['view']['brd_orderstatus_url'] = element('brd_orderstatus_url',$board_crawl);
-		
 
-		if ( ! element('brd_id', $data)) {
+		
+		if ( ! element('brd_id', $board)) {
 			alert('이 스토어는 현재 존재하지 않습니다',"",406);
 		}
-		if (element('brd_blind', $data)) {
+		if (element('brd_blind', $board)) {
 			alert('이 스토어는 현재 운영하지 않습니다',"",406);
 		}
 
@@ -3371,10 +3370,10 @@ class Cmall extends CB_Controller
 		// 		'1'
 		// 	);
 		// }
-		if ( ! $this->cb_jwt->userdata('brd_inlink_click_' . element('brd_id', $data))) {
+		if ( ! $this->cb_jwt->userdata('brd_inlink_click_' . element('brd_id', $board))) {
 
 			$this->cb_jwt->set_userdata(
-				'brd_inlink_click_' . element('brd_id', $data),
+				'brd_inlink_click_' . element('brd_id', $board),
 				'1'
 			);
 
@@ -3383,7 +3382,7 @@ class Cmall extends CB_Controller
 				$insertdata = array(
 					'pln_id' => 0,
 					'post_id' => 0,
-					'brd_id' => element('brd_id', $data),
+					'brd_id' => element('brd_id', $board),
 					'cit_id' => 0,
 					'clc_datetime' => cdate('Y-m-d H:i:s'),
 					'clc_ip' => $this->input->ip_address(),
@@ -3394,7 +3393,7 @@ class Cmall extends CB_Controller
 				$this->Crawl_link_click_log_model->insert($insertdata);
 			}
 			$this->load->model('Board_model');
-			$this->Board_model->update_plus(element('brd_id', $data), 'brd_hit', 1);
+			$this->Board_model->update_plus(element('brd_id', $board), 'brd_hit', 1);
 			// $this->_stat_count_board(element('brd_id', $board));
 		}
 		
@@ -3409,24 +3408,24 @@ class Cmall extends CB_Controller
 		// 	: display_html_content(element('footer_content', element('meta', $data)), 1, $thumb_width);
 
 		$where = array(
-				'brd_id' => element('brd_id',$data),
+				'brd_id' => element('brd_id',$board),
 			);
 		$view['view']['storewishcount'] = $this->Cmall_storewishlist_model->count_by($where);	
 
-		$view['view']['addstorewish_url'] = cmall_item_url('storewish/'.element('brd_id',$data));
+		$view['view']['addstorewish_url'] = cmall_item_url('storewish/'.element('brd_id',$board));
 		$view['view']['storewishstatus'] = 0;
 		if(!empty($mem_id)){
 			$where = array(
 				'mem_id' => $mem_id,
-				'brd_id' => element('brd_id',$data),
+				'brd_id' => element('brd_id',$board),
 			);
 			$view['view']['storewishstatus'] = $this->Cmall_storewishlist_model->count_by($where);	
 		}
 		
 		
 
-		$view['view']['data'] = $this->denguruapi->get_brd_info(element('brd_id', $data));
-		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $data),8);
+		$view['view']['data'] = $this->denguruapi->get_brd_info(element('brd_id', $board));
+		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $board),8);
 		$view['view']['data']['brd_attr'] = array();
 		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));
 
