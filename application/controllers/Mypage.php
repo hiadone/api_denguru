@@ -84,13 +84,18 @@ class Mypage extends CB_Controller
 			);
 			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key', $owhere);
 			
-			
 
 			if ($order_crawl) {
 				foreach ($order_crawl as $okey => $oval) {
-					$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$oval));		
+					$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$oval));	
 
-					$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('brd_url_key',$board_crawl).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval));
+					$param =& $this->querystring;
+					$brd_url_key_ = parse_url(element('brd_url_key',$board_crawl));
+
+					
+
+
+					$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$oval),element('query',$brd_url_key_)),'cor_id' =>element('cor_id',$oval));
 					
 				}
 			}
