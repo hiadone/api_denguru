@@ -3333,8 +3333,8 @@ class Cmall extends CB_Controller
 		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind');
 		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
 
-		$view['view']['brd_register_url'] = element('brd_register_url',$board_crawl);	
-		$view['view']['brd_order_url'] = element('brd_order_url',$board_crawl);
+		$view['view']['brd_register_url'] = trim(element('brd_register_url',$board_crawl));	
+		$view['view']['brd_order_url'] = trim(element('brd_order_url',$board_crawl));
 
 		
 		if ( ! element('brd_id', $board)) {
