@@ -94,8 +94,11 @@ class Mypage extends CB_Controller
 
 
 
-
-					$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$oval),element('query',$brd_url_key_)),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+					if(element('brd_order_key',$board_crawl)==='sixshop' || element('brd_order_key',$board_crawl)==='parse'){
+						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+					} else {
+						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$oval),element('query',$brd_url_key_)),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+					}
 					
 				}
 			}
