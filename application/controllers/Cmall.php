@@ -2635,7 +2635,7 @@ class Cmall extends CB_Controller
 				$result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
 				
-				$result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
+				// $result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
 				
 				$result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
 				
