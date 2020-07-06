@@ -336,8 +336,13 @@ class Cmall_review extends CB_Controller
             ->get_list($per_page, $offset, $where, '', $findex, $forder);
 
         // $result = $this->Cmall_attr_model->get_review_list($per_page, $offset, $where, '', $findex, $forder);
+        // 
+        $data['item']['total_rows'] = $result['total_rows'];
+        $view['view']['data'] = $data;
 
+        
         $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
                 
