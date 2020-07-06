@@ -3234,6 +3234,7 @@ class Cmall extends CB_Controller
 		$data['list'][$key]['cca_id'] = 0;
 		$data['list'][$key]['cca_value'] = '전체';
 		$data['list'][$key]['category_url'] = base_url('cmall/itemlists');
+		$data['list'][$key]['category_image_url'] = cdn_url('category','icon-cate-0.svg');
 		$category = $this->cmalllib->get_all_category();
 		if (element(0, $category)) {
 			foreach (element(0, $category) as $value) {
@@ -3241,6 +3242,7 @@ class Cmall extends CB_Controller
 				$data['list'][$key]['cca_id'] = html_escape(element('cca_id', $value));
 				$data['list'][$key]['cca_value'] = html_escape(element('cca_value', $value));
 				$data['list'][$key]['category_url'] = base_url('cmall/itemlists/' . element('cca_id', $value));
+				$data['list'][$key]['category_image_url'] = cdn_url('category','icon-cate-'.element('cca_id', $value).'.svg');
 
 				// if (element(element('cca_id', $value), $category)) {
 				// 	foreach (element(element('cca_id', $value), $category) as $svalue) {
@@ -3318,7 +3320,7 @@ class Cmall extends CB_Controller
 	{
 
 		
-		
+
 
 		$view = array();
 		$view['view'] = array();
