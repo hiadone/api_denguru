@@ -2281,7 +2281,7 @@ class Cmall extends CB_Controller
 	}
 
 
-	public function _wishlist()
+	public function _wishlist($brd_id = 0 ,$type='')
 	{
 		
 
@@ -2308,6 +2308,10 @@ class Cmall extends CB_Controller
 		/**
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
+		
+
+		
+
 		$where = array();
 		$where['cmall_wishlist.mem_id'] = $this->member->item('mem_id');
 		// $where['cit_status'] = 1;
@@ -2321,7 +2325,68 @@ class Cmall extends CB_Controller
 				$result['list'][$key]['num'] = $list_num--;
 			}
 		}
+
 		$view['view']['data'] = $result;
+		$view['view']['storeby_wishlist'] = site_url('cmall/wishlist/0/store');
+
+		if($type==='store'){
+			$data=array();
+			if (element('list', $result)) {
+				foreach (element('list', $result) as $key => $val) {
+					
+					$_data = $this->denguruapi->get_brd_info(element('brd_id', $val));
+
+					$data['list'][element('brd_id',$val)]['brd_name'] = element('brd_name',$_data);
+					$data['list'][element('brd_id',$val)]['brd_image'] = element('brd_image',$_data);
+					$data['list'][element('brd_id',$val)]['brd_outlink_url'] = element('brd_outlink_url',$_data);
+					$data['list'][element('brd_id',$val)]['brd_inlink_url'] = element('brd_inlink_url',$_data);
+					$data['list'][element('brd_id',$val)]['brd_wishlist'] = site_url('cmall/wishlist/'.element('brd_id',$val));
+
+					$data['list'][element('brd_id',$val)]['brd_id'] = element('brd_id',$val);
+
+					if(empty($data['list'][element('brd_id',$val)]['cnt']))
+						$data['list'][element('brd_id',$val)]['cnt'] = 1;
+					else
+						$data['list'][element('brd_id',$val)]['cnt']++;
+					
+					$data['list'][element('brd_id',$val)]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
+
+						
+				}
+			}
+
+			$_data = array();
+			if (element('list', $data)) {
+				foreach (element('list', $data) as $key => $val) {
+					
+					
+
+					$_data['list'][]  = $val;
+					
+
+						
+				}
+			}
+			$_data['total_rows'] = count($_data['list']);			
+			$view['view']['data'] = $_data;
+		}
+
+		if(!empty($brd_id)){
+			$data=array();
+			if (element('list', $result)) {
+				foreach (element('list', $result) as $key => $val) {
+					
+					if($brd_id !== element('brd_id',$val)) continue;
+					$data['list'][] = $val;	
+
+						
+				}
+			}
+			$data['total_rows'] = count($data['list']);
+			$view['view']['data'] = $data;
+		}
+
+		
 
 		/**
 		 * 페이지네이션을 생성합니다
@@ -2339,7 +2404,7 @@ class Cmall extends CB_Controller
 		
 	}
 
-	public function wishlist_get()
+	public function wishlist_get($brd_id = 0 ,$type='')
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_wishlist';
@@ -2352,7 +2417,7 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
-		$view['view'] = $this->_wishlist();
+		$view['view'] = $this->_wishlist($brd_id, $type);
 		
 		/**
 		 * 레이아웃을 정의합니다
@@ -2618,7 +2683,7 @@ class Cmall extends CB_Controller
 				$result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
 				
-				$result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
+				// $result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
 				
 				$result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
 				
