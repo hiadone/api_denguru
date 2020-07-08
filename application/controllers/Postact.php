@@ -4077,4 +4077,61 @@ class Postact extends CB_Controller
         
 
 	}
+
+	public function wishlist_post()
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_multi_delete';
+		$this->load->event($eventname);
+
+		required_user_login();	
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Cmall_wishlist_model'));
+
+		$this->load->library(array('cmalllib'));
+
+		$result = array();
+		$this->output->set_content_type('application/json');
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$cwi_ids = $this->input->post('chk_cwi_id');
+		if (empty($cwi_ids)) {
+			alert_close('선택된 게시물이 없습니다.');
+			// $result = array('error' => '선택된 게시물이 없습니다.');
+			// exit(json_encode($result));
+		}
+
+		foreach ($cwi_ids as $cwi_id) {
+			$cwi_id = (int) $cwi_id;
+			if (empty($cwi_id) OR $cwi_id < 1) {
+				alert_close('잘못된 접근입니다');
+				// $result = array('error' => '잘못된 접근입니다');
+				// exit(json_encode($result));
+			}			
+
+			
+			$wishlist = $this->Cmall_wishlist_model->get_one($cwi_id);
+
+			if ( ! element('cwi_id', $wishlist)) {
+				alert('이 상품은 Pick 목록에 존재하지 않습니다',"",406);
+			}
+
+			if ((int) element('mem_id', $wishlist) !== $mem_id) {
+				alert_close('본인외에는 접근하실 수 없습니다');
+			}
+
+			$this->cmalllib->_wishlist_delete($cwi_id);
+
+			
+		}
+
+		// 이벤트가 존재하면 실행합니다
+		return $this->response('', 204);
+
+	}
 }

@@ -84,7 +84,7 @@ class Denguruapi extends CI_Controller
         $cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
         if(empty(element('cit_price_sale',$cmall_item)))
             $cmall_item['cit_price_sale_percent'] = 0;
-        else $cmall_item['cit_price_sale_percent'] = number_format((element('cit_price',$cmall_item) - $element('cit_price_sale',$cmall_item)) / element('cit_price',$cmall_item) * 100);
+        else $cmall_item['cit_price_sale_percent'] = number_format((element('cit_price',$cmall_item,0) - element('cit_price_sale',$cmall_item,0)) / element('cit_price',$cmall_item,0) * 100);
         $cmall_item['cit_brand'] = element('cbr_value_kr',$cmall_item,element('cbr_value_en',$cmall_item,''));
 
         return $cmall_item;

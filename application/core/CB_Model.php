@@ -414,4 +414,14 @@ class CB_Model extends CI_Model
 			$this->db->group_end();
 		}
 	}
+
+	public function group_by($by, $escape = NULL)
+	{
+		if (empty($by)) {
+			return false;
+		}
+
+		$this->db->group_by($by,$escape);
+	}
+
 }

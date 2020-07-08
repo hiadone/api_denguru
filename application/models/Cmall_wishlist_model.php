@@ -46,6 +46,12 @@ class Cmall_wishlist_model extends CB_Model
 		return $result;
 	}
 
+	 public function get_storegroup_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
+    {
+        $select = 'cmall_wishlist.*';
+        $result = $this->_get_list_common($select, $join='', $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);
+        return $result;
+    }
 
 	public function get_rank($start_date = '', $end_date = '')
 	{

@@ -182,15 +182,16 @@ class Register extends CB_Controller
 	/**
 	 * 회원가입 폼 페이지입니다
 	 */
-	public function form()
+	public function _form()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_register_form';
 		$this->load->event($eventname);
 
 		if ($this->member->is_member() && ! ($this->member->is_admin() === 'super' && $this->uri->segment(1) === config_item('uri_segment_admin'))) {
-			redirect();
+			alert_close('잘못된 접근입니다');
 		}
+		
 
 		$view = array();
 		$view['view'] = array();
@@ -200,57 +201,21 @@ class Register extends CB_Controller
 
 		if ($this->cbconfig->item('use_register_block')) {
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['before_block_layout'] = Events::trigger('before_block_layout', $eventname);
-
-			/**
-			 * 레이아웃을 정의합니다
-			 */
-			$page_title = $this->cbconfig->item('site_meta_title_register_form');
-			$meta_description = $this->cbconfig->item('site_meta_description_register_form');
-			$meta_keywords = $this->cbconfig->item('site_meta_keywords_register_form');
-			$meta_author = $this->cbconfig->item('site_meta_author_register_form');
-			$page_name = $this->cbconfig->item('site_page_name_register_form');
-
-			$layoutconfig = array(
-				'path' => 'register',
-				'layout' => 'layout',
-				'skin' => 'register_block',
-				'layout_dir' => $this->cbconfig->item('layout_register'),
-				'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_register'),
-				'use_sidebar' => $this->cbconfig->item('sidebar_register'),
-				'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_register'),
-				'skin_dir' => $this->cbconfig->item('skin_register'),
-				'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_register'),
-				'page_title' => $page_title,
-				'meta_description' => $meta_description,
-				'meta_keywords' => $meta_keywords,
-				'meta_author' => $meta_author,
-				'page_name' => $page_name,
-			);
-			$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-			$this->data = $view;
-			$this->layout = element('layout_skin_file', element('layout', $view));
-			$this->view = element('view_skin_file', element('layout', $view));
-			return false;
+			alert_close('잘못된 접근입니다');
 		}
 
 
-		if ($this->cbconfig->item('use_selfcert') && $this->cbconfig->item('use_selfcert_required') && ! $this->session->userdata('selfcertinfo')) {
-			if ( ! $this->session->userdata('selfcertinfo')) {
-				$this->session->set_flashdata(
-					'message',
-					'본인 확인 후에 회원가입이 가능합니다.'
-				);
-				redirect('register');
+		if ($this->cbconfig->item('use_selfcert') && $this->cbconfig->item('use_selfcert_required') && ! $this->jwt->userdata('selfcertinfo')) {
+			if ( ! $this->jwt->userdata('selfcertinfo')) {
+				alert_close('본인 확인 후에 회원가입이 가능합니다.');
 			}
 		}
 
 		$selfcert_phone = $selfcert_username = $selfcert_birthday = $selfcert_sex = '';
 		$selfcert_meta = '';
 
-		if ($this->cbconfig->item('use_selfcert') && $this->session->userdata('selfcertinfo')) {
-			$selfcertinfo = $this->session->userdata('selfcertinfo');
+		if ($this->cbconfig->item('use_selfcert') && $this->jwt->userdata('selfcertinfo')) {
+			$selfcertinfo = $this->jwt->userdata('selfcertinfo');
 			if (element('selfcert_type', $selfcertinfo) == 'phone') {
 				if ($this->cbconfig->item('use_selfcert_phone') == 'kcb' OR $this->cbconfig->item('use_selfcert_phone') == 'kcp') {
 					$selfcert_phone = element('selfcert_phone', $selfcertinfo);
@@ -288,12 +253,12 @@ class Register extends CB_Controller
 				. $this->cbconfig->item('change_nickname_date') . '일 이내에는 변경할 수 없습니다';
 		}
 
-		$configbasic['mem_userid'] = array(
-			'field' => 'mem_userid',
-			'label' => '아이디',
-			'rules' => 'trim|required|alphanumunder|min_length[3]|max_length[20]|is_unique[member_userid.mem_userid]|callback__mem_userid_check',
-			'description' => '영문자, 숫자, _ 만 입력 가능. 최소 3자이상 입력하세요',
-		);
+		// $configbasic['mem_userid'] = array(
+		// 	'field' => 'mem_userid',
+		// 	'label' => '아이디',
+		// 	'rules' => 'trim|required|alphanumunder|min_length[3]|max_length[20]|is_unique[member_userid.mem_userid]|callback__mem_userid_check',
+		// 	'description' => '영문자, 숫자, _ 만 입력 가능. 최소 3자이상 입력하세요',
+		// );
 
 		$password_description = '비밀번호는 ' . $password_length . '자리 이상이어야 ';
 		if ($this->cbconfig->item('password_uppercase_length')
@@ -428,13 +393,13 @@ class Register extends CB_Controller
 			'rules' => 'trim|alphanumunder|min_length[3]|max_length[20]|callback__mem_recommend_check',
 		);
 
-		if ($this->member->is_admin() === false && ! $this->session->userdata('registeragree')) {
-			$this->session->set_flashdata(
-				'message',
-				'회원가입약관동의와 개인정보취급방침동의후 회원가입이 가능합니다'
-			);
-			redirect('register');
-		}
+		// if ($this->member->is_admin() === false && ! $this->session->userdata('registeragree')) {
+		// 	$this->session->set_flashdata(
+		// 		'message',
+		// 		'회원가입약관동의와 개인정보취급방침동의후 회원가입이 가능합니다'
+		// 	);
+		// 	redirect('register');
+		// }
 
 		$registerform = $this->cbconfig->item('registerform');
 		$form = json_decode($registerform, true);
@@ -443,6 +408,9 @@ class Register extends CB_Controller
 		if ($form && is_array($form)) {
 			foreach ($form as $key => $value) {
 				if ( ! element('use', $value)) {
+					continue;
+				}
+				if ($key ==='mem_userid') {
 					continue;
 				}
 				if (element('func', $value) === 'basic') {
@@ -503,19 +471,19 @@ class Register extends CB_Controller
 			}
 		}
 
-		if ($this->cbconfig->item('use_recaptcha')) {
-			$config[] = array(
-				'field' => 'g-recaptcha-response',
-				'label' => '자동등록방지문자',
-				'rules' => 'trim|required|callback__check_recaptcha',
-			);
-		} else {
-			$config[] = array(
-				'field' => 'captcha_key',
-				'label' => '자동등록방지문자',
-				'rules' => 'trim|required|callback__check_captcha',
-			);
-		}
+		// if ($this->cbconfig->item('use_recaptcha')) {
+		// 	$config[] = array(
+		// 		'field' => 'g-recaptcha-response',
+		// 		'label' => '자동등록방지문자',
+		// 		'rules' => 'trim|required|callback__check_recaptcha',
+		// 	);
+		// } else {
+		// 	$config[] = array(
+		// 		'field' => 'captcha_key',
+		// 		'label' => '자동등록방지문자',
+		// 		'rules' => 'trim|required|callback__check_captcha',
+		// 	);
+		// }
 		$this->form_validation->set_rules($config);
 
 		$form_validation = $this->form_validation->run();
@@ -631,180 +599,14 @@ class Register extends CB_Controller
 		 * 즉 글쓰기나 수정 페이지를 보고 있는 경우입니다
 		 */
 		if ($form_validation === false OR $file_error !== '' OR $file_error2 !== '') {
+			
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+			$view['msg'] = $file_error . $file_error2.validation_errors();
 
-			$html_content = array();
+            $view['http_status_codes'] = parent::HTTP_OK;
 
-			$k = 0;
-			if ($form && is_array($form)) {
-				foreach ($form as $key => $value) {
-					if ( ! element('use', $value)) {
-						continue;
-					}
-					if (element('field_name', $value) === 'mem_username' && $selfcert_username) {
-						continue;
-					}
-					if (element('field_name', $value) === 'mem_phone' && $selfcert_phone) {
-						continue;
-					}
-					if (element('field_name', $value) === 'mem_birthday' && $selfcert_birthday) {
-						continue;
-					}
-					if (element('field_name', $value) === 'mem_sex' && $selfcert_sex) {
-						continue;
-					}
-
-					$required = element('required', $value) ? 'required' : '';
-
-					$html_content[$k]['field_name'] = element('field_name', $value);
-					$html_content[$k]['display_name'] = element('display_name', $value);
-					$html_content[$k]['input'] = '';
-
-					//field_type : text, url, email, phone, textarea, radio, select, checkbox, date
-					if (element('field_type', $value) === 'text'
-						OR element('field_type', $value) === 'url'
-						OR element('field_type', $value) === 'email'
-						OR element('field_type', $value) === 'phone'
-						OR element('field_type', $value) === 'date') {
-						if (element('field_type', $value) === 'date') {
-							$html_content[$k]['input'] .= '<input type="text" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input datepicker" value="' . set_value(element('field_name', $value)) . '" readonly="readonly" ' . $required . ' />';
-						} elseif (element('field_type', $value) === 'phone') {
-							$html_content[$k]['input'] .= '<input type="text" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input validphone" value="' . set_value(element('field_name', $value)) . '" ' . $required . ' />';
-						} else {
-							$html_content[$k]['input'] .= '<input type="' . element('field_type', $value) . '" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" value="' . set_value(element('field_name', $value)) . '" ' . $required . '/>';
-						}
-					} elseif (element('field_type', $value) === 'textarea') {
-						$html_content[$k]['input'] .= '<textarea id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" ' . $required . '>' . set_value(element('field_name', $value)) . '</textarea>';
-					} elseif (element('field_type', $value) === 'radio') {
-						$html_content[$k]['input'] .= '<div class="checkbox">';
-						if (element('field_name', $value) === 'mem_sex') {
-							$options = array(
-								'1' => '남성',
-								'2' => '여성',
-							);
-						} else {
-							$options = explode("\n", element('options', $value));
-						}
-						$i =1;
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$radiovalue = (element('field_name', $value) === 'mem_sex') ? $okey : $oval;
-								$html_content[$k]['input'] .= '<label for="' . element('field_name', $value) . '_' . $i . '"><input type="radio" name="' . element('field_name', $value) . '" id="' . element('field_name', $value) . '_' . $i . '" value="' . $radiovalue . '" ' . set_radio(element('field_name', $value), $radiovalue) . ' /> ' . $oval . ' </label> ';
-								$i++;
-							}
-						}
-						$html_content[$k]['input'] .= '</div>';
-					} elseif (element('field_type', $value) === 'checkbox') {
-						$html_content[$k]['input'] .= '<div class="checkbox">';
-						$options = explode("\n", element('options', $value));
-						$i =1;
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$html_content[$k]['input'] .= '<label for="' . element('field_name', $value) . '_' . $i . '"><input type="checkbox" name="' . element('field_name', $value) . '[]" id="' . element('field_name', $value) . '_' . $i . '" value="' . $oval . '" ' . set_checkbox(element('field_name', $value), $oval) . ' /> ' . $oval . ' </label> ';
-								$i++;
-							}
-						}
-						$html_content[$k]['input'] .= '</div>';
-					} elseif (element('field_type', $value) === 'select') {
-						$html_content[$k]['input'] .= '<div class="input-group">';
-						$html_content[$k]['input'] .= '<select name="' . element('field_name', $value) . '" class="form-control input" ' . $required . '>';
-						$html_content[$k]['input'] .= '<option value="" >선택하세요</option> ';
-						$options = explode("\n", element('options', $value));
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$html_content[$k]['input'] .= '<option value="' . $oval . '" ' . set_select(element('field_name', $value), $oval) . ' >' . $oval . '</option> ';
-							}
-						}
-						$html_content[$k]['input'] .= '</select>';
-						$html_content[$k]['input'] .= '</div>';
-					} elseif (element('field_name', $value) === 'mem_address') {
-						$html_content[$k]['input'] .= '
-							<label for="mem_zipcode">우편번호</label>
-							<label>
-								<input type="text" name="mem_zipcode" value="' . set_value('mem_zipcode') . '" id="mem_zipcode" class="form-control input" size="7" maxlength="7" ' . $required . '/>
-							</label>
-							<label>
-								<button type="button" class="btn btn-black btn-sm" style="margin-top:0px;" onclick="win_zip(\'fregisterform\', \'mem_zipcode\', \'mem_address1\', \'mem_address2\', \'mem_address3\', \'mem_address4\');">주소 검색</button>
-							</label>
-							<div class="addr-line mt10">
-								<label for="mem_address1">기본주소</label>
-								<input type="text" name="mem_address1" value="' . set_value('mem_address1') . '" id="mem_address1" class="form-control input" placeholder="기본주소" ' . $required . ' />
-							</div>
-							<div class="addr-line mt10">
-								<label for="mem_address2">상세주소</label>
-								<input type="text" name="mem_address2" value="' . set_value('mem_address2') . '" id="mem_address2" class="form-control input" placeholder="상세주소" ' . $required . ' />
-							</div>
-							<div class="addr-line mt10">
-								<label for="mem_address3">참고항목</label>
-								<input type="text" name="mem_address3" value="' . set_value('mem_address3') . '" id="mem_address3" class="form-control input" readonly="readonly" placeholder="참고항목" />
-							</div>
-							<input type="hidden" name="mem_address4" value="' . set_value('mem_address4') . '" />
-						';
-					} elseif (element('field_name', $value) === 'mem_password') {
-						$html_content[$k]['input'] .= '<input type="' . element('field_type', $value) . '" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" minlength="' . $password_length . '" />';
-					}
-
-					$html_content[$k]['description'] = '';
-					if (isset($configbasic[$value['field_name']]['description']) && $configbasic[$value['field_name']]['description']) {
-						$html_content[$k]['description'] = $configbasic[$value['field_name']]['description'];
-					}
-					if (element('field_name', $value) === 'mem_password') {
-						$k++;
-						$html_content[$k]['field_name'] = 'mem_password_re';
-						$html_content[$k]['display_name'] = '비밀번호 확인';
-						$html_content[$k]['input'] = '<input type="password" id="mem_password_re" name="mem_password_re" class="form-control input" minlength="' . $password_length . '" />';
-					}
-					$k++;
-				}
-			}
-
-			$view['view']['html_content'] = $html_content;
-			$view['view']['open_profile_description'] = '';
-			if ($this->cbconfig->item('change_open_profile_date')) {
-				$view['view']['open_profile_description'] = '정보공개 설정은 ' . $this->cbconfig->item('change_open_profile_date') . '일 이내에는 변경할 수 없습니다';
-			}
-
-			$view['view']['use_note_description'] = '';
-			if ($this->cbconfig->item('change_use_note_date')) {
-				$view['view']['use_note_description'] = '쪽지 기능 사용 설정은 ' . $this->cbconfig->item('change_use_note_date') . '일 이내에는 변경할 수 없습니다';
-			}
-
-			$view['view']['canonical'] = site_url('register/form');
-
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
-			/**
-			 * 레이아웃을 정의합니다
-			 */
-			$page_title = $this->cbconfig->item('site_meta_title_register_form');
-			$meta_description = $this->cbconfig->item('site_meta_description_register_form');
-			$meta_keywords = $this->cbconfig->item('site_meta_keywords_register_form');
-			$meta_author = $this->cbconfig->item('site_meta_author_register_form');
-			$page_name = $this->cbconfig->item('site_page_name_register_form');
-
-			$layoutconfig = array(
-				'path' => 'register',
-				'layout' => 'layout',
-				'skin' => 'register_form',
-				'layout_dir' => $this->cbconfig->item('layout_register'),
-				'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_register'),
-				'use_sidebar' => $this->cbconfig->item('sidebar_register'),
-				'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_register'),
-				'skin_dir' => $this->cbconfig->item('skin_register'),
-				'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_register'),
-				'page_title' => $page_title,
-				'meta_description' => $meta_description,
-				'meta_keywords' => $meta_keywords,
-				'meta_author' => $meta_author,
-				'page_name' => $page_name,
-			);
-			$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-			$this->data = $view;
-			$this->layout = element('layout_skin_file', element('layout', $view));
-			$this->view = element('view_skin_file', element('layout', $view));
+            
+            return $view;
 
 		} else {
 
@@ -1232,7 +1034,7 @@ class Register extends CB_Controller
 				'mrg_ip' => $this->input->ip_address(),
 				'mrg_datetime' => cdate('Y-m-d H:i:s'),
 				'mrg_useragent' => $this->agent->agent_string(),
-				'mrg_referer' => $this->session->userdata('site_referer'),
+				'mrg_referer' => '',
 			);
 			$recommended = '';
 			if ($this->input->post('mem_recommend')) {
@@ -1271,23 +1073,40 @@ class Register extends CB_Controller
 				}
 			}
 
-			$this->session->set_flashdata(
-				'nickname',
-				$this->input->post('mem_nickname')
-			);
+			// $this->session->set_flashdata(
+			// 	'nickname',
+			// 	$this->input->post('mem_nickname')
+			// );
 
-			if ( ! $this->cbconfig->item('use_register_email_auth')) {
-				$this->session->set_userdata(
-					'mem_id',
-					$mem_id
-				);
-			}
-			$this->session->unset_userdata('selfcertinfo');
+			// if ( ! $this->cbconfig->item('use_register_email_auth')) {
+			// 	$this->session->set_userdata(
+			// 		'mem_id',
+			// 		$mem_id
+			// 	);
+			// }
+			// $this->session->unset_userdata('selfcertinfo');
 
-			redirect('register/result');
+			$view['msg'] = '정상적으로 가입되었습니다';
+			$view['http_status_codes'] = 201;
+
+            return $view;
+			
 		}
 	}
 
+
+	public function form_post()
+	{
+		$view = array();
+		$view['view'] = array();
+		$_POST['mem_userid']=$this->input->post('mem_email');
+		// 이벤트가 존재하면 실행합니다
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view = $this->_form();
+		
+		return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
+	}
 
 	/**
 	 * 회원가입 결과 페이지입니다
@@ -1346,14 +1165,14 @@ class Register extends CB_Controller
 	}
 
 
-	public function ajax_userid_check()
+	public function ajax_userid_check_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_register_ajax_userid_check';
 		$this->load->event($eventname);
 
 		$result = array();
-		$this->output->set_content_type('application/json');
+		// $this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('before', $eventname);
@@ -1364,7 +1183,9 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '아이디값이 넘어오지 않았습니다',
 			);
-			exit(json_encode($result));
+
+			return $this->response(array('msg' => $result['reason']), 200);
+			
 		}
 
 		if ( ! preg_match("/^([a-z0-9_])+$/i", $userid)) {
@@ -1372,7 +1193,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '아이디는 숫자, 알파벳, _ 만 입력가능합니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		$where = array(
@@ -1384,7 +1205,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '이미 사용중인 아이디입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		if ($this->_mem_userid_check($userid) === false) {
@@ -1392,7 +1213,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => $userid . '은(는) 예약어로 사용하실 수 없는 회원아이디입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		// 이벤트가 존재하면 실행합니다
@@ -1402,18 +1223,18 @@ class Register extends CB_Controller
 			'result' => 'available',
 			'reason' => '사용 가능한 아이디입니다',
 		);
-		exit(json_encode($result));
+		return $this->response(array('msg' => $result['reason']), 200);
 	}
 
 
-	public function ajax_email_check()
+	public function ajax_email_check_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_register_ajax_email_check';
 		$this->load->event($eventname);
 
 		$result = array();
-		$this->output->set_content_type('application/json');
+		// $this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('before', $eventname);
@@ -1424,7 +1245,17 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '이메일값이 넘어오지 않았습니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
+		}
+		
+
+		
+		if (empty(filter_var($email, FILTER_VALIDATE_EMAIL))) {
+			$result = array(
+				'result' => 'no',
+				'reason' => '이메일 형식이 아닙니다.',
+			);
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		if ($this->member->item('mem_email')
@@ -1433,7 +1264,7 @@ class Register extends CB_Controller
 				'result' => 'available',
 				'reason' => '사용 가능한 이메일입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		$where = array(
@@ -1445,7 +1276,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '이미 사용중인 이메일입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		if ($this->_mem_email_check($email) === false) {
@@ -1453,7 +1284,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => $email . '은(는) 예약어로 사용하실 수 없는 이메일입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		// 이벤트가 존재하면 실행합니다
@@ -1463,11 +1294,11 @@ class Register extends CB_Controller
 			'result' => 'available',
 			'reason' => '사용 가능한 이메일입니다',
 		);
-		exit(json_encode($result));
+		return $this->response(array('msg' => $result['reason']), 200);
 	}
 
 
-	public function ajax_password_check()
+	public function ajax_password_check_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_register_ajax_password_check';
@@ -1485,7 +1316,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '패스워드값이 넘어오지 않았습니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		if ($this->_mem_password_check($password) === false) {
@@ -1493,25 +1324,25 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '패스워드는 최소 1개 이상의 숫자를 포함해야 합니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		$result = array(
 			'result' => 'available',
 			'reason' => '사용 가능한 패스워드입니다',
 		);
-		exit(json_encode($result));
+		return $this->response(array('msg' => $result['reason']), 200);
 	}
 
 
-	public function ajax_nickname_check()
+	public function ajax_nickname_check_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_register_ajax_nickname_check';
 		$this->load->event($eventname);
 
 		$result = array();
-		$this->output->set_content_type('application/json');
+		// $this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('before', $eventname);
@@ -1522,7 +1353,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '닉네임값이 넘어오지 않았습니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		if ($this->member->item('mem_nickname')
@@ -1531,7 +1362,7 @@ class Register extends CB_Controller
 				'result' => 'available',
 				'reason' => '사용 가능한 닉네임입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		$where = array(
@@ -1543,7 +1374,7 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '이미 사용중인 닉네임입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		if ($this->_mem_nickname_check($nickname) === false) {
@@ -1551,14 +1382,14 @@ class Register extends CB_Controller
 				'result' => 'no',
 				'reason' => '이미 사용중인 닉네임입니다',
 			);
-			exit(json_encode($result));
+			return $this->response(array('msg' => $result['reason']), 200);
 		}
 
 		$result = array(
 			'result' => 'available',
 			'reason' => '사용 가능한 닉네임입니다',
 		);
-		exit(json_encode($result));
+		return $this->response(array('msg' => $result['reason']), 200);
 	}
 
 
@@ -1634,7 +1465,7 @@ class Register extends CB_Controller
 	 * 회원가입시 이메일을 체크하는 함수입니다
 	 */
 	public function _mem_email_check($str)
-	{
+	{	
 		list($emailid, $emaildomain) = explode('@', $str);
 		$denied_list = explode(',', $this->cbconfig->item('denied_email_list'));
 		$emaildomain = trim($emaildomain);

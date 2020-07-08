@@ -81,6 +81,7 @@ class Mypage extends CB_Controller
 			$owhere = array(
 				'mem_id' => $this->member->item('mem_id'),
 				'cor_status' => 0,
+				'brd_id' => 11,
 			);
 			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key', $owhere);
 			
@@ -98,6 +99,11 @@ class Mypage extends CB_Controller
 						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
 					} else {
 						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$oval),element('query',$brd_url_key_)),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+					}
+
+					if(element('cor_pay_type',$oval) =='naverpay'){
+						$brd_url_key_ = parse_url(trim('https://m.pay.naver.com/o/orderStatus'));
+						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
 					}
 					
 				}
