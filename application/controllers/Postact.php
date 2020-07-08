@@ -4078,7 +4078,7 @@ class Postact extends CB_Controller
 
 	}
 
-	public function wishlist_post()
+	public function wishlist_multi_delete_post()
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -4132,6 +4132,95 @@ class Postact extends CB_Controller
 
 		// 이벤트가 존재하면 실행합니다
 		return $this->response('', 204);
+
+	}
+
+
+	public function modwishlist_post()
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_postact_multi_delete';
+		$this->load->event($eventname);
+
+		required_user_login();	
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Cmall_item_model', 'Cmall_wishlist_model'));
+
+		$this->load->library(array('cmalllib'));
+
+		$result = array();
+		$this->output->set_content_type('application/json');
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+
+		$cit_ids = $this->input->post('chk_cit_id');
+		if (empty($cit_ids)) {
+			alert_close('선택된 게시물이 없습니다.');
+			// $result = array('error' => '선택된 게시물이 없습니다.');
+			// exit(json_encode($result));
+		}
+
+		$where = array(
+			'mem_id' => $mem_id
+		);
+		$cit_id_arr = $this->Cmall_wishlist_model->get('','cit_id',$where);
+
+
+		$this->Cmall_wishlist_model->delete_where($where);
+
+		foreach ($cit_ids as $cit_id) {
+			$cit_id = (int) $cit_id;
+			if (empty($cit_id) OR $cit_id < 1) {
+				alert_close('잘못된 접근입니다');
+				// $result = array('error' => '잘못된 접근입니다');
+				// exit(json_encode($result));
+			}			
+
+			
+			$insertdata = array(
+				'mem_id' => $mem_id,
+				'cit_id' => $cit_id,
+				'cwi_datetime' => cdate('Y-m-d H:i:s'),
+				'cwi_ip' => $this->input->ip_address(),
+			);
+			$cwi_id = $this->Cmall_wishlist_model->replace($insertdata);
+
+			
+
+			
+		}
+
+		foreach ($cit_id_arr as $val) {
+			$val['cit_id'] = (int) element('cit_id',$val);
+			if (empty(element('cit_id',$val)) OR element('cit_id',$val) < 1) {
+				alert_close('잘못된 접근입니다');
+				// $result = array('error' => '잘못된 접근입니다');
+				// exit(json_encode($result));
+			}			
+
+			
+			$where = array(
+				'cit_id' => element('cit_id',$val),
+			);
+			$count = $this->Cmall_wishlist_model->count_by($where);
+
+			$updatedata = array(
+				'cit_wish_count' => $count,
+			);
+			$this->Cmall_item_model->update(element('cit_id',$val), $updatedata);
+
+			
+
+			
+		}
+
+		// 이벤트가 존재하면 실행합니다
+		return $this->response('', 201);
 
 	}
 }

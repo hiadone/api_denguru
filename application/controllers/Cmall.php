@@ -826,6 +826,7 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
+		required_user_login();	
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
@@ -2300,7 +2301,7 @@ class Cmall extends CB_Controller
 		$param =& $this->querystring;
 		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
 		$findex = $this->Cmall_wishlist_model->primary_key;
-		$forder = 'desc';
+		$forder = 'asc';
 
 		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
 		$offset = ($page - 1) * $per_page;
