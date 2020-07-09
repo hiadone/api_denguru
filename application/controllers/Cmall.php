@@ -632,7 +632,7 @@ class Cmall extends CB_Controller
 
 		$data['brd_register_url'] = element('brd_register_url',$board_crawl);	
 		$data['brd_order_url'] = element('brd_order_url',$board_crawl);
-		$data['brd_orderstatus_url'] = element('brd_orderstatus_url',$board_crawl);
+		// $data['brd_orderstatus_url'] = element('brd_orderstatus_url',$board_crawl);
 
 		if ( ! element('cit_id', $data)) {
 			alert('이 상품은 현재 존재하지 않습니다',"",406);
@@ -2322,6 +2322,12 @@ class Cmall extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 				$result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id',$val),$result['list'][$key]);
+
+				$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$result['list'][$key]));
+
+				$result['list'][$key]['brd_register_url'] = element('brd_register_url',$board_crawl);	
+				$result['list'][$key]['brd_order_url'] = element('brd_order_url',$board_crawl);
+
 				$result['list'][$key]['delete_url'] = site_url('cmallact/wishlist/' . element('cwi_id', $val) . '?' . $param->output());
 				$result['list'][$key]['num'] = $list_num--;
 			}
@@ -2352,7 +2358,7 @@ class Cmall extends CB_Controller
 					
 					$data['list'][element('brd_id',$val)]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
-						
+					
 				}
 			}
 
@@ -2368,7 +2374,7 @@ class Cmall extends CB_Controller
 						
 				}
 			}
-			$_data['total_rows'] = count($_data['list']);			
+			$_data['total_rows'] = isset($data['list']) ? count($data['list']) : 0;
 			$view['view']['data'] = $_data;
 		}
 
@@ -2383,7 +2389,8 @@ class Cmall extends CB_Controller
 						
 				}
 			}
-			$data['total_rows'] = count($data['list']);
+			
+			$data['total_rows'] = isset($data['list']) ? count($data['list']) : 0;
 			$view['view']['data'] = $data;
 		}
 
