@@ -81,7 +81,7 @@ class Mypage extends CB_Controller
 			$owhere = array(
 				'mem_id' => $this->member->item('mem_id'),
 				'cor_status' => 0,
-				'brd_id' => 11,
+				// 'brd_id' => 11,
 			);
 			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key', $owhere);
 			
