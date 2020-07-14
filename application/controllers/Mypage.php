@@ -83,7 +83,7 @@ class Mypage extends CB_Controller
 				'cor_status' => 0,
 				// 'brd_id' => 11,
 			);
-			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key', $owhere);
+			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key,cor_pay_type', $owhere);
 			
 
 			if ($order_crawl) {
