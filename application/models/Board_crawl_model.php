@@ -44,14 +44,14 @@ class Board_crawl_model extends CB_Model
     public function get_one($primary_value = '', $select = '', $where = '')
     {
         $use_cache = false;
-        if ($primary_value && empty($select) && empty($where)) {
-            $use_cache = true;
-        }
+        // if (empty($select)) {
+        //     $use_cache = true;
+        // }
 
         if ($use_cache) {
-            $cachename = $this->cache_prefix . $primary_value;
+            $cachename = $this->cache_prefix . element('brd_id',$where);
             if ( ! $result = $this->cache->get($cachename)) {
-                $result = parent::get_one($primary_value);
+                $result = parent::get_one($primary_value, $select, $where);
                 $this->cache->save($cachename, $result, $this->cache_time);
             }
         } else {

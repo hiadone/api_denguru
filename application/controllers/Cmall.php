@@ -3607,6 +3607,134 @@ class Cmall extends CB_Controller
 		}
 	}
 
+	protected function _store_info($brd_id = 0)
+	{
+
+		
+
+
+		$view = array();
+		$view['view'] = array();
+
+		if (empty($brd_id )) {
+			show_404();
+		}
+		
+
+		
+		$this->load->model(array('Cmall_storewishlist_model','Board_model'));
+
+		
+		
+		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind');
+
+		if ( ! element('brd_id', $board)) {
+			alert('이 스토어는 현재 존재하지 않습니다',"",406);
+		}
+		if (element('brd_blind', $board)) {
+			alert('이 스토어는 현재 운영하지 않습니다',"",406);
+		}
+
+		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
+
+		foreach($board_crawl as $key => $val)
+			$view['view'][$key] = trim($val);	
+		
+
+		
+		
+
+		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
+		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
+
+		// $alertmessage = $this->member->is_member()
+		// 	? '회원님은 상품 페이지를 볼 수 있는 권한이 없습니다'
+		// 	: '비회원은 상품 페이지를 볼 수 있는 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		// $access_read = $this->cbconfig->item('access_cmall_read');
+		// $access_read_level = $this->cbconfig->item('access_cmall_read_level');
+		// $access_read_group = $this->cbconfig->item('access_cmall_read_group');
+		// $this->accesslevel->check(
+		// 	$access_read,
+		// 	$access_read_level,
+		// 	$access_read_group,
+		// 	$alertmessage,
+		// 	''
+		// );
+
+		
+
+		
+		
+
+		
+		
+		
+		return $view['view'];
+	}
+
+	public function store_info_get($brd_id = 0)
+	{
+
+		
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_cmall_item';
+		//$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		
+
+		
+		// 이벤트가 존재하면 실행합니다
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		
+
+		$view['view'] = $this->_store_info($brd_id);
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_cmall');
+		$meta_description = $this->cbconfig->item('site_meta_description_cmall');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall');
+		$meta_author = $this->cbconfig->item('site_meta_author_cmall');
+		$page_name = $this->cbconfig->item('site_page_name_cmall');
+
+		$searchconfig = array(
+			'{컨텐츠몰명}',
+		);
+		$replaceconfig = array(
+			$this->cbconfig->item('cmall_name'),
+		);
+
+		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
+
+		$layoutconfig = array(
+			'path' => 'cmall',
+			'layout' => 'layout',
+			'skin' => 'cmall',
+			'layout_dir' => $this->cbconfig->item('layout_cmall'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+			'skin_dir' => $this->cbconfig->item('skin_cmall'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
+	}
 
 	// public function _get_cit_info($cit_id = 0,$cmall_item = array())
 	// {
