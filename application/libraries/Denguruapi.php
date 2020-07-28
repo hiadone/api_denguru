@@ -635,7 +635,7 @@ class Denguruapi extends CI_Controller
 
         $member = $this->CI->Member_model->get_by_memid($_mem_id);
         
-        if
+        
         $pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
         
         if (is_array($pet)) {
