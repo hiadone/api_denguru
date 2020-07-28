@@ -3626,7 +3626,7 @@ class Cmall extends CB_Controller
 
 		
 		
-		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind');
+		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind,brd_name');
 
 		if ( ! element('brd_id', $board)) {
 			alert('이 스토어는 현재 존재하지 않습니다',"",406);
@@ -3641,7 +3641,7 @@ class Cmall extends CB_Controller
 			$view['view'][$key] = trim($val);	
 		
 
-		
+		$view['view']['brd_name'] = trim(element('brd_name', $board));	
 		
 
 		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
