@@ -106,6 +106,8 @@ class Denguruapi extends CI_Controller
         $cit_info = $this->CI->Board_model->get_cit_one($cit_id);
 
         $cmall_item = $this->convert_cit_info($cit_info);
+
+        if(empty($cmall_item)) $cmall_item = array();
         // $cmall_item['cit_id'] = $cit_id;
         // $cmall_item['cit_name'] = $this->item_id('cit_name',$cit_id);
         // $cmall_item['cit_review_average'] = $this->item_id('cit_review_average',$cit_id);
@@ -633,6 +635,7 @@ class Denguruapi extends CI_Controller
 
         $member = $this->CI->Member_model->get_by_memid($_mem_id);
         
+        if
         $pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
         
         if (is_array($pet)) {
