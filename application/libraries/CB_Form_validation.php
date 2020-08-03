@@ -133,6 +133,30 @@ class CB_Form_validation extends CI_Form_validation
 		}
 	}
 
+	public function valid_mobile($value)
+	{
+        $value = trim($value);
+        if ($value === '') {
+            return true;
+        } else {
+            if(substr($value,0,3) =="010"){
+                if (preg_match('/^\(?[0-9]{3}\)?[-. ]?[0-9]{4}[-. ]?[0-9]{4}$/', $value)) {
+                    return preg_replace('/^\(?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/', '$1-$2-$3', $value);
+                } else {
+                    return false;
+                }
+            } else {
+                if (preg_match('/^\(?[0-9]{2,3}\)?[-. ]?[0-9]{3,4}[-. ]?[0-9]{4}$/', $value)) {
+                    return preg_replace('/^\(?([0-9]{2,3})\)?[-. ]?([0-9]{3,4})[-. ]?([0-9]{4})$/', '$1-$2-$3', $value);
+                } else {
+                    return false;
+                }
+            }
+            
+            
+        }
+    }
+
 	public function set_rules($field, $label = '', $rules = array(), $errors = array())
 	{
 		// No reason to set rules if we have no POST data

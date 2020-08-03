@@ -3637,8 +3637,21 @@ class Cmall extends CB_Controller
 
 		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
 
-		foreach($board_crawl as $key => $val)
-			$view['view'][$key] = trim($val);	
+		foreach($board_crawl as $key => $val){
+			if($key ==='brd_register_zipcode')
+				$view['view'][$key] = explode("-",trim($val));	
+
+			if($key ==='brd_register_phone')
+				$view['view'][$key] = explode("-",trim($val));	
+
+			if($key ==='brd_register_handphone')
+				$view['view'][$key] = explode("-",trim($val));
+
+			if($key ==='brd_register_birthday')
+				$view['view'][$key] = explode("-",trim($val));
+
+			
+		}
 		
 
 		$view['view']['brd_name'] = trim(element('brd_name', $board));	

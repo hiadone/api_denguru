@@ -603,7 +603,7 @@ class Register extends CB_Controller
 
 			$view['msg'] = $file_error . $file_error2.validation_errors();
 
-            $view['http_status_codes'] = parent::HTTP_OK;
+            $view['http_status_codes'] = 401;
 
             
             return $view;
@@ -1597,5 +1597,191 @@ class Register extends CB_Controller
 		}
 
 		return true;
+	}
+
+	public function ajax_smssend_post()
+	{
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_register_ajax_nickname_check';
+		$this->load->event($eventname);
+
+		$result = array();
+		// $this->output->set_content_type('application/json');
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('before', $eventname);
+
+		$mem_phone = trim($this->input->post('mem_phone'));
+		if (empty($mem_phone)) {
+			$result = array(
+				'result' => 'error',
+				'reason' => '잘못된 핸드폰 번호입니다.',
+			);
+			return $this->response(array('msg' => $result['reason']), 401);
+		}
+
+		$this->load->library('form_validation');
+
+		$mem_phone = $this->form_validation->valid_mobile($this->input->post('mem_phone'));
+
+		if (empty($mem_phone)) {
+		    $result = array(
+				'result' => 'error',
+				'reason' => '잘못된 핸드폰 번호입니다.',
+			);
+			return $this->response(array('msg' => $result['reason']), 401);
+		}
+
+		$this->load->model( 'Sms_send_history_model');
+
+		$timestamp = strtotime("-1 hours");
+
+		$sendwhere= array(
+		    // 'post_id' => $this->input->post('post_id'),
+		    'ssh_phone' => str_replace("-","",$mem_phone),
+		    'ssh_success' => 1,
+		    'ssh_datetime >=' => date("Y-m-d H:i:s", $timestamp),
+		);
+
+		$cnt = 0 ;
+		$cnt = $this->Sms_send_history_model->count_by($sendwhere);
+
+		if($cnt > 5){
+
+			$result = array(
+				'result' => 'error',
+				'reason' => '인증 횟수가 초과 되었습니다 한시간 이후 다시 시도해 주세요.',
+			);
+			return $this->response(array('msg' => $result['reason']), 401);
+
+		    
+		    
+		    // exit(json_encode($result));
+		}
+
+		$ssc_key = rand(111111,999999);
+		
+
+		$sender = array(
+		    'phone' => $this->cbconfig->item('sms_admin_phone'),
+		    // 'post_id' => $this->input->post('post_id'),
+		    // 'multi_code' => $this->input->post('multi_code'),
+		    'ssc_key' => $ssc_key,
+		);
+		$receiver = array();
+		
+		$content= "인증번호 (".$ssc_key.") 입력하시면 정상처리 됩니다.";
+
+		$receiver['phone'] = $mem_phone;
+		$receiver['mem_id'] = 1;
+		$receiver['name'] = $this->input->post('mem_nickname',null,'익명사용자');
+		$this->load->library('smslib');
+		$smsresult = $this->smslib->send($receiver, $sender, $content, $date = '',$receiver['name'].'에게 전송');
+
+		if(empty($smsresult)){
+
+			$result = array(
+				'result' => 'error',
+				'reason' => 'sms 전송시 알 수 없는 오류가 발생하였습니다..',
+			);
+			return $this->response(array('msg' => $result['reason']), 401);
+		}
+
+		if($smsresult['result'] ==='success')
+			return $this->response($smsresult, 200);
+		else 
+			return $this->response($smsresult, 401);
+		
+
+		// if ($this->member->item('mem_nickname')
+		// 	&& $this->member->item('mem_nickname') === $nickname) {
+		// 	$result = array(
+		// 		'result' => 'available',
+		// 		'reason' => '사용 가능한 닉네임입니다',
+		// 	);
+		// 	return $this->response(array('msg' => $result['reason']), 200);
+		// }
+
+		// $where = array(
+		// 	'mem_nickname' => $nickname,
+		// );
+		// $count = $this->Member_model->count_by($where);
+		// if ($count > 0) {
+		// 	$result = array(
+		// 		'result' => 'no',
+		// 		'reason' => '이미 사용중인 닉네임입니다',
+		// 	);
+		// 	return $this->response(array('msg' => $result['reason']), 200);
+		// }
+
+		// if ($this->_mem_nickname_check($nickname) === false) {
+		// 	$result = array(
+		// 		'result' => 'no',
+		// 		'reason' => '이미 사용중인 닉네임입니다',
+		// 	);
+		// 	return $this->response(array('msg' => $result['reason']), 200);
+		// }
+
+		// $result = array(
+		// 	'result' => 'available',
+		// 	'reason' => '사용 가능한 닉네임입니다',
+		// );
+		// return $this->response(array('msg' => $result['reason']), 200);
+	}
+
+	public function ajax_smsmap_post()
+	{
+		$this->load->library('form_validation');
+
+       $cfc_num = $this->input->post('cfc_num');
+       
+       if(empty($cfc_num)) {
+           $result = array('result'=>'error','reason' => '잘못된 인증 번호입니다.');
+           
+           return $this->response(array('msg' => $result['reason']), 401);
+           
+       }
+       
+       $this->load->library('form_validation');
+
+       $mem_phone = $this->form_validation->valid_mobile($this->input->post('mem_phone'));
+       
+       if(empty($mem_phone)) {
+           $result = array('result'=>'error','reason' => '잘못된 핸드폰 번호입니다.');
+           return $this->response(array('msg' => $result['reason']), 401);
+           
+       }
+
+       $this->load->model( 'Sms_send_history_model');
+
+       $timestamp = strtotime("-1 hours");
+
+       $sendwhere= array(
+           // 'post_id' => $this->input->post('post_id'),
+           'ssh_phone' => str_replace("-","",$mem_phone),
+           'ssh_success' => 1,
+           'ssh_datetime >=' => date("Y-m-d H:i:s", $timestamp),
+           'ssh_key' => $cfc_num,
+       );
+
+       $cnt = 0 ;
+       $cnt = $this->Sms_send_history_model->count_by($sendwhere);
+       
+       if($cnt < 1){
+           $result = array('result'=>'error','reason' => '인증 번호가 맞지 앖습니다. 다시 확인해 주세요 ');
+           return $this->response(array('msg' => $result['reason']), 401);
+           
+       }
+
+       if($cnt > 0){
+           $result = array('result'=>'success','reason' => '확인 되었습니다.');
+           return $this->response(array('msg' => $result['reason']), 200);
+           
+       }
+
+       
+       $result = array('result'=>'error','reason' => 'sms 전송시 알 수 없는 오류가 발생하였습니다..');
+       return $this->response(array('msg' => $result['reason']), 401);
+       
 	}
 }
