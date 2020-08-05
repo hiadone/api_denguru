@@ -513,7 +513,7 @@ class Smslib extends CI_Controller
             $sms['destination'] = '';
             $sms['sender'] = element('sender',$val);
             $sms['title'] = element('title',$val);
-            $sms['testmode_yn'] = 'Y';
+            $sms['testmode_yn'] = 'N';
             $sms['msg_type'] = 'SMS';
 
             

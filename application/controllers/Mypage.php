@@ -2413,7 +2413,7 @@ class Mypage extends CB_Controller
 	    }
 	}
 
-	public function petwrite_get($pid = 0)
+	public function petwrite_get($pet_id = 0)
 	{
 	    // 이벤트 라이브러리를 로딩합니다
 	    $eventname = 'event_admin_member_memberpet_write';
@@ -2425,7 +2425,7 @@ class Mypage extends CB_Controller
 	    // 이벤트가 존재하면 실행합니다
 	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-	    $view = $this->_petwrite($pid);
+	    $view = $this->_petwrite($pet_id);
 	    
 	    
 		
@@ -2433,7 +2433,7 @@ class Mypage extends CB_Controller
 		
 	}
 
-	public function petwrite_post($pid = 0)
+	public function petwrite_post($pet_id = 0)
 	{
 	    // 이벤트 라이브러리를 로딩합니다
 	    $eventname = 'event_admin_member_memberpet_write';
@@ -2445,12 +2445,12 @@ class Mypage extends CB_Controller
 	    // 이벤트가 존재하면 실행합니다
 	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-	    $view = $this->_petwrite($pid);
+	    $view = $this->_petwrite($pet_id);
 	    
 	    return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
 	}
 
-	public function petwrite_put($pid = 0)
+	public function petwrite_put($pet_id = 0)
 	{
 	    // 이벤트 라이브러리를 로딩합니다
 	    $eventname = 'event_admin_member_memberpet_write';
@@ -2462,7 +2462,7 @@ class Mypage extends CB_Controller
 	    // 이벤트가 존재하면 실행합니다
 	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-	    $view = $this->_petwrite($pid);
+	    $view = $this->_petwrite($pet_id);
 		
 		return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
 		
@@ -2470,7 +2470,7 @@ class Mypage extends CB_Controller
 
 	
 
-	public function pet_delete($pid = 0)
+	public function pet_delete($pet_id = 0)
     {
         // 이벤트 라이브러리를 로딩합니다
         $eventname = 'event_admin_member_memberpet_listdelete';
@@ -2488,12 +2488,12 @@ class Mypage extends CB_Controller
 
 		$this->load->model(array('Member_pet_model'));
 
-		$pid = (int) $pid;
-		if (empty($pid) OR $pid < 1) {
+		$pet_id = (int) $pet_id;
+		if (empty($pet_id) OR $pet_id < 1) {
 		    show_404();
 		}
 
-		$getdata = $this->Member_pet_model->get_one($pid);
+		$getdata = $this->Member_pet_model->get_one($pet_id);
 		if(empty(element('pet_id',$getdata)))
 			alert('이 펫은 현재 존재하지 않습니다',"",406);
 
@@ -2508,7 +2508,7 @@ class Mypage extends CB_Controller
          * 체크한 게시물의 삭제를 실행합니다
          */
 
-        $this->member->delete_pet($pid);
+        $this->member->delete_pet($pet_id);
         
 
         // 이벤트가 존재하면 실행합니다
