@@ -98,7 +98,7 @@ class Smslib extends CI_Controller
         if (empty($total)) {
             $return = array(
                 'result' => 'error',
-                'message' => '발송할 대상이 없습니다.'
+                'msg' => '발송할 대상이 없습니다.'
             );
             return $return;
             // return json_encode($return,JSON_UNESCAPED_UNICODE);
@@ -192,19 +192,19 @@ class Smslib extends CI_Controller
 
                     $return = array(
                         'result' => 'error',
-                        'message' => '에러: SMS 서버와 통신이 불안정합니다.'
+                        'msg' => '에러: SMS 서버와 통신이 불안정합니다.'
                     );
                 } else {
 
                     if($ssh_success){
                         $return = array(
                             'result' => 'success',
-                            'message' => '발송이 완료되었습니다.'
+                            'msg' => '발송이 완료되었습니다.'
                         );    
                     } else {
                         $return = array(
                             'result' => 'error',
-                            'message' => $ssh_memo,
+                            'msg' => $ssh_memo,
                         );    
                     }
                     
@@ -217,7 +217,7 @@ class Smslib extends CI_Controller
             } else {
                 $return = array(
                     'result' => 'error',
-                    'message' => '에러: SMS 서버와 통신이 불안정합니다.'
+                    'msg' => '에러: SMS 서버와 통신이 불안정합니다.'
                 );
                 return $return;
                 // return json_encode($return,JSON_UNESCAPED_UNICODE);
@@ -226,7 +226,7 @@ class Smslib extends CI_Controller
         } else {
             $return = array(
                 'result' => 'error',
-                'message' => '에러: SMS 데이터 입력도중 에러가 발생하였습니다.'
+                'msg' => '에러: SMS 데이터 입력도중 에러가 발생하였습니다.'
             );
             return $return;
             // return json_encode($return,JSON_UNESCAPED_UNICODE);

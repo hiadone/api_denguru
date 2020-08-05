@@ -150,16 +150,15 @@ class Membermodify extends CB_Controller
 	/**
 	 * 회원정보 수정 페이지입니다
 	 */
-	public function modify()
+	public function _modify()
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_membermodify_modify';
-		$this->load->event($eventname);
+		
 
-		if ( ! $this->session->userdata('membermodify')) {
-			redirect('membermodify');
-		}
+		// if ( ! $this->session->userdata('membermodify')) {
+		// 	redirect('membermodify');
+		// }
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -184,8 +183,7 @@ class Membermodify extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+
 
 		$email_description = '';
 		if ($this->cbconfig->item('use_register_email_auth')) {
@@ -213,7 +211,7 @@ class Membermodify extends CB_Controller
 		} elseif (strtotime($this->member->item('meta_open_profile_datetime')) < ctimestamp() - $change_open_profile_date * 86400) {
 			$can_update_open_profile = true;
 		}
-		$view['view']['can_update_open_profile'] = $can_update_open_profile;
+		// $view['view']['can_update_open_profile'] = $can_update_open_profile;
 		$when_can_update_open_profile
 			= cdate('Y-m-d H:s', strtotime($this->member->item('meta_open_profile_datetime'))
 			+ $change_open_profile_date * 86400);
@@ -225,7 +223,7 @@ class Membermodify extends CB_Controller
 		} elseif (strtotime($this->member->item('meta_use_note_datetime')) < ctimestamp() - $change_use_note_date * 86400) {
 			$can_update_use_note = true;
 		}
-		$view['view']['can_update_use_note'] = $can_update_use_note;
+		// $view['view']['can_update_use_note'] = $can_update_use_note;
 		$when_can_update_use_note
 			= cdate('Y-m-d H:s', strtotime($this->member->item('meta_use_note_datetime'))
 			+ $change_use_note_date * 86400);
@@ -533,194 +531,35 @@ class Membermodify extends CB_Controller
 		 */
 		if ($form_validation === false OR $file_error !== '' OR $file_error2 !== '') {
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+			$view['msg'] = $file_error . $file_error2.validation_errors();
+            
+            
 
-			$view['view']['message'] = $file_error . $file_error2;
-
-			$html_content = array();
+			
 			$k = 0;
 			if ($form && is_array($form)) {
 				foreach ($form as $key => $value) {
 					if ( ! element('use', $value)) {
 						continue;
 					}
+
 					if ($key === 'mem_userid' OR $key === 'mem_password' OR $key === 'mem_recommend') {
 						continue;
 					}
-					if ($key === 'mem_username' && $selfcert_username) {
-						continue;
-					}
-					if ($key === 'mem_phone' && $selfcert_phone) {
-						continue;
-					}
-					if ($key === 'mem_birthday' && $selfcert_birthday) {
-						continue;
-					}
-					if ($key === 'mem_sex' && $selfcert_sex) {
-						continue;
-					}
+					
+					
+					
+					
 
-					$required = element('required', $value) ? 'required' : '';
-
-					$item = $this->member->item(element('field_name', $value));
-					$html_content[$k] = array();
-					$html_content[$k]['field_name'] = element('field_name', $value);
-					$html_content[$k]['display_name'] = element('display_name', $value);
-					$html_content[$k]['input'] = '';
-
-					//field_type : text, url, email, phone, textarea, radio, select, checkbox, date
-					if (element('field_type', $value) === 'text'
-						OR element('field_type', $value) === 'url'
-						OR element('field_type', $value) === 'email'
-						OR element('field_type', $value) === 'phone'
-						OR element('field_type', $value) === 'date') {
-						if (element('field_type', $value) === 'date') {
-							$html_content[$k]['input'] .= '<input type="text" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input datepicker" value="' . set_value(element('field_name', $value), $item) . '" readonly="readonly" ' . $required . ' />';
-						} elseif (element('field_type', $value) === 'phone') {
-							$html_content[$k]['input'] .= '<input type="text" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input validphone" value="' . set_value(element('field_name', $value), $item) . '" ' . $required . ' />';
-						} else {
-							$readonly = '';
-							if (element('field_name', $value) === 'mem_nickname' && $can_update_nickname === false) {
-								$readonly = 'readonly="readonly"';
-							}
-							$html_content[$k]['input'] .= '<input type="' . element('field_type', $value) . '" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" value="' . set_value(element('field_name', $value), $item) . '" ' . $readonly . ' ' . $required . ' />';
-						}
-					} elseif (element('field_type', $value) === 'textarea') {
-						$html_content[$k]['input'] .= '<textarea id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" ' . $required . ' >' . set_value(element('field_name', $value), $item) . '</textarea>';
-					} elseif (element('field_type', $value) === 'radio') {
-						$html_content[$k]['input'] .= '<div class="checkbox">';
-						if (element('field_name', $value) === 'mem_sex') {
-							$options = array(
-								'1' => '남성',
-								'2' => '여성',
-							);
-						} else {
-							$options = explode("\n", element('options', $value));
-						}
-						$i =1;
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$oval = trim($oval);
-								$radiovalue = (element('field_name', $value) === 'mem_sex') ? $okey : $oval;
-								$html_content[$k]['input'] .= '<label for="' . element('field_name', $value) . '_' . $i . '"><input type="radio" name="' . element('field_name', $value) . '" id="' . element('field_name', $value) . '_' . $i . '" value="' . $radiovalue . '" ' . set_radio(element('field_name', $value), $radiovalue, ($item === $radiovalue ? true : false)) . ' /> ' . $oval . ' </label> ';
-							$i++;
-							}
-						}
-						$html_content[$k]['input'] .= '</div>';
-					} elseif (element('field_type', $value) === 'checkbox') {
-						$html_content[$k]['input'] .= '<div class="checkbox">';
-						$options = explode("\n", element('options', $value));
-						$item = json_decode($item, true);
-						$i =1;
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$oval = trim($oval);
-								$chkvalue = is_array($item) && in_array($oval, $item) ? $oval : '';
-								$html_content[$k]['input'] .= '<label for="' . element('field_name', $value) . '_' . $i . '"><input type="checkbox" name="' . element('field_name', $value) . '[]" id="' . element('field_name', $value) . '_' . $i . '" value="' . $oval . '" ' . set_checkbox(element('field_name', $value), $oval, ($chkvalue === $oval ? true : false)) . ' /> ' . $oval . ' </label> ';
-							$i++;
-							}
-						}
-						$html_content[$k]['input'] .= '</div>';
-					} elseif (element('field_type', $value) === 'select') {
-						$html_content[$k]['input'] .= '<div class="input-group">';
-						$html_content[$k]['input'] .= '<select name="' . element('field_name', $value) . '" class="form-control input" ' . $required . '>';
-						$html_content[$k]['input'] .= '<option value="" >선택하세요</option> ';
-						$options = explode("\n", element('options', $value));
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$oval = trim($oval);
-								$html_content[$k]['input'] .= '<option value="' . $oval . '" ' . set_select(element('field_name', $value), $oval, ($item === $oval ? true : false)) . ' >' . $oval . '</option> ';
-							}
-						}
-						$html_content[$k]['input'] .= '</select>';
-						$html_content[$k]['input'] .= '</div>';
-					} elseif (element('field_name', $value) === 'mem_address') {
-						$html_content[$k]['input'] .= '
-							<label for="mem_zipcode">우편번호</label>
-							<label>
-								<input type="text" name="mem_zipcode" value="' . set_value('mem_zipcode', $this->member->item('mem_zipcode')) . '" id="mem_zipcode" class="form-control input" size="7" maxlength="7" ' . $required . ' />
-							</label>
-							<label>
-								<button type="button" class="btn btn-black btn-sm" style="margin-top:0px;" onclick="win_zip(\'fregisterform\', \'mem_zipcode\', \'mem_address1\', \'mem_address2\', \'mem_address3\', \'mem_address4\');">주소 검색</button>
-							</label>
-							<div class="addr-line mt10">
-								<label for="mem_address1">기본주소</label>
-								<input type="text" name="mem_address1" value="' . set_value('mem_address1', $this->member->item('mem_address1')) . '" id="mem_address1" class="form-control input" placeholder="기본주소" ' . $required . ' />
-							</div>
-							<div class="addr-line mt10 ">
-								<label for="mem_address2">상세주소</label>
-								<input type="text" name="mem_address2" value="' . set_value('mem_address2', $this->member->item('mem_address2')) . '" id="mem_address2" class="form-control input" placeholder="상세주소" ' . $required . ' />
-							</div>
-							<div class="addr-line mt10 ">
-								<label for="mem_address3">참고항목</label>
-								<input type="text" name="mem_address3" value="' . set_value('mem_address3', $this->member->item('mem_address3')) . '" id="mem_address3" class="form-control input" readonly="readonly" placeholder="참고항목" />
-							</div>
-							<input type="hidden" name="mem_address4" value="' . set_value('mem_address4', $this->member->item('mem_address4')) . '" />
-						';
-					}
-
-					$html_content[$k]['description'] = '';
-					if (isset($configbasic[$value['field_name']]['description']) && $configbasic[$value['field_name']]['description']) {
-						$html_content[$k]['description'] = $configbasic[$value['field_name']]['description'];
-					}
-					$k++;
+					$view['view']['data'][$key] = $this->member->item($key);
+					
 				}
 			}
 
-			$view['view']['html_content'] = $html_content;
-			$view['view']['open_profile_description'] = '';
-			if ($this->cbconfig->item('change_open_profile_date')) {
-				if ($can_update_open_profile === false) {
-					$view['view']['open_profile_description'] = '정보공개 설정을 변경하시면 ' . $this->cbconfig->item('change_open_profile_date') . '일 이내에는 다시 변경할 수 없습니다<br>회원님은 ' . $when_can_update_open_profile . ' 이후에 정보공개설정변경이 가능합니다';
-				} else {
-					$view['view']['open_profile_description'] = '정보공개 설정을 변경하시면 ' . $this->cbconfig->item('change_open_profile_date') . '일 이내에는 다시 변경할 수 없습니다';
-				}
-			}
+            $view['http_status_codes'] = parent::HTTP_OK;
 
-			$view['view']['use_note_description'] = '';
-			if ($this->cbconfig->item('change_use_note_date')) {
-				if ($can_update_use_note === false) {
-					$view['view']['use_note_description'] = '쪽지 사용 설정을 변경하시면 ' . $this->cbconfig->item('change_use_note_date') . '일 이내에는 다시 변경할 수 없습니다<br>회원님은 ' . $when_can_update_use_note . ' 이후에 쪽지사용설정변경이 가능합니다';
-				} else {
-					$view['view']['use_note_description'] = '쪽지 사용 설정을 변경하시면 ' . $this->cbconfig->item('change_use_note_date') . '일 이내에는 다시 변경할 수 없습니다';
-				}
-			}
-
-			$view['view']['canonical'] = site_url('membermodify/modify');
-
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
-			/**
-			 * 레이아웃을 정의합니다
-			 */
-			$page_title = $this->cbconfig->item('site_meta_title_membermodify');
-			$meta_description = $this->cbconfig->item('site_meta_description_membermodify');
-			$meta_keywords = $this->cbconfig->item('site_meta_keywords_membermodify');
-			$meta_author = $this->cbconfig->item('site_meta_author_membermodify');
-			$page_name = $this->cbconfig->item('site_page_name_membermodify');
-
-			$layoutconfig = array(
-				'path' => 'mypage',
-				'layout' => 'layout',
-				'skin' => 'member_modify',
-				'layout_dir' => $this->cbconfig->item('layout_mypage'),
-				'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_mypage'),
-				'use_sidebar' => $this->cbconfig->item('sidebar_mypage'),
-				'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_mypage'),
-				'skin_dir' => $this->cbconfig->item('skin_mypage'),
-				'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_mypage'),
-				'page_title' => $page_title,
-				'meta_description' => $meta_description,
-				'meta_keywords' => $meta_keywords,
-				'meta_author' => $meta_author,
-				'page_name' => $page_name,
-			);
-			$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-			$this->data = $view;
-			$this->layout = element('layout_skin_file', element('layout', $view));
-			$this->view = element('view_skin_file', element('layout', $view));
+            
+            return $view;
 
 		} else {
 			/**
@@ -988,6 +827,61 @@ class Membermodify extends CB_Controller
 		}
 	}
 
+
+	public function modify_get()
+	{
+	    // 이벤트 라이브러리를 로딩합니다
+	    $eventname = 'event_admin_member_memberpet_write';
+	    // $this->load->event($eventname);
+
+	    $view = array();
+	    
+
+	    // 이벤트가 존재하면 실행합니다
+	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    $view = $this->_modify();
+	    
+	    
+		
+		return $this->response($view['view'], parent::HTTP_OK);
+		
+	}
+
+	public function modify_post()
+	{
+	    // 이벤트 라이브러리를 로딩합니다
+	    $eventname = 'event_admin_member_memberpet_write';
+	    // $this->load->event($eventname);
+
+	    $view = array();
+	    $view['view'] = array();
+
+	    // 이벤트가 존재하면 실행합니다
+	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    $view = $this->_modify();
+	    
+	    return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
+	}
+
+	public function petwrite_put($pid = 0)
+	{
+	    // 이벤트 라이브러리를 로딩합니다
+	    $eventname = 'event_admin_member_memberpet_write';
+	    // $this->load->event($eventname);
+
+	    $view = array();
+	    $view['view'] = array();
+
+	    // 이벤트가 존재하면 실행합니다
+	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+	    $view = $this->_modify($mem_id);
+		
+		return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
+		
+	}
 
 	/**
 	 * 소셜로그인 한 회원의 회원정보 수정 페이지입니다
