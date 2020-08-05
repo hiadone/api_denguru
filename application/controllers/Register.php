@@ -1652,7 +1652,7 @@ class Register extends CB_Controller
 				'result' => 'error',
 				'msg' => '인증 횟수가 초과 되었습니다 한시간 이후 다시 시도해 주세요.',
 			);
-			return $this->response($result, 200);
+			// return $this->response($result, 200);
 
 		    
 		    
