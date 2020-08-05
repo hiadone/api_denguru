@@ -742,7 +742,7 @@ class Register extends CB_Controller
 				'mlh_from' => 0,
 				'mlh_to' => $mem_level,
 				'mlh_datetime' => cdate('Y-m-d H:i:s'),
-				'mlh_reason' => '회원가입',
+				'mlh_msg' => '회원가입',
 				'mlh_ip' => $this->input->ip_address(),
 			);
 			$this->load->model('Member_level_history_model');
@@ -1180,20 +1180,20 @@ class Register extends CB_Controller
 		$userid = trim($this->input->post('userid'));
 		if (empty($userid)) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '아이디값이 넘어오지 않았습니다',
+				'result' => 'error',
+				'msg' => '아이디값이 넘어오지 않았습니다',
 			);
 
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 			
 		}
 
 		if ( ! preg_match("/^([a-z0-9_])+$/i", $userid)) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '아이디는 숫자, 알파벳, _ 만 입력가능합니다',
+				'result' => 'error',
+				'msg' => '아이디는 숫자, 알파벳, _ 만 입력가능합니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		$where = array(
@@ -1202,28 +1202,28 @@ class Register extends CB_Controller
 		$count = $this->Member_userid_model->count_by($where);
 		if ($count > 0) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '이미 사용중인 아이디입니다',
+				'result' => 'error',
+				'msg' => '이미 사용중인 아이디입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		if ($this->_mem_userid_check($userid) === false) {
 			$result = array(
-				'result' => 'no',
-				'reason' => $userid . '은(는) 예약어로 사용하실 수 없는 회원아이디입니다',
+				'result' => 'error',
+				'msg' => $userid . '은(는) 예약어로 사용하실 수 없는 회원아이디입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('after', $eventname);
 
 		$result = array(
-			'result' => 'available',
-			'reason' => '사용 가능한 아이디입니다',
+			'result' => 'success',
+			'msg' => '사용 가능한 아이디입니다',
 		);
-		return $this->response(array('msg' => $result['reason']), 200);
+		return $this->response($result, 200);
 	}
 
 
@@ -1242,29 +1242,29 @@ class Register extends CB_Controller
 		$email = trim($this->input->post('email'));
 		if (empty($email)) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '이메일값이 넘어오지 않았습니다',
+				'result' => 'error',
+				'msg' => '이메일값이 넘어오지 않았습니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 		
 
 		
 		if (empty(filter_var($email, FILTER_VALIDATE_EMAIL))) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '이메일 형식이 아닙니다.',
+				'result' => 'error',
+				'msg' => '이메일 형식이 아닙니다.',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		if ($this->member->item('mem_email')
 			&& $this->member->item('mem_email') === $email) {
 			$result = array(
-				'result' => 'available',
-				'reason' => '사용 가능한 이메일입니다',
+				'result' => 'success',
+				'msg' => '사용 가능한 이메일입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		$where = array(
@@ -1273,28 +1273,28 @@ class Register extends CB_Controller
 		$count = $this->Member_model->count_by($where);
 		if ($count > 0) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '이미 사용중인 이메일입니다',
+				'result' => 'error',
+				'msg' => '이미 사용중인 이메일입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		if ($this->_mem_email_check($email) === false) {
 			$result = array(
-				'result' => 'no',
-				'reason' => $email . '은(는) 예약어로 사용하실 수 없는 이메일입니다',
+				'result' => 'error',
+				'msg' => $email . '은(는) 예약어로 사용하실 수 없는 이메일입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('before', $eventname);
 
 		$result = array(
-			'result' => 'available',
-			'reason' => '사용 가능한 이메일입니다',
+			'result' => 'success',
+			'msg' => '사용 가능한 이메일입니다',
 		);
-		return $this->response(array('msg' => $result['reason']), 200);
+		return $this->response($result, 200);
 	}
 
 
@@ -1313,25 +1313,25 @@ class Register extends CB_Controller
 		$password = trim($this->input->post('password'));
 		if (empty($password)) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '패스워드값이 넘어오지 않았습니다',
+				'result' => 'error',
+				'msg' => '패스워드값이 넘어오지 않았습니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		if ($this->_mem_password_check($password) === false) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '패스워드는 최소 1개 이상의 숫자를 포함해야 합니다',
+				'result' => 'error',
+				'msg' => '패스워드는 최소 1개 이상의 숫자를 포함해야 합니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		$result = array(
-			'result' => 'available',
-			'reason' => '사용 가능한 패스워드입니다',
+			'result' => 'success',
+			'msg' => '사용 가능한 패스워드입니다',
 		);
-		return $this->response(array('msg' => $result['reason']), 200);
+		return $this->response($result, 200);
 	}
 
 
@@ -1350,19 +1350,19 @@ class Register extends CB_Controller
 		$nickname = trim($this->input->post('nickname'));
 		if (empty($nickname)) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '닉네임값이 넘어오지 않았습니다',
+				'result' => 'error',
+				'msg' => '닉네임값이 넘어오지 않았습니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		if ($this->member->item('mem_nickname')
 			&& $this->member->item('mem_nickname') === $nickname) {
 			$result = array(
-				'result' => 'available',
-				'reason' => '사용 가능한 닉네임입니다',
+				'result' => 'success',
+				'msg' => '사용 가능한 닉네임입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		$where = array(
@@ -1371,25 +1371,25 @@ class Register extends CB_Controller
 		$count = $this->Member_model->count_by($where);
 		if ($count > 0) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '이미 사용중인 닉네임입니다',
+				'result' => 'error',
+				'msg' => '이미 사용중인 닉네임입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		if ($this->_mem_nickname_check($nickname) === false) {
 			$result = array(
-				'result' => 'no',
-				'reason' => '이미 사용중인 닉네임입니다',
+				'result' => 'error',
+				'msg' => '이미 사용중인 닉네임입니다',
 			);
-			return $this->response(array('msg' => $result['reason']), 200);
+			return $this->response($result, 200);
 		}
 
 		$result = array(
-			'result' => 'available',
-			'reason' => '사용 가능한 닉네임입니다',
+			'result' => 'success',
+			'msg' => '사용 가능한 닉네임입니다',
 		);
-		return $this->response(array('msg' => $result['reason']), 200);
+		return $this->response($result, 200);
 	}
 
 
@@ -1615,9 +1615,9 @@ class Register extends CB_Controller
 		if (empty($mem_phone)) {
 			$result = array(
 				'result' => 'error',
-				'reason' => '잘못된 핸드폰 번호입니다.',
+				'msg' => '잘못된 핸드폰 번호입니다.',
 			);
-			return $this->response(array('msg' => $result['reason']), 401);
+			return $this->response($result, 200);
 		}
 
 		$this->load->library('form_validation');
@@ -1627,9 +1627,9 @@ class Register extends CB_Controller
 		if (empty($mem_phone)) {
 		    $result = array(
 				'result' => 'error',
-				'reason' => '잘못된 핸드폰 번호입니다.',
+				'msg' => '잘못된 핸드폰 번호입니다.',
 			);
-			return $this->response(array('msg' => $result['reason']), 401);
+			return $this->response($result, 200);
 		}
 
 		$this->load->model( 'Sms_send_history_model');
@@ -1650,9 +1650,9 @@ class Register extends CB_Controller
 
 			$result = array(
 				'result' => 'error',
-				'reason' => '인증 횟수가 초과 되었습니다 한시간 이후 다시 시도해 주세요.',
+				'msg' => '인증 횟수가 초과 되었습니다 한시간 이후 다시 시도해 주세요.',
 			);
-			return $this->response(array('msg' => $result['reason']), 401);
+			return $this->response($result, 200);
 
 		    
 		    
@@ -1682,24 +1682,24 @@ class Register extends CB_Controller
 
 			$result = array(
 				'result' => 'error',
-				'reason' => 'sms 전송시 알 수 없는 오류가 발생하였습니다..',
+				'msg' => 'sms 전송시 알 수 없는 오류가 발생하였습니다..',
 			);
-			return $this->response(array('msg' => $result['reason']), 401);
+			return $this->response($result, 200);
 		}
 
-		if($smsresult['result'] ==='success')
+		// if($smsresult['result'] ==='success')
 			return $this->response($smsresult, 200);
-		else 
-			return $this->response($smsresult, 401);
+		// else 
+		// 	return $this->response($smsresult, 200);
 		
 
 		// if ($this->member->item('mem_nickname')
 		// 	&& $this->member->item('mem_nickname') === $nickname) {
 		// 	$result = array(
-		// 		'result' => 'available',
-		// 		'reason' => '사용 가능한 닉네임입니다',
+		// 		'result' => 'success',
+		// 		'msg' => '사용 가능한 닉네임입니다',
 		// 	);
-		// 	return $this->response(array('msg' => $result['reason']), 200);
+		// 	return $this->response(array('msg' => $result['msg']), 200);
 		// }
 
 		// $where = array(
@@ -1708,25 +1708,25 @@ class Register extends CB_Controller
 		// $count = $this->Member_model->count_by($where);
 		// if ($count > 0) {
 		// 	$result = array(
-		// 		'result' => 'no',
-		// 		'reason' => '이미 사용중인 닉네임입니다',
+		// 		'result' => 'error',
+		// 		'msg' => '이미 사용중인 닉네임입니다',
 		// 	);
-		// 	return $this->response(array('msg' => $result['reason']), 200);
+		// 	return $this->response(array('msg' => $result['msg']), 200);
 		// }
 
 		// if ($this->_mem_nickname_check($nickname) === false) {
 		// 	$result = array(
-		// 		'result' => 'no',
-		// 		'reason' => '이미 사용중인 닉네임입니다',
+		// 		'result' => 'error',
+		// 		'msg' => '이미 사용중인 닉네임입니다',
 		// 	);
-		// 	return $this->response(array('msg' => $result['reason']), 200);
+		// 	return $this->response(array('msg' => $result['msg']), 200);
 		// }
 
 		// $result = array(
-		// 	'result' => 'available',
-		// 	'reason' => '사용 가능한 닉네임입니다',
+		// 	'result' => 'success',
+		// 	'msg' => '사용 가능한 닉네임입니다',
 		// );
-		// return $this->response(array('msg' => $result['reason']), 200);
+		// return $this->response(array('msg' => $result['msg']), 200);
 	}
 
 	public function ajax_smsmap_post()
@@ -1736,9 +1736,9 @@ class Register extends CB_Controller
        $cfc_num = $this->input->post('cfc_num');
        
        if(empty($cfc_num)) {
-           $result = array('result'=>'error','reason' => '잘못된 인증 번호입니다.');
+           $result = array('result'=>'error','msg' => '잘못된 인증 번호입니다.');
            
-           return $this->response(array('msg' => $result['reason']), 401);
+           return $this->response($result, 200);
            
        }
        
@@ -1747,8 +1747,8 @@ class Register extends CB_Controller
        $mem_phone = $this->form_validation->valid_mobile($this->input->post('mem_phone'));
        
        if(empty($mem_phone)) {
-           $result = array('result'=>'error','reason' => '잘못된 핸드폰 번호입니다.');
-           return $this->response(array('msg' => $result['reason']), 401);
+           $result = array('result'=>'error','msg' => '잘못된 핸드폰 번호입니다.');
+           return $this->response($result, 200);
            
        }
 
@@ -1768,20 +1768,20 @@ class Register extends CB_Controller
        $cnt = $this->Sms_send_history_model->count_by($sendwhere);
        
        if($cnt < 1){
-           $result = array('result'=>'error','reason' => '인증 번호가 맞지 앖습니다. 다시 확인해 주세요 ');
-           return $this->response(array('msg' => $result['reason']), 401);
+           $result = array('result'=>'error','msg' => '인증 번호가 맞지 앖습니다. 다시 확인해 주세요 ');
+           return $this->response($result, 200);
            
        }
 
        if($cnt > 0){
-           $result = array('result'=>'success','reason' => '확인 되었습니다.');
-           return $this->response(array('msg' => $result['reason']), 200);
+           $result = array('result'=>'success','msg' => '확인 되었습니다.');
+           return $this->response($result, 200);
            
        }
 
        
-       $result = array('result'=>'error','reason' => 'sms 전송시 알 수 없는 오류가 발생하였습니다..');
-       return $this->response(array('msg' => $result['reason']), 401);
+       $result = array('result'=>'error','msg' => 'sms 전송시 알 수 없는 오류가 발생하였습니다..');
+       return $this->response($result, 200);
        
 	}
 }
