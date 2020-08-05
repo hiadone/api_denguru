@@ -742,13 +742,13 @@ class Denguruapi extends CI_Controller
                     $data['pet']['list'][$key]['pet_form'] = element(element('pet_form',$value),config_item('pet_form'),'');
                     $data['pet']['list'][$key]['pet_kind'] = element('pet_kind',$value);
 
-                    $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$getdata));
+                    $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$value));
                             
                             
                             
                     $data['pet_allergy'] = element('pet_allergy',$member);
 
-                    $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$getdata));
+                    $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$value));
                 }
             
         
