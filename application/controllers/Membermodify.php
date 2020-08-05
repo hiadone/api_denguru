@@ -960,7 +960,8 @@ class Membermodify extends CB_Controller
 
 			$page_title = $this->cbconfig->item('site_meta_title_membermodify');
 			$meta_description = $this->cbconfig->item('site_meta_description_membermodify');
-			$meta_keywords = $this->cbconfig->item('site_meta_keywords_membermodify');
+			$meta_keywords = $this->cbconfig
+			->item('site_meta_keywords_membermodify');
 			$meta_author = $this->cbconfig->item('site_meta_author_membermodify');
 			$page_name = $this->cbconfig->item('site_page_name_membermodify');
 

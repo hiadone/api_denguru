@@ -241,7 +241,7 @@ class Cmall_review extends CB_Controller
 
         $view['view']['reviewmmodify_url'] = base_url('cmall_review/reviewwrite/'.$cit_id);
     
-        $this->load->model(array('Cmall_item_model', 'Cmall_review_model', 'Cmall_attr_model'));
+        $this->load->model(array('Cmall_item_model', 'Cmall_review_model', 'Cmall_attr_model','Pet_attr_model','Cmall_kind_model'));
 
         if (!$cit_id || $cit_id < 1) {
             show_404();
@@ -403,10 +403,12 @@ class Cmall_review extends CB_Controller
         
         
         
-        $view['view']['config']['pet_age'] = config_item('pet_age');
-        $view['view']['config']['pet_form'] = config_item('pet_form');
-        $view['view']['config']['pet_kind'] = array();
-        $view['view']['config']['pet_attr'] = config_item('pet_attr');
+        $pet_attr = $this->Pet_attr_model->get_all_attr();
+
+        $view['view']['config']['pet_age'] = element(3,$pet_attr);;
+        $view['view']['config']['pet_form'] = element(2,$pet_attr);
+        $view['view']['config']['pet_kind'] = $this->Cmall_kind_model->get_all_kind();
+        $view['view']['config']['pet_attr'] = element(3,$pet_attr);;
         
 
         

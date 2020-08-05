@@ -2628,7 +2628,7 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
-		$this->load->model(array('Board_model','Cmall_item_model'));
+		$this->load->model(array('Board_model','Cmall_item_model','Pet_attr_model','Cmall_kind_model'));
 
 
 
@@ -2716,10 +2716,18 @@ class Cmall extends CB_Controller
 		}
 		$view['view']['data']['theme']['list'] = $result;
 
-		$view['view']['config']['pet_age'] = config_item('pet_age');
-        $view['view']['config']['pet_form'] = config_item('pet_form');
-        $view['view']['config']['pet_kind'] = array();
-        $view['view']['config']['pet_attr'] = config_item('pet_attr');
+		$pet_attr = $this->Pet_attr_model->get_all_attr();
+
+		$view['view']['config']['pet_age'] = element(3,$pet_attr);;
+        $view['view']['config']['pet_form'] = element(2,$pet_attr);
+        $view['view']['config']['pet_kind'] = $this->Cmall_kind_model->get_all_kind();
+        $view['view']['config']['pet_attr'] = element(3,$pet_attr);;
+
+
+  
+            
+            
+
 		/**
 		 * 페이지네이션을 생성합니다
 		 */

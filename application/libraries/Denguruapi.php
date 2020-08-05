@@ -77,8 +77,7 @@ class Denguruapi extends CI_Controller
         if (empty($cit_id) OR $cit_id < 1) {
             return false;
         }
-        
-        
+
         $cmall_item['cit_image'] = cdn_url('cmallitem',element('cit_file_1',$cmall_item));
         $cmall_item['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
         $cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
@@ -612,7 +611,7 @@ class Denguruapi extends CI_Controller
 
         $this->CI->load->model(
             array(
-                'Member_pet_model','Reviewer_model',
+                'Member_pet_model','Reviewer_model','Pet_attr_model','Pet_allergy_model'
             )
         );
 
@@ -658,15 +657,15 @@ class Denguruapi extends CI_Controller
         $data['pet_form'] = element(element('pet_form',$member),config_item('pet_form'),'');
         $data['pet_kind'] = element('pet_kind',$member);
 
-        $data['pet_attr'] = array();
-        if(element('pet_attr',$member)){
-            foreach(explode(",",element('pet_attr',$member)) as $value){
-                $data['pet_attr'][]= element($value,config_item('pet_attr'),'');
-            }
-        }
+        $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$getdata));
+        
         
         
         $data['pet_allergy'] = element('pet_allergy',$member);
+
+        $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$getdata));
+
+
             
 
         $data = array_merge($arr, $data);
@@ -715,7 +714,11 @@ class Denguruapi extends CI_Controller
         //  $data['pet_allergy'] = $this->item('pet_allergy');
         // }else{
 
-           
+           $this->CI->load->model(
+               array(
+                   'Pet_attr_model','Pet_allergy_model'
+               )
+           );
 
             $data['mem_id'] = element('mem_id',$member);
             $data['mem_userid'] = element('mem_userid',$member);
@@ -739,14 +742,13 @@ class Denguruapi extends CI_Controller
                     $data['pet']['list'][$key]['pet_form'] = element(element('pet_form',$value),config_item('pet_form'),'');
                     $data['pet']['list'][$key]['pet_kind'] = element('pet_kind',$value);
 
-                    if(element('pet_attr',$value)){
-                        foreach(explode(",",element('pet_attr',$value)) as $val){
-                            $data['pet']['list'][$key]['pet_attr'][]= element($val,config_item('pet_attr'),'');
-                        }
-                    }
-                    
-                    
-                    $data['pet']['list'][$key]['pet_allergy'] = element('pet_allergy',$value);
+                    $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$getdata));
+                            
+                            
+                            
+                    $data['pet_allergy'] = element('pet_allergy',$member);
+
+                    $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$getdata));
                 }
             
         

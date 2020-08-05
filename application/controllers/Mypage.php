@@ -2033,7 +2033,7 @@ class Mypage extends CB_Controller
 
 		$mem_id = (int) $this->member->item('mem_id');
 
-	    $this->load->model(array('Member_model','Member_pet_model'));
+	    $this->load->model(array('Member_model','Member_pet_model','Pet_allergy_model','Pet_attr_model','Cmall_kind_model','Pet_allergy_rel_model','Pet_attr_rel_model'));
 	    $primary_key = $this->Member_pet_model->primary_key;
 
 	    /**
@@ -2046,6 +2046,11 @@ class Mypage extends CB_Controller
 	        	alert('이 펫은 현재 존재하지 않습니다',"",406);
 
 	        $getdata['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$getdata));
+
+	        $getdata['pet_attr'] = $this->Pet_attr_model->get_attr(element('pet_id',$getdata));
+	        
+	        
+	        $getdata['pet_allergy_rel'] = $this->Pet_allergy_model->get_allergy(element('pet_id',$getdata));
 
 	        $is_admin = $this->member->is_admin();
             if ($is_admin === false
@@ -2089,9 +2094,19 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|numeric',
 	        ),
 	        array(
-	            'field' => 'pet_attr[]',
+	            'field' => 'pet_form',
+	            'label' => '체형 ',
+	            'rules' => 'trim|numeric|required',
+	        ),
+	        array(
+	            'field' => 'pet_kind',
+	            'label' => '품종',
+	            'rules' => 'trim|numeric|required',
+	        ),
+	        array(
+	            'field' => 'pet_attr',
 	            'label' => '우리 아이 특성',
-	            'rules' => 'trim|required',
+	            'rules' => 'trim|callback__pet_attr',
 	        ),
 	        array(
 	            'field' => 'pet_weight',
@@ -2099,10 +2114,17 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|numeric',
 	        ),
 	        array(
+	            'field' => 'pet_allergy',
+	            'label' => '알레르기',
+	            'rules' => 'trim|numeric|required|callback__pet_allergy',
+	        ),
+	        
+	        array(
 	            'field' => 'pet_main',
 	            'label' => '메인 펫',
 	            'rules' => 'trim|numeric',
 	        ),
+
 	        
 
 	        
@@ -2241,11 +2263,21 @@ class Mypage extends CB_Controller
 	        $view['msg'] = $file_error . $file_error2.validation_errors();
             
             $view['view']['data'] = $getdata;
+            $pet_attr = array();
+            
+            
+
+            $pet_attr = $this->Pet_attr_model->get_all_attr();
+            
+            
 
             
-	        $view['view']['config']['pet_form'] = config_item('pet_form');
-	        $view['view']['config']['pet_kind'] = array();
-	        $view['view']['config']['pet_attr'] = config_item('pet_attr');
+	        $view['view']['config']['pet_form'] = element(2,$pet_attr);
+	        $view['view']['config']['pet_kind'] = $this->Cmall_kind_model->get_all_kind();
+	        $view['view']['config']['pet_attr'] = element(1,$pet_attr);
+	        $view['view']['config']['pet_age'] = element(3,$pet_attr);;
+            
+            $view['view']['config']['pet_allergy_rel'] = $this->Pet_allergy_model->get_all_allergy();
             
 
             $view['view']['primary_key'] = $primary_key;
@@ -2269,7 +2301,8 @@ class Mypage extends CB_Controller
 	        $pet_sex = $this->input->post_put('pet_sex') ? $this->input->post_put('pet_sex') : 0;
 	        $pet_neutral = $this->input->post_put('pet_neutral') ? $this->input->post_put('pet_neutral') : 0;
 	        $pet_weight = $this->input->post_put('pet_weight') ? $this->input->post_put('pet_weight') : 0;
-	        $pet_attr = $this->input->post_put('pet_attr') ? implode(",",$this->input->post_put('pet_attr')) : '';
+	        $pet_form = $this->input->post_put('pet_form') ? $this->input->post_put('pet_form') : 0;
+	        $pet_kind = $this->input->post_put('pet_kind') ? $this->input->post_put('pet_kind') : 0;
 	        $pet_allergy = $this->input->post_put('pet_allergy') ? $this->input->post_put('pet_allergy') : 0;
 
 	        $updatedata = array(
@@ -2279,8 +2312,9 @@ class Mypage extends CB_Controller
 	            'pet_sex' => $pet_sex,
 	            'pet_neutral' => $pet_neutral,
 	            'pet_weight' => $pet_weight,                
-	            'pet_attr' => $pet_attr,
 	            'pet_allergy' => $pet_allergy,
+	            'pet_form' => $pet_form,
+	            'pet_kind' => $pet_kind,
 	            
 	        );
 
@@ -2332,6 +2366,13 @@ class Mypage extends CB_Controller
 	            
 	            $this->Member_pet_model->update($pid, $updatedata);
 	            
+	            $pet_attr = $this->input->post('pet_attr', null, '');
+	            $pet_allergy_rel = $this->input->post('pet_allergy_rel', null, '');
+
+	            $this->Pet_allergy_rel_model->save_attr($pid, $pet_allergy_rel);
+				$this->Pet_attr_rel_model->save_attr($pid, $pet_attr);
+
+
 	            $view['msg'] = '정상적으로 수정되었습니다';
 	            
 	                
@@ -2345,6 +2386,13 @@ class Mypage extends CB_Controller
 	            $updatedata['mem_id'] = $mem_id;
 	            
 	            $pid = $this->Member_pet_model->insert($updatedata);
+
+	            
+	            $pet_attr = $this->input->post('pet_attr', null, '');
+	            $pet_allergy_rel = $this->input->post('pet_allergy_rel', null, '');
+
+	            $this->Pet_allergy_rel_model->save_attr($pid, $pet_allergy_rel);
+				$this->Pet_attr_rel_model->save_attr($pid, $pet_attr);
 
 	            $view['msg'] = '정상적으로 입력되었습니다';
 	            
@@ -2473,6 +2521,52 @@ class Mypage extends CB_Controller
             
         
         return $this->response(array('msg' => '정상적으로 삭제되었습니다'),204);
+    }
+
+    public function _pet_allergy($str,$param)
+    {   
+
+        
+        
+        
+        if(!empty($str)){
+        	if(empty($this->input->post('pet_allergy_rel'))){
+        		$this->form_validation->set_message(
+        		    '_pet_allergy',
+        		    '상세한 알레르기를 선택해 주세요.'
+        		);
+        		return false;
+        	}
+        }
+
+        return true;
+    }
+
+    public function _pet_attr($str)
+    {   
+    	
+    	
+    	if(count($this->input->post('pet_attr')) < 1){
+        	
+        		$this->form_validation->set_message(
+        		    '_pet_attr',
+        		    '우리 아이 특징을 선택해 주세요'
+        		);
+        		return false;
+        	
+        }
+        
+        if(count($this->input->post('pet_attr')) > 5){
+        	
+        		$this->form_validation->set_message(
+        		    '_pet_attr',
+        		    '우리 아이 특징은 5개 까지만 선택이 가능합니다..'
+        		);
+        		return false;
+        	
+        }
+
+        return true;
     }
 }
 
