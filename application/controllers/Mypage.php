@@ -2101,7 +2101,7 @@ class Mypage extends CB_Controller
 	        array(
 	            'field' => 'pet_kind',
 	            'label' => '품종',
-	            'rules' => 'trim|numeric|required',
+	            'rules' => 'trim|numeric',
 	        ),
 	        array(
 	            'field' => 'pet_attr',
@@ -2523,7 +2523,7 @@ class Mypage extends CB_Controller
         return $this->response(array('msg' => '정상적으로 삭제되었습니다'),204);
     }
 
-    public function _pet_allergy($str,$param)
+    public function _pet_allergy($str)
     {   
 
         

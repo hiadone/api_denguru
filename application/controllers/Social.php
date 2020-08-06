@@ -51,7 +51,7 @@ class Social extends CB_Controller
 	/**
 	 * 페이스북 연동 함수입니다
 	 */
-	 public function facebook_login()
+	 public function facebook_login_post()
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -62,46 +62,46 @@ class Social extends CB_Controller
 		Events::trigger('before', $eventname);
 
 		if ( ! $this->cbconfig->item('use_sociallogin_facebook')) {
-			alert_close('이 웹사이트는 페이스북 로그인 기능을 지원하고 있지 않습니다.');
+			alert_close('이 앱은  페이스북 로그인 기능을 지원하고 있지 않습니다.');
 		}
 
-		require_once FCPATH . 'plugin/social/libraries/Facebook/autoload.php';
+		// require_once FCPATH . 'plugin/social/libraries/Facebook/autoload.php';
 
-		$fb = new Facebook\Facebook([
-		'app_id' => $this->cbconfig->item('facebook_app_id'),
-		'app_secret' => $this->cbconfig->item('facebook_secret'),
-		'default_graph_version' => 'v2.2',
-		]);
+		// $fb = new Facebook\Facebook([
+		// 'app_id' => $this->cbconfig->item('facebook_app_id'),
+		// 'app_secret' => $this->cbconfig->item('facebook_secret'),
+		// 'default_graph_version' => 'v2.2',
+		// ]);
 
-		$helper = $fb->getRedirectLoginHelper();
+		// $helper = $fb->getRedirectLoginHelper();
 
-		try {
-			$accessToken = $helper->getAccessToken();
-			if (empty($accessToken)) {
-				$permissions = ['email', 'public_profile']; // Optional permissions
-				$loginUrl = $helper->getLoginUrl(site_url('social/facebook_login'), $permissions);
-				redirect($loginUrl);
-			}
-		} catch(Facebook\Exceptions\FacebookResponseException $e) {
-			// When Graph returns an error
-			echo 'Graph returned an error: ' . $e->getMessage();
-			exit;
-		} catch(Facebook\Exceptions\FacebookSDKException $e) {
-			// When validation fails or other local issues
-			echo 'Facebook SDK returned an error: ' . $e->getMessage();
-			exit;
-		}
+		// try {
+		// 	$accessToken = $helper->getAccessToken();
+		// 	if (empty($accessToken)) {
+		// 		$permissions = ['email', 'public_profile']; // Optional permissions
+		// 		$loginUrl = $helper->getLoginUrl(site_url('social/facebook_login'), $permissions);
+		// 		redirect($loginUrl);
+		// 	}
+		// } catch(Facebook\Exceptions\FacebookResponseException $e) {
+		// 	// When Graph returns an error
+		// 	echo 'Graph returned an error: ' . $e->getMessage();
+		// 	exit;
+		// } catch(Facebook\Exceptions\FacebookSDKException $e) {
+		// 	// When validation fails or other local issues
+		// 	echo 'Facebook SDK returned an error: ' . $e->getMessage();
+		// 	exit;
+		// }
 
-		try {
-			// Returns a `Facebook\FacebookResponse` object
-			$response = $fb->get('/me?fields=id,name,first_name,last_name,link,gender,locale,timezone,updated_time,verified,email', $accessToken->getValue());
-		} catch(Facebook\Exceptions\FacebookResponseException $e) {
-			echo 'Graph returned an error: ' . $e->getMessage();
-			exit;
-		} catch(Facebook\Exceptions\FacebookSDKException $e) {
-			echo 'Facebook SDK returned an error: ' . $e->getMessage();
-			exit;
-		}
+		// try {
+		// 	// Returns a `Facebook\FacebookResponse` object
+		// 	$response = $fb->get('/me?fields=id,name,first_name,last_name,link,gender,locale,timezone,updated_time,verified,email', $accessToken->getValue());
+		// } catch(Facebook\Exceptions\FacebookResponseException $e) {
+		// 	echo 'Graph returned an error: ' . $e->getMessage();
+		// 	exit;
+		// } catch(Facebook\Exceptions\FacebookSDKException $e) {
+		// 	echo 'Facebook SDK returned an error: ' . $e->getMessage();
+		// 	exit;
+		// }
 
 		$userinfo = $response->getGraphUser();
 
@@ -128,14 +128,25 @@ class Social extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('after', $eventname);
 
-		$this->_common_login('facebook', $facebook_id);
+		
+
+		$view = array();
+		// $view['view'] = array();
+		
+		// 이벤트가 존재하면 실행합니다
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view = $this->_common_login('facebook', $facebook_id);
+		
+		return $this->response($view, $view['http_status_codes']);
+
 	}
 
 
 	/**
 	 * 트위터 연동 함수입니다
 	 */
-	 public function twitter_login()
+	 public function twitter_login_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_social_twitter_login';
@@ -227,7 +238,17 @@ class Social extends CB_Controller
 				// 이벤트가 존재하면 실행합니다
 				Events::trigger('after', $eventname);
 
-				$this->_common_login('twitter', $twitter_id);
+				
+
+				$view = array();
+				// $view['view'] = array();
+				
+				// 이벤트가 존재하면 실행합니다
+				// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+				$view = $this->_common_login('twitter', $twitter_id);
+				
+				return $this->response($view, $view['http_status_codes']);
 
 			} else {
 				alert_close('잘못된 접근입니다');
@@ -239,7 +260,7 @@ class Social extends CB_Controller
 	/**
 	 * 구글 연동 함수입니다
 	 */
-	 public function google_login()
+	 public function google_login_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_social_google_login';
@@ -252,67 +273,67 @@ class Social extends CB_Controller
 			alert_close('이 웹사이트는 구글 로그인 기능을 지원하고 있지 않습니다.');
 		}
 
-		require_once FCPATH . 'plugin/social/libraries/google/autoload.php';
+		// require_once FCPATH . 'plugin/social/libraries/google/autoload.php';
 
-		$client_id = $this->cbconfig->item('google_client_id');
-		$client_secret = $this->cbconfig->item('google_client_secret');
-		$redirect_uri = site_url('social/google_login');
+		// $client_id = $this->cbconfig->item('google_client_id');
+		// $client_secret = $this->cbconfig->item('google_client_secret');
+		// $redirect_uri = site_url('social/google_login');
 
-		$client = new Google_Client();
-		$client->setClientId($client_id);
-		$client->setClientSecret($client_secret);
-		$client->setRedirectUri($redirect_uri);
-		$client->setScopes('email');
-		$client->addScope('profile');
+		// $client = new Google_Client();
+		// $client->setClientId($client_id);
+		// $client->setClientSecret($client_secret);
+		// $client->setRedirectUri($redirect_uri);
+		// $client->setScopes('email');
+		// $client->addScope('profile');
 
-		$plus = new Google_Service_Oauth2($client);
+		// $plus = new Google_Service_Oauth2($client);
 
 
-		/************************************************
-		If we have a code back from the OAuth 2.0 flow,
-		we need to exchange that with the authenticate()
-		function. We store the resultant access token
-		bundle in the session, and redirect to ourself.
-		 ************************************************/
-		if ($this->input->get('code')) {
-			$client->authenticate($this->input->get('code'));
-			$this->session->set_userdata(
-				'google_access_token',
-				$client->getAccessToken()
-			);
-			redirect(current_url());
-		}
+		// /************************************************
+		// If we have a code back from the OAuth 2.0 flow,
+		// we need to exchange that with the authenticate()
+		// function. We store the resultant access token
+		// bundle in the session, and redirect to ourself.
+		//  ************************************************/
+		// if ($this->input->get('code')) {
+		// 	$client->authenticate($this->input->get('code'));
+		// 	$this->session->set_userdata(
+		// 		'google_access_token',
+		// 		$client->getAccessToken()
+		// 	);
+		// 	redirect(current_url());
+		// }
 
-		/************************************************
-		If we have an access token, we can make
-		requests, else we generate an authentication URL.
-		 ************************************************/
-		if ($this->session->userdata('google_access_token')) {
-			$client->setAccessToken($this->session->userdata('google_access_token'));
-		} else {
-			$authUrl = $client->createAuthUrl();
-			redirect($authUrl);
-		}
+		// ***********************************************
+		// If we have an access token, we can make
+		// requests, else we generate an authentication URL.
+		//  ***********************************************
+		// if ($this->session->userdata('google_access_token')) {
+		// 	$client->setAccessToken($this->session->userdata('google_access_token'));
+		// } else {
+		// 	$authUrl = $client->createAuthUrl();
+		// 	redirect($authUrl);
+		// }
 
-		/************************************************
-		If we're signed in we can go ahead and retrieve
-		the ID token, which is part of the bundle of
-		data that is exchange in the authenticate step
-		- we only need to do a network call if we have
-		to retrieve the Google certificate to verify it,
-		and that can be cached.
-		 ************************************************/
-		if ($client->getAccessToken()) {
-			$this->session->set_userdata(
-				'google_access_token',
-				$client->getAccessToken()
-			);
-			$token_data = $client->verifyIdToken()->getAttributes();
-		}
+		// /************************************************
+		// If we're signed in we can go ahead and retrieve
+		// the ID token, which is part of the bundle of
+		// data that is exchange in the authenticate step
+		// - we only need to do a network call if we have
+		// to retrieve the Google certificate to verify it,
+		// and that can be cached.
+		//  ************************************************/
+		// if ($client->getAccessToken()) {
+		// 	$this->session->set_userdata(
+		// 		'google_access_token',
+		// 		$client->getAccessToken()
+		// 	);
+		// 	$token_data = $client->verifyIdToken()->getAttributes();
+		// }
 
-		if (strpos($client_id, 'googleusercontent') === false) {
-			alert_close('구글 API 정보가 제대로 입력되지 않았습니다');
-		}
+		// if (strpos($client_id, 'googleusercontent') === false) {
+		// 	alert_close('구글 API 정보가 제대로 입력되지 않았습니다');
+		// }
 
 		if (isset($token_data)) {
 
@@ -341,7 +362,17 @@ class Social extends CB_Controller
 			// 이벤트가 존재하면 실행합니다
 			Events::trigger('after', $eventname);
 
-			$this->_common_login('google', $google_id);
+			
+
+			$view = array();
+			// $view['view'] = array();
+			
+			// 이벤트가 존재하면 실행합니다
+			// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+			$view = $this->_common_login('google', $google_id);
+			
+			return $this->response($view, $view['http_status_codes']);
 
 		} else {
 			alert_close('잘못된 접근입니다');
@@ -352,7 +383,7 @@ class Social extends CB_Controller
 	/**
 	 * 네이버 연동 함수입니다
 	 */
-	 public function naver_login()
+	 public function naver_login_post()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_social_naver_login';
@@ -415,71 +446,81 @@ class Social extends CB_Controller
 			// 이벤트가 존재하면 실행합니다
 			Events::trigger('after', $eventname);
 
-			$this->_common_login('naver', $naver_id);
+			
+
+			$view = array();
+			// $view['view'] = array();
+			
+			// 이벤트가 존재하면 실행합니다
+			// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+			$view = $this->_common_login('naver', $naver_id);
+			
+			return $this->response($view, $view['http_status_codes']);
 		}
 
-		if ($this->input->get('code')) {
-			$url = 'https://nid.naver.com/oauth2.0/token';
-			$url.= sprintf("?client_id=%s&client_secret=%s&grant_type=authorization_code&state=%s&code=%s",
-				$this->cbconfig->item('naver_client_id'), $this->cbconfig->item('naver_client_secret'), $this->input->get('state', null, ''), $this->input->get('code'));
+		// if ($this->input->get('code')) {
+		// 	$url = 'https://nid.naver.com/oauth2.0/token';
+		// 	$url.= sprintf("?client_id=%s&client_secret=%s&grant_type=authorization_code&state=%s&code=%s",
+		// 		$this->cbconfig->item('naver_client_id'), $this->cbconfig->item('naver_client_secret'), $this->input->get('state', null, ''), $this->input->get('code'));
 
-			$ch = curl_init();
-			curl_setopt ($ch, CURLOPT_URL, $url);
-			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt ($ch, CURLOPT_SSLVERSION,1);
-			curl_setopt ($ch, CURLOPT_HEADER, 0);
-			curl_setopt ($ch, CURLOPT_POST, 0);
-			curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
-			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($ch);
-			curl_close($ch);
+		// 	$ch = curl_init();
+		// 	curl_setopt ($ch, CURLOPT_URL, $url);
+		// 	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		// 	curl_setopt ($ch, CURLOPT_SSLVERSION,1);
+		// 	curl_setopt ($ch, CURLOPT_HEADER, 0);
+		// 	curl_setopt ($ch, CURLOPT_POST, 0);
+		// 	curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+		// 	curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+		// 	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+		// 	$result = curl_exec($ch);
+		// 	curl_close($ch);
 
-			$json = json_decode($result, true);
+		// 	$json = json_decode($result, true);
 
-			if (element('access_token', $json)) {
+		// 	if (element('access_token', $json)) {
 
-				$this->session->set_userdata(
-					'naver_access_token',
-					element('access_token', $json)
-				);
-				echo '<script type="text/javascript">location.reload()</script>';
-				exit;
+		// 		$this->session->set_userdata(
+		// 			'naver_access_token',
+		// 			element('access_token', $json)
+		// 		);
+		// 		echo '<script type="text/javascript">location.reload()</script>';
+		// 		exit;
 
-			} else {
+		// 	} else {
 
-				alert_close('로그인에 실패하였습니다');
+		// 		alert_close('로그인에 실패하였습니다');
 
-			}
-		}
+		// 	}
+		// }
 
-		if ($this->input->get('state')) {
-			if ($this->input->get('state') === $this->session->userdata('naver_state')) {
-				return RESPONSE_SUCCESS;
-			} else {
-				return RESPONSE_UNAUTHORIZED;
-			}
-			exit;
-		}
+		// if ($this->input->get('state')) {
+		// 	if ($this->input->get('state') === $this->session->userdata('naver_state')) {
+		// 		return RESPONSE_SUCCESS;
+		// 	} else {
+		// 		return RESPONSE_UNAUTHORIZED;
+		// 	}
+		// 	exit;
+		// }
 
-		if ( ! $this->session->userdata('naver_access_token')) {
-			$this->load->helper('string');
-			$state = random_string('alnum', 50);
-			$this->session->set_userdata('naver_state', $state);
+		// if ( ! $this->session->userdata('naver_access_token')) {
+		// 	$this->load->helper('string');
+		// 	$state = random_string('alnum', 50);
+		// 	$this->session->set_userdata('naver_state', $state);
 
-			$url = 'https://nid.naver.com/oauth2.0/authorize';
-			$url.= sprintf("?client_id=%s&response_type=code&redirect_uri=%s&state=%s",
-				$this->cbconfig->item('naver_client_id'), urlencode(site_url('social/naver_login')), $state);
+		// 	$url = 'https://nid.naver.com/oauth2.0/authorize';
+		// 	$url.= sprintf("?client_id=%s&response_type=code&redirect_uri=%s&state=%s",
+		// 		$this->cbconfig->item('naver_client_id'), urlencode(site_url('social/naver_login')), $state);
 
-			redirect($url);
-		}
+		// 	redirect($url);
+		// }
 	}
 
 
 	/**
 	 * 카카오 연동 함수입니다
 	 */
-	 public function kakao_login()
+	 public function kakao_login_post()
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
@@ -534,49 +575,59 @@ class Social extends CB_Controller
 			// 이벤트가 존재하면 실행합니다
 			Events::trigger('after', $eventname);
 
-			$this->_common_login('kakao', $kakao_id);
+			
+
+			$view = array();
+			// $view['view'] = array();
+			
+			// 이벤트가 존재하면 실행합니다
+			// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+			$view = $this->_common_login('kakao', $kakao_id);
+			
+			return $this->response($view, $view['http_status_codes']);
 		}
 
-		if ($this->input->get('code')) {
-			$url = 'https://kauth.kakao.com/oauth/token';
-			$url.= sprintf("?client_id=%s&grant_type=authorization_code&redirect_uri=%s&code=%s",
-				$this->cbconfig->item('kakao_client_id'), urlencode(site_url('social/kakao_login')), $this->input->get('code'));
+		// if ($this->input->get('code')) {
+		// 	$url = 'https://kauth.kakao.com/oauth/token';
+		// 	$url.= sprintf("?client_id=%s&grant_type=authorization_code&redirect_uri=%s&code=%s",
+		// 		$this->cbconfig->item('kakao_client_id'), urlencode(site_url('social/kakao_login')), $this->input->get('code'));
 
-			$ch = curl_init();
-			curl_setopt ($ch, CURLOPT_URL, $url);
-			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt ($ch, CURLOPT_SSLVERSION,1);
-			curl_setopt ($ch, CURLOPT_HEADER, 0);
-			curl_setopt ($ch, CURLOPT_POST, 0);
-			curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
-			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($ch);
-			curl_close($ch);
+		// 	$ch = curl_init();
+		// 	curl_setopt ($ch, CURLOPT_URL, $url);
+		// 	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		// 	curl_setopt ($ch, CURLOPT_SSLVERSION,1);
+		// 	curl_setopt ($ch, CURLOPT_HEADER, 0);
+		// 	curl_setopt ($ch, CURLOPT_POST, 0);
+		// 	curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+		// 	curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+		// 	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+		// 	$result = curl_exec($ch);
+		// 	curl_close($ch);
 
-			$json = json_decode($result, true);
+		// 	$json = json_decode($result, true);
 
-			if (element('access_token', $json)) {
-				$this->session->set_userdata(
-					'kakao_access_token',
-					element('access_token', $json)
-				);
+		// 	if (element('access_token', $json)) {
+		// 		$this->session->set_userdata(
+		// 			'kakao_access_token',
+		// 			element('access_token', $json)
+		// 		);
 
-				echo '<script type="text/javascript">location.reload()</script>';
-				exit;
-			} else {
-				alert_close('로그인에 실패하였습니다');
-			}
-		}
+		// 		echo '<script type="text/javascript">location.reload()</script>';
+		// 		exit;
+		// 	} else {
+		// 		alert_close('로그인에 실패하였습니다');
+		// 	}
+		// }
 
-		if ( ! $this->session->userdata('kakao_access_token')) {
+		// if ( ! $this->session->userdata('kakao_access_token')) {
 
-			$url = 'https://kauth.kakao.com/oauth/authorize';
-			$url.= sprintf("?client_id=%s&response_type=code&redirect_uri=%s",
-				$this->cbconfig->item('kakao_client_id'), urlencode(site_url('social/kakao_login')));
+		// 	$url = 'https://kauth.kakao.com/oauth/authorize';
+		// 	$url.= sprintf("?client_id=%s&response_type=code&redirect_uri=%s",
+		// 		$this->cbconfig->item('kakao_client_id'), urlencode(site_url('social/kakao_login')));
 
-			redirect($url);
-		}
+		// 	redirect($url);
+		// }
 	}
 
 
@@ -746,21 +797,32 @@ class Social extends CB_Controller
 				// 이미 회원정보를 가지고 있는 상황에서 소셜로그인을 진행한 상황
 
 				$this->member->update_login_log($mem_id, '', 1, element($social_type, $this->socialtype) . ' 로그인 성공');
-				$this->session->set_userdata('mem_id', $mem_id);
+				// $this->session->set_userdata('mem_id', $mem_id);
 
-				$url_after_login = $this->cbconfig->item('url_after_login');
-				if ($url_after_login) {
-					$url_after_login = site_url($url_after_login);
-				}
-				echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-				echo '<script type="text/javascript"> window.close();';
-				if ($url_after_login) {
-					echo 'window.opener.document.location.href = "' . $url_after_login . '";';
-				} else {
-					echo 'window.opener.location.reload();';
-				}
-				echo '</script>';
-				exit;
+				$tokenData = array();
+				$tokenData['mem_id'] = $mem_id; //TODO: Replace with data for token
+				$output['token'] = AUTHORIZATION::generateToken($tokenData);
+
+				$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
+
+				$view['membermodify'] = 0;
+				$view['token'] = $output['token'];
+				$view['http_status_codes'] = 200;
+
+			    return $view;
+				// $url_after_login = $this->cbconfig->item('url_after_login');
+				// if ($url_after_login) {
+				// 	$url_after_login = site_url($url_after_login);
+				// }
+				// echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
+				// echo '<script type="text/javascript"> window.close();';
+				// if ($url_after_login) {
+				// 	echo 'window.opener.document.location.href = "' . $url_after_login . '";';
+				// } else {
+				// 	echo 'window.opener.location.reload();';
+				// }
+				// echo '</script>';
+				// exit;
 
 			} else {
 				// 비회원이 소셜로그인을 처음 진행하는 상황
@@ -783,14 +845,17 @@ class Social extends CB_Controller
 
 				$nickname = '';
 				$user_id = '';
+				$user_email = '';
 				if ($social_type === 'facebook') {
 					$nickname = element('name', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					if (element('email', $socialinfo)) {
 						$user_id = '-social_' . strtolower(substr(element('email', $socialinfo), 0, strpos(element('email', $socialinfo), '@')));
+						$user_email = '-social_'.element('email', $socialinfo);
 					} else {
 						$user_id = '-social_' . $social_id;
+						$user_email = $user_id .'@facebook.com';
 					}
 				} elseif ($social_type === 'twitter') {
 					$nickname = element('name', $socialinfo);
@@ -807,8 +872,10 @@ class Social extends CB_Controller
 
 					if (element('email', $socialinfo)) {
 						$user_id = '-social_' . strtolower(substr(element('email', $socialinfo), 0, strpos(element('email', $socialinfo), '@')));
+						$user_email = '-social_'.element('email', $socialinfo);
 					} else {
 						$user_id = '-social_' . $social_id;
+						$user_email = $user_id .'@google.com';
 					}
 				} elseif ($social_type === 'naver') {
 					$nickname = element('nickname', $socialinfo) ? element('nickname', $socialinfo) : element('name', $socialinfo);
@@ -816,14 +883,17 @@ class Social extends CB_Controller
 
 					if (element('email', $socialinfo)) {
 						$user_id = '-social_' . strtolower(substr(element('email', $socialinfo), 0, strpos(element('email', $socialinfo), '@')));
+						$user_email = '-social_'.element('email', $socialinfo);
 					} else {
 						$user_id = '-social_' . $social_id;
+						$user_email = $user_id .'@naver.com';
 					}
 				} elseif ($social_type === 'kakao') {
 					$nickname = element('nickname', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					$user_id = '-social_' . $social_id;
+					$user_email = $user_id .'@kakao.com';
 				}
 
 				if (empty($nickname)) {
@@ -890,6 +960,7 @@ class Social extends CB_Controller
 				$mem_level = (int) $this->cbconfig->item('register_level');
 				$insertdata = array();
 				$insertdata['mem_userid'] = $user_id;
+				$insertdata['mem_email'] = $user_email;
 				$insertdata['mem_nickname'] = $nickname;
 				$insertdata['mem_level'] = $mem_level;
 
@@ -897,6 +968,12 @@ class Social extends CB_Controller
 				$insertdata['mem_register_ip'] = $this->input->ip_address();
 				$insertdata['mem_lastlogin_datetime'] = cdate('Y-m-d H:i:s');
 				$insertdata['mem_lastlogin_ip'] = $this->input->ip_address();
+
+				if ( ! function_exists('password_hash')) {
+					$this->load->helper('password');
+				}
+
+				$insertdata['mem_password'] = password_hash('a28182818', PASSWORD_BCRYPT);
 
 				$mem_id = $this->Member_model->insert($insertdata);
 
@@ -1085,25 +1162,37 @@ class Social extends CB_Controller
 				$this->Social_meta_model->save($mem_id, $metadata);
 
 				$this->member->update_login_log($mem_id, '', 1, element($social_type, $this->socialtype) . ' 로그인 성공');
-				$this->session->set_userdata('mem_id', $mem_id);
+				// $this->session->set_userdata('mem_id', $mem_id);
 
-				$url_after_login = $this->cbconfig->item('url_after_login');
-				if ($url_after_login) {
-					$url_after_login = site_url($url_after_login);
-				}
+				$tokenData = array();
+				$tokenData['mem_id'] = $mem_id; //TODO: Replace with data for token
+				$output['token'] = AUTHORIZATION::generateToken($tokenData);
 
-				// 이벤트가 존재하면 실행합니다
-				Events::trigger('common_login_after', $eventname);
+				$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
 
-				echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-				echo '<script type="text/javascript"> window.close();';
-				if ($url_after_login) {
-					echo 'window.opener.document.location.href = "' . $url_after_login . '";';
-				} else {
-					echo 'window.opener.location.reload();';
-				}
-				echo '</script>';
-				exit;
+				$view['membermodify'] = 0;
+				$view['token'] = $output['token'];
+				$view['http_status_codes'] = 200;
+
+			    return $view;
+
+				// $url_after_login = $this->cbconfig->item('url_after_login');
+				// if ($url_after_login) {
+				// 	$url_after_login = site_url($url_after_login);
+				// }
+
+				// // 이벤트가 존재하면 실행합니다
+				// Events::trigger('common_login_after', $eventname);
+
+				// echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
+				// echo '<script type="text/javascript"> window.close();';
+				// if ($url_after_login) {
+				// 	echo 'window.opener.document.location.href = "' . $url_after_login . '";';
+				// } else {
+				// 	echo 'window.opener.location.reload();';
+				// }
+				// echo '</script>';
+				// exit;
 			}
 		}
 	}

@@ -33,3 +33,4 @@ $lang['form_validation_in_list'] = '{field} 항목은 반드시 {param} 중의 �
 
 $lang['form_validation_alphanumunder'] = "%s 항목은 알파벳, 숫자, 언더바(_)만 입력 가능합니다.";
 $lang['form_validation_valid_phone'] = "%s 항목에 올바른 전화번호를 입력해주시기 바랍니다.";
+$lang['form_validation_valid_mobile'] = "%s 항목에 올바른 전화번호를 입력해주시기 바랍니다.";

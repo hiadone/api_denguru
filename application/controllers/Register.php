@@ -189,7 +189,7 @@ class Register extends CB_Controller
 		$this->load->event($eventname);
 
 		if ($this->member->is_member() && ! ($this->member->is_admin() === 'super' && $this->uri->segment(1) === config_item('uri_segment_admin'))) {
-			alert_close('잘못된 접근입니다');
+			// alert_close('잘못된 접근입니다');
 		}
 		
 
@@ -318,9 +318,10 @@ class Register extends CB_Controller
 			$configbasic['mem_phone'] = array(
 				'field' => 'mem_phone',
 				'label' => '전화번호',
-				'rules' => 'trim|valid_phone',
+				'rules' => 'trim|valid_mobile|required',
 			);
 		}
+
 		if ( ! $selfcert_birthday) {
 			$configbasic['mem_birthday'] = array(
 				'field' => 'mem_birthday',
@@ -470,6 +471,14 @@ class Register extends CB_Controller
 				}
 			}
 		}
+
+
+		$config[] = array(
+			'field' => 'cfc_num',
+			'label' => '인증번호',
+			'rules' => 'trim|required|callback__mem_smsmap_check',
+		);
+		
 
 		// if ($this->cbconfig->item('use_recaptcha')) {
 		// 	$config[] = array(
@@ -659,13 +668,15 @@ class Register extends CB_Controller
 				$insertdata['mem_address3'] = $this->input->post('mem_address3', null, '');
 				$insertdata['mem_address4'] = $this->input->post('mem_address4', null, '');
 			}
-			$insertdata['mem_receive_email'] = $this->input->post('mem_receive_email') ? 1 : 0;
+			// $insertdata['mem_receive_email'] = $this->input->post('mem_receive_email') ? 1 : 0;
+			$insertdata['mem_receive_email'] = 1;
 			if ($this->cbconfig->item('use_note')) {
-				$insertdata['mem_use_note'] = $this->input->post('mem_use_note') ? 1 : 0;
+				$insertdata['mem_use_note'] = 1;
 				$metadata['meta_use_note_datetime'] = cdate('Y-m-d H:i:s');
 			}
-			$insertdata['mem_receive_sms'] = $this->input->post('mem_receive_sms') ? 1 : 0;
-			$insertdata['mem_open_profile'] = $this->input->post('mem_open_profile') ? 1 : 0;
+			// $insertdata['mem_receive_sms'] = $this->input->post('mem_receive_sms') ? 1 : 0;
+			$insertdata['mem_receive_sms'] = 1;
+			$insertdata['mem_open_profile'] = 1;
 			$metadata['meta_open_profile_datetime'] = cdate('Y-m-d H:i:s');
 			$insertdata['mem_register_datetime'] = cdate('Y-m-d H:i:s');
 			$insertdata['mem_register_ip'] = $this->input->ip_address();
@@ -742,7 +753,7 @@ class Register extends CB_Controller
 				'mlh_from' => 0,
 				'mlh_to' => $mem_level,
 				'mlh_datetime' => cdate('Y-m-d H:i:s'),
-				'mlh_msg' => '회원가입',
+				'mlh_reason' => '회원가입',
 				'mlh_ip' => $this->input->ip_address(),
 			);
 			$this->load->model('Member_level_history_model');
@@ -1652,7 +1663,7 @@ class Register extends CB_Controller
 				'result' => 'error',
 				'msg' => '인증 횟수가 초과 되었습니다 한시간 이후 다시 시도해 주세요.',
 			);
-			// return $this->response($result, 200);
+			return $this->response($result, 200);
 
 		    
 		    
@@ -1784,4 +1795,68 @@ class Register extends CB_Controller
        return $this->response($result, 200);
        
 	}
+
+
+	public function _mem_smsmap_check($str)
+	{
+	   $this->load->library('form_validation');
+
+       $cfc_num = $str;
+
+       
+       
+       if(empty($cfc_num)) {
+           
+			$this->form_validation->set_message(
+				'_mem_smsmap_check',
+				'잘못된 인증 번호 입니다.'
+			);
+			return false;
+       }
+       
+       $this->load->library('form_validation');
+
+       $mem_phone = $this->form_validation->valid_mobile($this->input->post('mem_phone'));
+       
+       if(empty($mem_phone)) {
+
+           $this->form_validation->set_message(
+				'_mem_smsmap_check',
+				'잘못된 핸드폰 번호입니다.'
+			);
+           return false;
+       }
+
+       $this->load->model( 'Sms_send_history_model');
+
+       $timestamp = strtotime("-1 hours");
+
+       $sendwhere= array(
+           // 'post_id' => $this->input->post('post_id'),
+           'ssh_phone' => str_replace("-","",$mem_phone),
+           'ssh_success' => 1,
+           'ssh_datetime >=' => date("Y-m-d H:i:s", $timestamp),
+           'ssh_key' => $cfc_num,
+       );
+
+       $cnt = 0 ;
+       $cnt = $this->Sms_send_history_model->count_by($sendwhere);
+       
+       if($cnt < 1){
+
+           $this->form_validation->set_message(
+				'_mem_smsmap_check',
+				'인증 번호가 맞지 앖습니다. 다시 확인해 주세요 '
+			);
+           return false;
+       }
+
+       
+
+       
+       
+     	return true;  
+	}
+
+	
 }

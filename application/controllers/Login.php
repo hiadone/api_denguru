@@ -42,7 +42,7 @@ class Login extends CB_Controller
 		$this->load->event($eventname);
 
 		if ($this->member->is_member() !== false && ! ($this->member->is_admin() === 'super' && $this->uri->segment(1) === config_item('uri_segment_admin'))) {
-			alert_close('잘못된 접근입니다');
+			// alert_close('잘못된 접근입니다');
 		}
 
 		$view = array();
@@ -98,8 +98,10 @@ class Login extends CB_Controller
 
 			$view['msg'] = validation_errors();
 
-            $view['http_status_codes'] = 401;
-
+			if(validation_errors())
+            	$view['http_status_codes'] = 401;
+           	else
+           		$view['http_status_codes'] = 200;
             
             return $view;
 
@@ -245,6 +247,56 @@ class Login extends CB_Controller
 
 			// redirect($url_after_login);
 		}
+	}
+
+	public function login_get()
+	{
+		$view = array();
+		// $view['view'] = array();
+		
+		// 이벤트가 존재하면 실행합니다
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		$view = $this->_login();
+		
+		$view['view']['data'] = array(
+									'use_sociallogin_facebook' => $this->cbconfig->item('use_sociallogin_facebook') ? 1:0,
+									'use_sociallogin_kakao' => $this->cbconfig->item('use_sociallogin_kakao') ? 1:0,
+									'use_sociallogin_google' => $this->cbconfig->item('use_sociallogin_google') ? 1:0,
+									'use_sociallogin_naver' => $this->cbconfig->item('use_sociallogin_naver') ? 1:0,
+								);
+
+
+		
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_mypage');
+		$meta_description = $this->cbconfig->item('site_meta_description_mypage');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_mypage');
+		$meta_author = $this->cbconfig->item('site_meta_author_mypage');
+		$page_name = $this->cbconfig->item('site_page_name_mypage');
+
+		$layoutconfig = array(
+			'path' => 'mypage',
+			'layout' => 'layout',
+			'skin' => 'main',
+			'layout_dir' => $this->cbconfig->item('layout_mypage'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_mypage'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_mypage'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_mypage'),
+			'skin_dir' => $this->cbconfig->item('skin_mypage'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_mypage'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view['view'];
+
+		return $this->response($this->data, $view['http_status_codes']);
 	}
 
 	public function login_post()
