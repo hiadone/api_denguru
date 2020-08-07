@@ -259,7 +259,7 @@ class Login extends CB_Controller
 
 		$view = $this->_login();
 		
-		$view['view']['data'] = array(
+		$view['data'] = array(
 									'use_sociallogin_facebook' => $this->cbconfig->item('use_sociallogin_facebook') ? 1:0,
 									'use_sociallogin_kakao' => $this->cbconfig->item('use_sociallogin_kakao') ? 1:0,
 									'use_sociallogin_google' => $this->cbconfig->item('use_sociallogin_google') ? 1:0,
@@ -293,9 +293,10 @@ class Login extends CB_Controller
 			'meta_author' => $meta_author,
 			'page_name' => $page_name,
 		);
-		$view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view['view'];
-
+		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		$this->data = $view;
+		// @unset($this->data['http_status_codes']);
+		unset($this->data['http_status_codes']);
 		return $this->response($this->data, $view['http_status_codes']);
 	}
 
@@ -308,8 +309,11 @@ class Login extends CB_Controller
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$view = $this->_login();
+
+		$this->data = $view;
 		
-		return $this->response($view, $view['http_status_codes']);
+		unset($this->data['http_status_codes']);
+		return $this->response($this->data, $view['http_status_codes']);
 	}
 
 

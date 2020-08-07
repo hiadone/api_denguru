@@ -956,20 +956,35 @@ class Cmall_review extends CB_Controller
             // $view['view']['primary_key'] = $primary_key;
             
 
-            $view['msg'] = validation_errors().$file_error;
+            if(validation_errors().$file_error){
+                $view['msg'] = validation_errors().$file_error;
 
-            $view['view']['wishlist_url'] = base_url('cmall/wishlist');
-            $view['view']['itemlists_url'] = base_url('cmall/itemlists');
-            $view['view']['data']['review'] = $getdata;
-            $view['view']['data']['item'] = $item;
+                // $view['view']['wishlist_url'] = base_url('cmall/wishlist');
+                // $view['view']['itemlists_url'] = base_url('cmall/itemlists');
+                // $view['view']['data']['review'] = $getdata;
+                // $view['view']['data']['item'] = $item;
 
-            /**
-             * primary key 정보를 저장합니다
-             */
-            $view['view']['primary_key'] = $primary_key;
+                /**
+                 * primary key 정보를 저장합니다
+                 */
+                // $view['view']['primary_key'] = $primary_key;
 
-            $view['http_status_codes'] = parent::HTTP_OK;
+                $view['http_status_codes'] = 400;
+            }   else {
+                // $view['msg'] = validation_errors().$file_error;
 
+                $view['wishlist_url'] = base_url('cmall/wishlist');
+                $view['itemlists_url'] = base_url('cmall/itemlists');
+                $view['data']['review'] = $getdata;
+                $view['data']['item'] = $item;
+
+                /**
+                 * primary key 정보를 저장합니다
+                 */
+                $view['primary_key'] = $primary_key;
+
+                $view['http_status_codes'] = parent::HTTP_OK;
+            }
             
             return $view;
             // return $this->response($view['view'], parent::HTTP_OK);
@@ -1245,7 +1260,7 @@ class Cmall_review extends CB_Controller
         $this->data = $view;
         
         
-        return $this->response($view['view'], parent::HTTP_OK);
+        return $this->response($view, $view['http_status_codes']);
     }
 
     public function reviewwrite_post($cit_id = 0)
@@ -1270,7 +1285,7 @@ class Cmall_review extends CB_Controller
         $view = $this->_reviewwrite($cit_id);
 
 
-        return $this->response(array('msg' => $view['msg']), $view['http_status_codes']);
+        return $this->response($view, $view['http_status_codes']);
        
     }
 
