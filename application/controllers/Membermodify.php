@@ -114,7 +114,7 @@ class Membermodify extends CB_Controller
 					
 			
 			if(validation_errors())
-            	$view['http_status_codes'] = 401;
+            	$view['http_status_codes'] = 400;
             else 
             	$view['http_status_codes'] = 200;
             return $view;
@@ -654,7 +654,7 @@ class Membermodify extends CB_Controller
 
 			$view['view']['data']['mem_receive_email'] = $this->member->item('mem_receive_email');
 			$view['view']['data']['mem_receive_sms'] = $this->member->item('mem_receive_sms');
-            $view['http_status_codes'] = 401;
+            $view['http_status_codes'] = 400;
 
             
             return $view;
@@ -1349,7 +1349,7 @@ class Membermodify extends CB_Controller
 
 			$view['msg'] = validation_errors();
 
-			return $this->response(array('msg' => $view['msg']), 401);
+			return $this->response(array('msg' => $view['msg']), 400);
 
 		} else {
 
@@ -1641,9 +1641,9 @@ class Membermodify extends CB_Controller
 			
 			
 
-            $view['http_status_codes'] = 401;
+            $view['http_status_codes'] = 400;
 
-            return $this->response(array('msg' => $view['msg']), 401);
+            return $this->response(array('msg' => $view['msg']), 400);
             
 
 		} else {

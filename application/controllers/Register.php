@@ -612,7 +612,7 @@ class Register extends CB_Controller
 
 			$view['msg'] = $file_error . $file_error2.validation_errors();
 
-            $view['http_status_codes'] = 401;
+            $view['http_status_codes'] = 400;
 
             
             return $view;

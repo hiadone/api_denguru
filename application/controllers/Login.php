@@ -99,7 +99,7 @@ class Login extends CB_Controller
 			$view['msg'] = validation_errors();
 
 			if(validation_errors())
-            	$view['http_status_codes'] = 401;
+            	$view['http_status_codes'] = 400;
            	else
            		$view['http_status_codes'] = 200;
             
