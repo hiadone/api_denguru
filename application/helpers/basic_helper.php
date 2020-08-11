@@ -39,8 +39,8 @@ if ( ! function_exists('alert')) {
         log_message('error', 'msg:'.$msg .' pointer:'.current_url());
 
         $CI->output->set_content_type('application/json');
-        $response = [ 'msg' => $msg ,'status_code' => $status ,'pointer' => current_url()];
-        $CI->output->set_status_header(200);
+        $response = [ 'msg' => $msg  ,'pointer' => current_url()];
+        $CI->output->set_status_header($status);
         $CI->output->set_output(json_encode($response,JSON_UNESCAPED_UNICODE));
         $CI->output->_display();
         exit;
@@ -75,8 +75,8 @@ if ( ! function_exists('alert_close')) {
         $status = 403;
 
         $CI->output->set_content_type('application/json');
-        $response = [ 'msg' => $msg ,'status_code' => $status ,'pointer' => current_url()];
-        $CI->output->set_status_header(200);
+        $response = [ 'msg' => $msg  ,'pointer' => current_url()];
+        $CI->output->set_status_header($status);
         $CI->output->set_output(json_encode($response,JSON_UNESCAPED_UNICODE));
         $CI->output->_display();
         exit;
