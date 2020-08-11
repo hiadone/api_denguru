@@ -1522,5 +1522,98 @@ class Cmalllib extends CI_Controller
         
     }
 
-	
+	public function _itemlists($category_id = 0,$brd_id = 0,$swhere = array(),$chk_item_id = array())
+	{
+		
+
+		$view = array();
+		$view['view'] = array();
+
+		$this->CI->load->model(array('Board_model'));
+
+		$this->CI->load->library('denguruapi');
+		/**
+		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+		 */
+		$param =& $this->CI->querystring;
+		$cmalllibpage = (((int) $this->CI->input->get('cmalllibpage')) > 0) ? ((int) $this->CI->input->get('cmalllibpage')) : 1;
+
+		
+
+		$findex =  'cit_order asc';
+		
+		
+
+		$per_page = $this->CI->cbconfig->item('list_count') ? (int) $this->CI->cbconfig->item('list_count') : 20;
+		$offset = ($cmalllibpage - 1) * $per_page;
+
+		$this->CI->Board_model->allow_search_field = array('brd_name','cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
+		$this->CI->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
+
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array();
+		$where['cit_status'] = 1;
+		$where['brd_blind'] = 0;
+		// $field = array(
+		// 	'board' => array('brd_name'),
+		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+		// 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// );
+		
+		// $select = get_selected($field);
+
+		// $this->CI->Board_model->select = $select;
+
+		$item_ids = $chk_item_id;
+		if($item_ids && is_array($item_ids)){
+			$this->CI->Board_model->group_where_in('cit_id',$item_ids);
+			$per_page = 9999;
+			$offset = '';
+		}
+
+		if($brd_id){
+			$where['board.brd_id'] = $brd_id;
+			$per_page = 18;
+			$offset = '';
+		}
+		$result = $this->CI->Board_model
+			->get_item_list($per_page, $offset, $where, $category_id, $findex);
+		$list_num = $result['total_rows'] - ($cmalllibpage - 1) * $per_page;
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+
+				$result['list'][$key] = $this->CI->denguruapi->convert_cit_info($result['list'][$key]);
+				$result['list'][$key] = $this->CI->denguruapi->convert_brd_info($result['list'][$key]);
+				$result['list'][$key]['num'] = $list_num--;
+			}
+		}
+		$view['view'] = $result;
+		if($category_id){
+			$view['view']['category_nav'] = $this->get_nav_category($category_id);
+			$view['view']['category_all'] = $this->get_all_category();
+			$view['view']['category_id'] = $category_id;
+		}
+		/**
+		 * 페이지네이션을 생성합니다
+		 */
+		if(empty($brd_id)){
+			$config['base_url'] = site_url('cmall/itemlists/' . $category_id.'/' . $brd_id) . '?' . $param->replace('cmalllibpage');
+			$config['total_rows'] = $result['total_rows'];
+			$config['per_page'] = $per_page;
+			$this->CI->pagination->initialize($config);
+			// $view['view']['paging'] = $this->CI->pagination->create_links();
+			$view['view']['next_link'] = $this->CI->pagination->get_next_link();
+			$view['view']['cmalllibpage'] = $cmalllibpage;
+
+
+		}
+		
+
+		
+		
+		return $view['view'];
+		
+	}
 }

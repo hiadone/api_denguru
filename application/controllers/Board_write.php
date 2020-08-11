@@ -39,7 +39,7 @@ class Board_write extends CB_Controller
 	/**
 	 * 게시물 작성 페이지입니다
 	 */
-	public function write($brd_key = '')
+	public function write_post($brd_key = '')
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_board_write_write';
@@ -209,8 +209,7 @@ class Board_write extends CB_Controller
 	public function _write_common($board, $origin = '', $reply = '')
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_board_write_write_common';
-		$this->load->event($eventname);
+		
 
 		$param =& $this->querystring;
 
@@ -218,7 +217,7 @@ class Board_write extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('common_before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('common_before', $eventname);
 
 		$view['view']['post'] = array();
 
@@ -237,6 +236,7 @@ class Board_write extends CB_Controller
 
 		// 글 한개만 작성 가능
 		if (element('use_only_one_post', $board) && $is_admin === false) {
+
 			if ($this->member->is_member() === false) {
 				alert('비회원은 글을 작성할 수 있는 권한이 없습니다. 회원이사라면 로그인 후 이용해주세요');
 			}
@@ -261,11 +261,7 @@ class Board_write extends CB_Controller
 			}
 		}
 
-		if ($this->session->userdata('lastest_post_time') && $this->cbconfig->item('new_post_second')) {
-			if ($this->session->userdata('lastest_post_time') >= ( ctimestamp() - $this->cbconfig->item('new_post_second')) && $is_admin === false) {
-				alert('너무 빠른 시간내에 게시물을 연속해서 올릴 수 없습니다.\\n\\n' . ($this->cbconfig->item('new_post_second') - (ctimestamp() - $this->session->userdata('lastest_post_time'))) . '초 후 글쓰기가 가능합니다');
-			}
-		}
+		
 
 		if (element('use_point', $board)
 			&& $this->cbconfig->item('block_write_zeropoint')
@@ -276,7 +272,7 @@ class Board_write extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['step1'] = Events::trigger('common_step1', $eventname);
+		// $view['view']['event']['step1'] = Events::trigger('common_step1', $eventname);
 
 		$view['view']['post']['is_post_name'] = $is_post_name
 			= ($this->member->is_member() === false) ? true : false;
@@ -312,105 +308,128 @@ class Board_write extends CB_Controller
 		/**
 		 * 전송된 데이터의 유효성을 체크합니다
 		 */
-		$config = array(
-			array(
-				'field' => 'post_title',
-				'label' => '제목',
-				'rules' => 'trim|required',
-			),
-			array(
-				'field' => 'post_content',
-				'label' => '내용',
-				'rules' => 'trim|required',
-			),
-		);
-		if ($form && is_array($form)) {
-			foreach ($form as $key => $value) {
-				if ( ! element('use', $value)) {
-					continue;
-				}
-				$required = element('required', $value) ? '|required' : '';
-				if (element('field_type', $value) === 'checkbox') {
-					$config[] = array(
-						'field' => element('field_name', $value) . '[]',
-						'label' => element('display_name', $value),
-						'rules' => 'trim' . $required,
-					);
-				} else {
-					$config[] = array(
-						'field' => element('field_name', $value),
-						'label' => element('display_name', $value),
-						'rules' => 'trim' . $required,
-					);
+		
+		if(element('brd_key', $board) === 'b-a-9998'){
+			$config = array(
+				array(
+					'field' => 'post_title',
+					'label' => '회사명',
+					'rules' => 'trim|required',
+				),
+				array(
+					'field' => 'post_content',
+					'label' => '내용',
+					'rules' => 'trim|required',
+				),
+			);
+
+			
+			if ($form && is_array($form)) {
+				foreach ($form as $key => $value) {
+					if ( ! element('use', $value)) {
+						continue;
+					}
+					$required = element('required', $value) ? '|required' : '';
+					if (element('field_type', $value) === 'checkbox') {
+						$config[] = array(
+							'field' => element('field_name', $value) . '[]',
+							'label' => element('display_name', $value),
+							'rules' => 'trim' . $required,
+						);
+					} else {
+						$config[] = array(
+							'field' => element('field_name', $value),
+							'label' => element('display_name', $value),
+							'rules' => 'trim' . $required,
+						);
+					}
 				}
 			}
-		}
 
-		if ($is_post_name) {
-			$config[] = array(
-				'field' => 'post_nickname',
-				'label' => '닉네임',
-				'rules' => 'trim|required|min_length[2]|max_length[20]|callback__mem_nickname_check',
-			);
-			$config[] = array(
-				'field' => 'post_email',
-				'label' => '이메일',
-				'rules' => 'trim|required|valid_email|max_length[50]|callback__mem_email_check',
-			);
-			$config[] = array(
-				'field' => 'post_homepage',
-				'label' => '홈페이지',
-				'rules' => 'prep_url|valid_url',
-			);
-		}
-		if ($this->member->is_member() === false) {
-			$password_length = $this->cbconfig->item('password_length');
-			$config[] = array(
-				'field' => 'post_password',
-				'label' => '패스워드',
-				'rules' => 'trim|required|min_length[' . $password_length . ']|callback__mem_password_check',
-			);
-		}
+			
 
-		if ( check_use_captcha($this->member, $board) ) {
-			if ($this->cbconfig->item('use_recaptcha')) {
+		} else {
+			$config = array(
+				array(
+					'field' => 'post_title',
+					'label' => '제목',
+					'rules' => 'trim|required',
+				),
+				array(
+					'field' => 'post_content',
+					'label' => '내용',
+					'rules' => 'trim|required',
+				),
+			);
+			if ($form && is_array($form)) {
+				foreach ($form as $key => $value) {
+					if ( ! element('use', $value)) {
+						continue;
+					}
+					$required = element('required', $value) ? '|required' : '';
+					if (element('field_type', $value) === 'checkbox') {
+						$config[] = array(
+							'field' => element('field_name', $value) . '[]',
+							'label' => element('display_name', $value),
+							'rules' => 'trim' . $required,
+						);
+					} else {
+						$config[] = array(
+							'field' => element('field_name', $value),
+							'label' => element('display_name', $value),
+							'rules' => 'trim' . $required,
+						);
+					}
+				}
+			}
+
+			if ($is_post_name) {
+				// $config[] = array(
+				// 	'field' => 'post_nickname',
+				// 	'label' => '닉네임',
+				// 	'rules' => 'trim|required|min_length[2]|max_length[20]|callback__mem_nickname_check',
+				// );
+			
+
 				$config[] = array(
-					'field' => 'g-recaptcha-response',
-					'label' => '자동등록방지문자',
-					'rules' => 'trim|required|callback__check_recaptcha',
+					'field' => 'post_email',
+					'label' => '이메일',
+					'rules' => 'trim|required|valid_email|max_length[50]|callback__mem_email_check',
 				);
-			} else {
-				$config[] = array(
-					'field' => 'captcha_key',
-					'label' => '자동등록방지문자',
-					'rules' => 'trim|required|callback__check_captcha',
-				);
+
+
+				
+
+				
 			}
 		}
-		if ($use_subj_style) {
-			$config[] = array(
-				'field' => 'post_title_color',
-				'label' => '제목색상',
-				'rules' => 'trim|exact_length[7]',
-			);
-			$config[] = array(
-				'field' => 'post_title_font',
-				'label' => '제목폰트',
-				'rules' => 'trim',
-			);
-			$config[] = array(
-				'field' => 'post_title_bold',
-				'label' => '제목볼드',
-				'rules' => 'trim|exact_length[1]',
-			);
-		}
-		if (element('use_category', $board) && $is_admin === false) {
-			$config[] = array(
-				'field' => 'post_category',
-				'label' => '카테고리',
-				'rules' => 'trim|required',
-			);
-		}
+		
+
+		// if ($this->member->is_member() === false) {
+		// 	$password_length = $this->cbconfig->item('password_length');
+		// 	$config[] = array(
+		// 		'field' => 'post_password',
+		// 		'label' => '패스워드',
+		// 		'rules' => 'trim|required|min_length[' . $password_length . ']|callback__mem_password_check',
+		// 	);
+		// }
+
+		// if ( check_use_captcha($this->member, $board) ) {
+		// 	if ($this->cbconfig->item('use_recaptcha')) {
+		// 		$config[] = array(
+		// 			'field' => 'g-recaptcha-response',
+		// 			'label' => '자동등록방지문자',
+		// 			'rules' => 'trim|required|callback__check_recaptcha',
+		// 		);
+		// 	} else {
+		// 		$config[] = array(
+		// 			'field' => 'captcha_key',
+		// 			'label' => '자동등록방지문자',
+		// 			'rules' => 'trim|required|callback__check_captcha',
+		// 		);
+		// 	}
+		// }
+		
 		$this->form_validation->set_rules($config);
 		$form_validation = $this->form_validation->run();
 
@@ -530,7 +549,7 @@ class Board_write extends CB_Controller
 			: element('footer_content', $board);
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['step2'] = Events::trigger('common_step2', $eventname);
+		// $view['view']['event']['step2'] = Events::trigger('common_step2', $eventname);
 
 		if ($use_upload === true && $form_validation && element('use_upload_file', $board)) {
 
@@ -582,6 +601,7 @@ class Board_write extends CB_Controller
 						$_FILES['userfile']['tmp_name'] = $_FILES['post_file']['tmp_name'][$i];
 						$_FILES['userfile']['error'] = $_FILES['post_file']['error'][$i];
 						$_FILES['userfile']['size'] = $_FILES['post_file']['size'][$i];
+
 						if ($this->upload->do_upload()) {
 							$filedata = $this->upload->data();
 
@@ -609,165 +629,26 @@ class Board_write extends CB_Controller
 		 */
 		if ($form_validation === false OR $file_error) {
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formrunfalse'] = Events::trigger('common_formrunfalse', $eventname);
 
-			if ($file_error) {
-				$view['view']['message'] = $file_error;
+
+			if ($file_error.validation_errors()) {
+				$view['view']['msg'] = $file_error.validation_errors();
+
+				return $this->response(array('msg' =>$view['view']['msg']),400);
+			} else {
+				return $this->response($view['view'],200);
 			}
 
-			/**
-			 * primary key 정보를 저장합니다
-			 */
-			$view['view']['primary_key'] = $primary_key;
+			
+			
+			
+			
 
-			$extra_content = array();
+			
 
-			$k= 0;
-			if ($form && is_array($form)) {
-				foreach ($form as $key => $value) {
-					if ( ! element('use', $value)) {
-						continue;
-					}
-					$required = element('required', $value) ? 'required' : '';
+			
 
-					$extra_content[$k]['field_name'] = element('field_name', $value);
-					$extra_content[$k]['display_name'] = element('display_name', $value);
-					$extra_content[$k]['input'] = '';
-
-					//field_type : text, url, email, phone, textarea, radio, select, checkbox, date
-					if (element('field_type', $value) === 'text'
-						OR element('field_type', $value) === 'url'
-						OR element('field_type', $value) === 'email'
-						OR element('field_type', $value) === 'phone'
-						OR element('field_type', $value) === 'date') {
-
-						if (element('field_type', $value) === 'date') {
-							$extra_content[$k]['input'] .= '<input type="text" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input datepicker" value="' . set_value(element('field_name', $value)) . '" readonly="readonly" ' . $required . ' />';
-						} elseif (element('field_type', $value) === 'phone') {
-							$extra_content[$k]['input'] .= '<input type="text" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input validphone" value="' . set_value(element('field_name', $value)) . '" ' . $required . ' />';
-						} else {
-							$extra_content[$k]['input'] .= '<input type="' . element('field_type', $value) . '" id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" value="' . set_value(element('field_name', $value)) . '" ' . $required . '/>';
-						}
-					} elseif (element('field_type', $value) === 'textarea') {
-							$extra_content[$k]['input'] .= '<textarea id="' . element('field_name', $value) . '" name="' . element('field_name', $value) . '" class="form-control input" ' . $required . '>' . set_value(element('field_name', $value)) . '</textarea>';
-					} elseif (element('field_type', $value) === 'radio') {
-						$extra_content[$k]['input'] .= '<div class="checkbox">';
-						$options = explode("\n", element('options', $value));
-						$i =1;
-						if ($options) {
-							foreach ($options as $okey => $oval) {
-								$radiovalue = $oval;
-								$extra_content[$k]['input'] .= '<label for="' . element('field_name', $value) . '_' . $i . '"><input type="radio" name="' . element('field_name', $value) . '" id="' . element('field_name', $value) . '_' . $i . '" value="' . $radiovalue . '" ' . set_radio(element('field_name', $value), $radiovalue) . ' /> ' . $oval . ' </label> ';
-								$i++;
-							}
-						}
-						$extra_content[$k]['input'] .= '</div>';
-					} elseif (element('field_type', $value) === 'checkbox') {
-							$extra_content[$k]['input'] .= '<div class="checkbox">';
-							$options = explode("\n", element('options', $value));
-							$i =1;
-							if ($options) {
-								foreach ($options as $okey => $oval) {
-									$extra_content[$k]['input'] .= '<label for="' . element('field_name', $value) . '_' . $i . '"><input type="checkbox" name="' . element('field_name', $value) . '[]" id="' . element('field_name', $value) . '_' . $i . '" value="' . $oval . '" ' . set_checkbox(element('field_name', $value), $oval) . ' /> ' . $oval . ' </label> ';
-									$i++;
-								}
-							}
-							$extra_content[$k]['input'] .= '</div>';
-					} elseif (element('field_type', $value) === 'select') {
-							$extra_content[$k]['input'] .= '<div class="input-group">';
-							$extra_content[$k]['input'] .= '<select name="' . element('field_name', $value) . '" class="form-control input" ' . $required . '>';
-							$extra_content[$k]['input'] .= '<option value="" >선택하세요</option> ';
-							$options = explode("\n", element('options', $value));
-							if ($options) {
-								foreach ($options as $okey => $oval) {
-									$extra_content[$k]['input'] .= '<option value="' . $oval . '" ' . set_select(element('field_name', $value), $oval) . ' >' . $oval . '</option> ';
-								}
-							}
-							$extra_content[$k]['input'] .= '</select>';
-							$extra_content[$k]['input'] .= '</div>';
-					}
-					$k++;
-				}
-			}
-
-			$view['view']['extra_content'] = $extra_content;
-
-			if (element('use_category', $board)) {
-				$this->load->model('Board_category_model');
-				$view['view']['category']
-					= $this->Board_category_model
-					->get_all_category(element('brd_id', $board));
-			}
-
-			$view['view']['has_tempsave'] = false;
-			if ($this->member->is_member() && element('use_tempsave', $board)) {
-				$this->load->model('Tempsave_model');
-				$twhere = array(
-					'brd_id' => element('brd_id', $board),
-					'mem_id' => $mem_id,
-				);
-				$tempsave = $this->Tempsave_model
-					->get_one('', '', $twhere);
-
-				if (element('tmp_id', $tempsave)) {
-					$view['view']['has_tempsave'] = true;
-				}
-			}
-
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['before_layout'] = Events::trigger('common_before_layout', $eventname);
-
-			/**
-			 * 레이아웃을 정의합니다
-			 */
-			$page_title = $this->cbconfig->item('site_meta_title_board_write');
-			$meta_description = $this->cbconfig->item('site_meta_description_board_write');
-			$meta_keywords = $this->cbconfig->item('site_meta_keywords_board_write');
-			$meta_author = $this->cbconfig->item('site_meta_author_board_write');
-			$page_name = $this->cbconfig->item('site_page_name_board_write');
-
-			$searchconfig = array(
-				'{게시판명}',
-				'{게시판아이디}',
-			);
-			$replaceconfig = array(
-				element('board_name', $board),
-				element('brd_key', $board),
-			);
-
-			$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
-			$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
-			$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
-			$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
-			$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
-
-			$layout_dir = element('board_layout', $board) ? element('board_layout', $board) : $this->cbconfig->item('layout_board');
-			$mobile_layout_dir = element('board_mobile_layout', $board) ? element('board_mobile_layout', $board) : $this->cbconfig->item('mobile_layout_board');
-			$use_sidebar = element('board_sidebar', $board) ? element('board_sidebar', $board) : $this->cbconfig->item('sidebar_board');
-			$use_mobile_sidebar = element('board_mobile_sidebar', $board) ? element('board_mobile_sidebar', $board) : $this->cbconfig->item('mobile_sidebar_board');
-			$skin_dir = element('board_skin', $board) ? element('board_skin', $board) : $this->cbconfig->item('skin_board');
-			$mobile_skin_dir = element('board_mobile_skin', $board) ? element('board_mobile_skin', $board) : $this->cbconfig->item('mobile_skin_board');
-			$layoutconfig = array(
-				'path' => 'board',
-				'layout' => 'layout',
-				'skin' => 'write',
-				'layout_dir' => $layout_dir,
-				'mobile_layout_dir' => $mobile_layout_dir,
-				'use_sidebar' => $use_sidebar,
-				'use_mobile_sidebar' => $use_mobile_sidebar,
-				'skin_dir' => $skin_dir,
-				'mobile_skin_dir' => $mobile_skin_dir,
-				'page_title' => $page_title,
-				'meta_description' => $meta_description,
-				'meta_keywords' => $meta_keywords,
-				'meta_author' => $meta_author,
-				'page_name' => $page_name,
-			);
-			$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-			$this->data = $view;
-			$this->layout = element('layout_skin_file', element('layout', $view));
-			$this->view = element('view_skin_file', element('layout', $view));
+			
 
 		} else {
 
@@ -777,7 +658,7 @@ class Board_write extends CB_Controller
 			 */
 
 			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formruntrue'] = Events::trigger('common_formruntrue', $eventname);
+			// $view['view']['event']['formruntrue'] = Events::trigger('common_formruntrue', $eventname);
 
 			$content_type = $use_dhtml ? 1 : 0;
 
@@ -827,17 +708,18 @@ class Board_write extends CB_Controller
 			}
 
 			if ($is_post_name) {
-				$updatedata['post_nickname'] = $this->input->post('post_nickname', null, '');
+				$updatedata['post_userid'] = '';
+				$updatedata['post_nickname'] = '';
 				$updatedata['post_email'] = $this->input->post('post_email', null, '');
 				$updatedata['post_homepage'] = $this->input->post('post_homepage', null, '');
 			}
 
-			if ($this->member->is_member() === false && $this->input->post('post_password')) {
-				if ( ! function_exists('password_hash')) {
-					$this->load->helper('password');
-				}
-				$updatedata['post_password'] = password_hash($this->input->post('post_password'), PASSWORD_BCRYPT);
-			}
+			// if ($this->member->is_member() === false && $this->input->post('post_password')) {
+			// 	if ( ! function_exists('password_hash')) {
+			// 		$this->load->helper('password');
+			// 	}
+			// 	$updatedata['post_password'] = password_hash($this->input->post('post_password'), PASSWORD_BCRYPT);
+			// }
 
 			if ($can_post_notice) {
 				$updatedata['post_notice'] = $this->input->post('post_notice', null, 0);
@@ -1206,6 +1088,7 @@ class Board_write extends CB_Controller
 				board_url(element('brd_key', $board)),
 			);
 			if ($emailsendlistadmin) {
+				
 				$title = str_replace(
 					$searchconfig,
 					$replaceconfig,
@@ -1217,6 +1100,7 @@ class Board_write extends CB_Controller
 					$this->cbconfig->item('send_email_post_admin_content')
 				);
 				foreach ($emailsendlistadmin as $akey => $aval) {
+
 					$this->email->clear(true);
 					$this->email->from($this->cbconfig->item('webmaster_email'), $this->cbconfig->item('webmaster_name'));
 					$this->email->to(element('mem_email', $aval));
@@ -1239,6 +1123,8 @@ class Board_write extends CB_Controller
 				$this->email->clear(true);
 				$this->email->from($this->cbconfig->item('webmaster_email'), $this->cbconfig->item('webmaster_name'));
 				$this->email->to(element('mem_email', $emailsendlistpostwriter));
+				// $this->email->from(element('mem_email', $emailsendlistpostwriter),element('post_nickname',$updatedata,'비회원'));
+				// $this->email->to($this->cbconfig->item('webmaster_email'));
 				$this->email->subject($title);
 				$this->email->message($content);
 				$this->email->send();
@@ -1333,23 +1219,7 @@ class Board_write extends CB_Controller
 				}
 			}
 
-			$this->session->set_flashdata(
-				'message',
-				'게시물이 정상적으로 입력되었습니다'
-			);
-			$this->session->set_userdata(
-				'lastest_post_time',
-				ctimestamp()
-			);
-
-			// 이벤트가 존재하면 실행합니다
-			Events::trigger('common_after', $eventname);
-
-			/**
-			 * 게시물의 신규입력 또는 수정작업이 끝난 후 뷰 페이지로 이동합니다
-			 */
-			$redirecturl = post_url(element('brd_key', $board), $post_id);
-			// redirect($redirecturl);
+			return $this->response(array('msg' => '정상적으로 작성되었습니다.'), parent::HTTP_OK);
 		}
 	}
 
@@ -1696,11 +1566,11 @@ class Board_write extends CB_Controller
 		}
 
 		if ($is_post_name) {
-			$config[] = array(
-				'field' => 'post_nickname',
-				'label' => '닉네임',
-				'rules' => 'trim|required|min_length[2]|max_length[20]|callback__mem_nickname_check',
-			);
+			// $config[] = array(
+			// 	'field' => 'post_nickname',
+			// 	'label' => '닉네임',
+			// 	'rules' => 'trim|required|min_length[2]|max_length[20]|callback__mem_nickname_check',
+			// );
 			$config[] = array(
 				'field' => 'post_email',
 				'label' => '이메일',
@@ -1714,24 +1584,24 @@ class Board_write extends CB_Controller
 		}
 		if ($this->member->is_member() === false) {
 			$password_length = $this->cbconfig->item('password_length');
-			$config[] = array(
-				'field' => 'post_password',
-				'label' => '패스워드',
-				'rules' => 'trim|required|min_length[' . $password_length . ']|callback__mem_password_check',
-			);
-			if ($this->cbconfig->item('use_recaptcha')) {
-				$config[] = array(
-					'field' => 'g-recaptcha-response',
-					'label' => '자동등록방지문자',
-					'rules' => 'trim|required|callback__check_recaptcha',
-				);
-			} else {
-				$config[] = array(
-					'field' => 'captcha_key',
-					'label' => '자동등록방지문자',
-					'rules' => 'trim|required|callback__check_captcha',
-				);
-			}
+			// $config[] = array(
+			// 	'field' => 'post_password',
+			// 	'label' => '패스워드',
+			// 	'rules' => 'trim|required|min_length[' . $password_length . ']|callback__mem_password_check',
+			// );
+			// if ($this->cbconfig->item('use_recaptcha')) {
+			// 	$config[] = array(
+			// 		'field' => 'g-recaptcha-response',
+			// 		'label' => '자동등록방지문자',
+			// 		'rules' => 'trim|required|callback__check_recaptcha',
+			// 	);
+			// } else {
+			// 	$config[] = array(
+			// 		'field' => 'captcha_key',
+			// 		'label' => '자동등록방지문자',
+			// 		'rules' => 'trim|required|callback__check_captcha',
+			// 	);
+			// }
 		}
 		if ($use_subject_style) {
 			$config[] = array(
@@ -2534,17 +2404,27 @@ class Board_write extends CB_Controller
 	 * 게시물 작성시 비회원이 작성한 경우 이메일체크합니다
 	 */
 	public function _mem_email_check($str)
-	{
-		list($emailid, $emaildomain) = explode('@', $str);
-		$denied_list = explode(',', $this->cbconfig->item('denied_email_list'));
-		$emaildomain = trim($emaildomain);
-		$denied_list = array_map('trim', $denied_list);
-		if (in_array($emaildomain, $denied_list)) {
+	{	
+
+		$this->load->library('form_validation');
+		if($this->form_validation->valid_email($str)){
+			list($emailid, $emaildomain) = explode('@', $str);
+			$denied_list = explode(',', $this->cbconfig->item('denied_email_list'));
+			$emaildomain = trim($emaildomain);
+			$denied_list = array_map('trim', $denied_list);
+			if (in_array($emaildomain, $denied_list)) {
+				$this->form_validation->set_message(
+					'_mem_email_check',
+					$emaildomain . ' 은(는) 사용하실 수 없는 이메일입니다'
+				);
+				return false;
+			}
+		} else {
 			$this->form_validation->set_message(
 				'_mem_email_check',
-				$emaildomain . ' 은(는) 사용하실 수 없는 이메일입니다'
+				$str . ' 은(는) 이메일 형식에 맞지 않습니다.'
 			);
-			return false;
+			return true;
 		}
 		return true;
 	}

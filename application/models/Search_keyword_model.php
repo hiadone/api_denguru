@@ -46,6 +46,7 @@ class Search_keyword_model extends CB_Model
 		$this->db->where('left(sek_datetime, 10) >=', $start_date);
 		$this->db->where('left(sek_datetime, 10) <=', $end_date);
 		$this->db->select('sek_keyword');
+		$this->db->limit(20);
 		$qry = $this->db->get($this->_table);
 		$result = $qry->result_array();
 

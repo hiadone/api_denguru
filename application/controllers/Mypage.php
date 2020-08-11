@@ -2568,5 +2568,52 @@ class Mypage extends CB_Controller
 
         return true;
     }
+
+    public function setup_get()
+    {   
+    	
+    	/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+    	$view = array();
+    	$view['data']['mem_receive_email'] = $this->member->item('mem_receive_email');
+    	$view['data']['mem_receive_sms'] = $this->member->item('mem_receive_sms');
+
+        return $this->response($view,200);
+    }
+
+    public function setup_post($mem_receive_type,$flag=0)
+    {   
+    	
+    	/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+
+		$mem_id = (int) $this->member->item('mem_id');
+		$view = array();
+		if($mem_receive_type === 'mem_receive_email'){
+
+			$updatedata['mem_receive_email'] = $flag;			
+
+			$this->Member_model->update($mem_id, $updatedata);
+
+		    return $this->response(array('msg' => '정상적으로 처리 되었습니다'),201);
+
+        	
+        } elseif($mem_receive_type === 'mem_receive_sms'){
+        		$updatedata['mem_receive_sms'] = $flag;			
+
+        		$this->Member_model->update($mem_id, $updatedata);
+
+        	    return $this->response(array('msg' => '정상적으로 처리 되었습니다'),201);
+      	} else{
+      		alert('잘못된 접근입니다.',"",403);
+      	}
+    	
+    	alert('잘못된 접근입니다.',"",403);
+    }
 }
 

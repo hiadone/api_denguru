@@ -218,4 +218,20 @@ class Event_model extends CB_Model
         }
         return $result;
     }
+
+    public function get_event($eve_id = 0)
+    {
+        $eve_id = (int) $eve_id;
+        if (empty($eve_id) OR $eve_id < 1) {
+            return;
+        }
+
+        $this->db->select('event_rel.*');
+        $this->db->join('event_rel', 'event.eve_id = event_rel.eve_id', 'inner');
+        $this->db->where(array('event_rel.eve_id' => $eve_id));
+        $qry = $this->db->get($this->_table);
+        $result = $qry->result_array();
+
+        return $result;
+    }
 }

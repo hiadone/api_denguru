@@ -34,7 +34,7 @@ class Event extends CB_Controller
     /**
      * 헬퍼를 로딩합니다
      */
-    protected $helpers = array('form', 'array', 'dhtml_editor');
+    protected $helpers = array('form', 'array', 'dhtml_editor','cmall');
 
     function __construct()
     {
@@ -52,14 +52,13 @@ class Event extends CB_Controller
     public function _lists()
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_admin_page_event_lists';
-        $this->load->event($eventname);
+        
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
@@ -172,14 +171,14 @@ class Event extends CB_Controller
     public function lists_get()
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_admin_page_event_lists';
-        $this->load->event($eventname);
+        // $eventname = 'event_admin_page_event_lists';
+        // $this->load->event($eventname);
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        // $view['view']['event']['before'] = Events::trigger('before', $eventname);
         $view['view'] = $this->_lists();
 
         /**
@@ -234,14 +233,14 @@ class Event extends CB_Controller
     public function _post($pid = 0)
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_event_post';
-        $this->load->event($eventname);
+        // $eventname = 'event_event_post';
+        // $this->load->event($eventname);
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
         /**
          * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
@@ -277,7 +276,7 @@ class Event extends CB_Controller
     
 
             // 이벤트가 존재하면 실행합니다
-            $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+            // $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
 
             if ($pid) {
                 if (empty($getdata['eve_start_date']) OR $getdata['eve_start_date'] === '0000-00-00') {
@@ -297,7 +296,7 @@ class Event extends CB_Controller
             $view['view']['primary_key'] = $primary_key;
 
             // 이벤트가 존재하면 실행합니다
-            $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+            // $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
             $view['view']['list_url'] = base_url('/event/lists');
             
@@ -314,8 +313,23 @@ class Event extends CB_Controller
              $view['view']['data']['image_url'] = cdn_url(config_item('uploads_dir') . '/event/' . element('eve_image', $getdata));
                         
                     
+            $event_rel = $this->{$this->modelname}->get_event($pid);
             
+            if($event_rel){
+                $eveval_id =array();
+                foreach($event_rel as $eveval){
+                    array_push($eveval_id,element('cit_id',$eveval));
+                }
+
+                if(!empty($eveval_id)){
+
+                    $this->load->library('cmalllib');
+
+                    $view['view']['data']['itemlists'] = $this->cmalllib->_itemlists('','','',$eveval_id);
+                }
+            }
             
+
             
             $view['view']['next_post'] = '';
             $view['view']['prev_post'] = '';
@@ -373,14 +387,14 @@ class Event extends CB_Controller
     public function post_get($pid = 0)
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_event_post';
-        $this->load->event($eventname);
+        // $eventname = 'event_event_post';
+        // $this->load->event($eventname);
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
         $view['view'] = $this->_post($pid);
         /**
