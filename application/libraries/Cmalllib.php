@@ -1522,7 +1522,7 @@ class Cmalllib extends CI_Controller
         
     }
 
-	public function _itemlists($category_id = 0,$brd_id = 0,$swhere = array(),$chk_item_id = array())
+	public function _itemlists($category_id = 0,$brd_id = 0,$swhere = array(),$config = array())
 	{
 		
 
@@ -1566,17 +1566,32 @@ class Cmalllib extends CI_Controller
 
 		// $this->CI->Board_model->select = $select;
 
-		$item_ids = $chk_item_id;
-		if($item_ids && is_array($item_ids)){
-			$this->CI->Board_model->group_where_in('cit_id',$item_ids);
-			$per_page = 9999;
-			$offset = '';
-		}
+		// $item_ids = $chk_item_id;
+		// if($item_ids && is_array($item_ids)){
+		// 	$this->CI->Board_model->set_where_in('cit_id',$item_ids);
+		// 	$per_page = 9999;
+		// 	$offset = '';
+		// }
 
 		if($brd_id){
 			$where['board.brd_id'] = $brd_id;
 			$per_page = 18;
 			$offset = '';
+		}
+		if(element('per_page', $config)){
+			$per_page = element('per_page', $config);
+			$offset = ($page - 1) * $per_page;	
+		}
+		
+		if($swhere && is_array($swhere)){
+			foreach($swhere as $skey => $sval){
+				if(!empty($sval)){
+					if(is_array($sval) )
+						$this->CI->Board_model->set_where_in($skey,$sval);
+					else
+						$where[$skey] = $sval;
+				}
+			}
 		}
 		$result = $this->CI->Board_model
 			->get_item_list($per_page, $offset, $where, $category_id, $findex);

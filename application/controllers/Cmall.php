@@ -510,7 +510,7 @@ class Cmall extends CB_Controller
 			foreach($swhere as $skey => $sval){
 				if(!empty($sval)){
 					if(is_array($sval) )
-						$this->Board_model->where_in = array($skey =>$sval);
+						$this->Board_model->set_where_in($skey,$sval);
 					else
 						$where[$skey] = $sval;
 				}
@@ -2658,7 +2658,7 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
-		$this->load->model(array('Board_model','Cmall_item_model','Pet_attr_model','Cmall_kind_model'));
+		$this->load->model(array('Board_model','Cmall_item_model','Pet_attr_model','Cmall_kind_model','Theme_model'));
 
 
 
@@ -2729,22 +2729,30 @@ class Cmall extends CB_Controller
 		}
 		$view['view']['data']['rank']['list'] = $result;
 
-		$result = $this->Board_model->get_board_list($where,'brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,cit_updated_datetime',10);
+		$result = $this->Theme_model->get_theme();
+		$result_= array();
 		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
 		if ($result) {
 			foreach ($result as $key => $val) {
 
-				$result[$key] = $this->denguruapi->convert_brd_info($result[$key]);
-				$result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
+				$result_[element('the_id',$val)]['the_title'] = element('the_title',$val);
+				$result_[element('the_id',$val)]['brd_list'][] = $this->denguruapi->get_brd_info(element('brd_id', $val) );
+
+				
+				// $result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
 
 				
 				// $result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
 				
-				$result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
+				// $result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
 				
 			}
+
+			$view['view']['data']['theme']['list'] = $result_[array_key_first($result_)];
 		}
-		$view['view']['data']['theme']['list'] = $result;
+		
+
+		
 
 		$pet_attr = $this->Pet_attr_model->get_all_attr();
 

@@ -325,7 +325,7 @@ class Event extends CB_Controller
 
                     $this->load->library('cmalllib');
 
-                    $view['view']['data']['itemlists'] = $this->cmalllib->_itemlists('','','',$eveval_id);
+                    $view['view']['data']['itemlists'] = $this->cmalllib->_itemlists('','',array('cit_id' =>$eveval_id));
                 }
             }
             

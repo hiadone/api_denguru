@@ -52,14 +52,13 @@ class Notice extends CB_Controller
     public function _lists()
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_admin_page_notice_lists';
-        $this->load->event($eventname);
+        
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        
 
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
@@ -149,14 +148,13 @@ class Notice extends CB_Controller
     public function lists_get()
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_admin_page_notice_lists';
-        $this->load->event($eventname);
+        
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        
         $view['view'] = $this->_lists();
 
 
@@ -318,14 +316,13 @@ class Notice extends CB_Controller
     public function post_get($pid = 0)
     {
         // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_notice_post';
-        $this->load->event($eventname);
+        
 
         $view = array();
         $view['view'] = array();
 
         // 이벤트가 존재하면 실행합니다
-        $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        
         $view['view'] = $this->_post($pid);
         
             
