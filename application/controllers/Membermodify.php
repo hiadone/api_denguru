@@ -415,13 +415,13 @@ class Membermodify extends CB_Controller
 
 		$config = array();
 
-		$config = array(
-			array(
-				'field' => 'cur_password',
-				'label' => '현재패스워드',
-				'rules' => 'trim|required|callback__cur_password_check',
-			),						
-		);
+		// $config = array(
+		// 	array(
+		// 		'field' => 'cur_password',
+		// 		'label' => '현재패스워드',
+		// 		'rules' => 'trim|required|callback__cur_password_check',
+		// 	),						
+		// );
 
 		if($this->input->post('new_password') || $this->input->post('new_password_re')){
 

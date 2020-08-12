@@ -46,8 +46,8 @@ class Notification extends CB_Controller
 	protected function _index()
 	{	
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_index';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_index';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -60,7 +60,7 @@ class Notification extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		// 2개월 이상된 알림은 하루에 한번씩 체크해서 삭제합니다.
 		$cachename = 'delete_old_notifications_cache';
@@ -128,14 +128,14 @@ class Notification extends CB_Controller
 	public function index_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_index';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_index';
+		// $this->load->event($eventname);
 
 		$view = array();
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$view['view'] = $this->_index();	
 
@@ -214,14 +214,14 @@ class Notification extends CB_Controller
 	public function read_get($not_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_read';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_read';
+		// $this->load->event($eventname);
 
 		$view['view'] = array();
 
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 		$view['view'] = $this->_read($not_id);
 
 		return $this->response($view['view'], 201);
@@ -235,13 +235,13 @@ class Notification extends CB_Controller
 	public function readajax($not_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_readajax';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_readajax';
+		// $this->load->event($eventname);
 
 		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -274,7 +274,7 @@ class Notification extends CB_Controller
 		$this->Notification_model->mark_read($not_id, $mem_id);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$result = array('success' => '읽음으로 처리하였습니다');
 
@@ -288,13 +288,13 @@ class Notification extends CB_Controller
 	public function readallajax()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_readallajax';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_readallajax';
+		// $this->load->event($eventname);
 
 		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -307,7 +307,7 @@ class Notification extends CB_Controller
 		$this->Notification_model->mark_allread($this->member->item('mem_id'));
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$result = array('success' => '읽음으로 처리하였습니다');
 		exit(json_encode($result));
@@ -320,8 +320,8 @@ class Notification extends CB_Controller
 	public function ajax_list()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_ajax_list';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_ajax_list';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -329,7 +329,7 @@ class Notification extends CB_Controller
 		required_user_login();
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
@@ -379,8 +379,8 @@ class Notification extends CB_Controller
 	public function notification_delete($not_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_delete';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_delete';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -390,7 +390,7 @@ class Notification extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$not_id = (int) $not_id;
 		if (empty($not_id) OR $not_id < 1) {
@@ -410,7 +410,7 @@ class Notification extends CB_Controller
 		$this->Notification_model->delete($not_id);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		/**
 		 * 삭제가 끝난 후 목록페이지로 이동합니다
@@ -432,8 +432,8 @@ class Notification extends CB_Controller
 	public function listdelete_delete()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_listdelete';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_listdelete';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -441,7 +441,7 @@ class Notification extends CB_Controller
 		required_user_login();
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		/**
 		 * 체크한 게시물의 삭제를 실행합니다
@@ -459,7 +459,7 @@ class Notification extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		/**
 		 * 삭제가 끝난 후 목록페이지로 이동합니다
@@ -481,8 +481,8 @@ class Notification extends CB_Controller
 	public function listupdate()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_notification_listupdate';
-		$this->load->event($eventname);
+		// $eventname = 'event_notification_listupdate';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -490,7 +490,7 @@ class Notification extends CB_Controller
 		required_user_login();
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		/**
 		 * 체크한 게시물의 업데이트를 실행합니다
@@ -504,7 +504,7 @@ class Notification extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		/**
 		 * 삭제가 끝난 후 목록페이지로 이동합니다
