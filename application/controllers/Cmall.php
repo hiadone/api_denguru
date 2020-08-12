@@ -2182,7 +2182,7 @@ class Cmall extends CB_Controller
 	}
 
 
-	public function orderlist()
+	public function orderlist_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_cmall_orderlist';
@@ -2199,7 +2199,7 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$this->load->model(array('Cmall_order_model'));
+		$this->load->model(array('Cmall_order_model','Cmall_order_detail_model','Cmall_item_model'));
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
@@ -2217,10 +2217,45 @@ class Cmall extends CB_Controller
 		$where = array();
 		$where['mem_id'] = $this->member->item('mem_id');
 
+		$result_= array();
 		$result = $this->Cmall_order_model
 			->get_list($per_page, $offset, $where, '', $findex, $forder);
+
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
+
+				
+
+				$result_['list'][$key]['brd_info']  = $this->denguruapi->get_brd_info(element('brd_id', $val));
+
+				$orderdetail = $this->Cmall_order_detail_model->get_by_item(element('cor_id',$val));
+				if ($orderdetail) {
+					foreach ($orderdetail as $value) {
+						$result_['list'][$key]['item'][] 
+							= $this->denguruapi->get_cit_info(element('cit_id', $value));
+						
+					}
+				}
+
+				$result_['list'][$key]['cor_memo'] = element('cor_memo',$val);
+				$result_['list'][$key]['cor_total_money'] = element('cor_total_money',$val);
+				$result_['list'][$key]['cor_content'] = element('cor_content',$val);
+				$result_['list'][$key]['cor_pay_type'] = element('cor_pay_type',$val);
+
+				$result_['list'][$key]['display_datetime'] = display_datetime(
+					element('cor_datetime', $val),'user','Y-m-d'
+				);
+
+				
+				
+
+				
+				// $result['list'][$key]['num'] = $list_num--;
+			}
+		}
+
 		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
-		$view['view']['data'] = $result;
+		$view['view']['data'] = $result_;
 
 		/**
 		 * 페이지네이션을 생성합니다
@@ -2237,48 +2272,11 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
-		/**
-		 * 레이아웃을 정의합니다
-		 */
-		$page_title = $this->cbconfig->item('site_meta_title_cmall_orderlist');
-		$meta_description = $this->cbconfig->item('site_meta_description_cmall_orderlist');
-		$meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_orderlist');
-		$meta_author = $this->cbconfig->item('site_meta_author_cmall_orderlist');
-		$page_name = $this->cbconfig->item('site_page_name_cmall_orderlist');
+		
 
-		$searchconfig = array(
-			'{컨텐츠몰명}',
-		);
-		$replaceconfig = array(
-			$this->cbconfig->item('cmall_name'),
-		);
-
-		$page_title = str_replace($searchconfig, $replaceconfig, $page_title);
-		$meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
-		$meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
-		$meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
-		$page_name = str_replace($searchconfig, $replaceconfig, $page_name);
-
-		$layoutconfig = array(
-			'path' => 'cmall',
-			'layout' => 'layout',
-			'skin' => 'order_list',
-			'layout_dir' => $this->cbconfig->item('layout_cmall'),
-			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
-			'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
-			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
-			'skin_dir' => $this->cbconfig->item('skin_cmall'),
-			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
-			'page_title' => $page_title,
-			'meta_description' => $meta_description,
-			'meta_keywords' => $meta_keywords,
-			'meta_author' => $meta_author,
-			'page_name' => $page_name,
-		);
-		$view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-		$this->data = $view;
-		$this->layout = element('layout_skin_file', element('layout', $view));
-		$this->view = element('view_skin_file', element('layout', $view));
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);
 	}
 
 
@@ -3413,12 +3411,12 @@ class Cmall extends CB_Controller
 
 		
 		
-		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind');
+		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind,cit_updated_datetime');
 		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
 
 		$view['view']['brd_register_url'] = trim(element('brd_register_url',$board_crawl));	
 		$view['view']['brd_order_url'] = trim(element('brd_order_url',$board_crawl));
-
+		$view['view']['brd_updated_datetime'] = element('cit_updated_datetime', $board);
 		
 		if ( ! element('brd_id', $board)) {
 			alert('이 스토어는 현재 존재하지 않습니다',"",406);
