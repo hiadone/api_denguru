@@ -112,25 +112,22 @@ class Mypage extends CB_Controller
 
 		$view['view']['data'] = $data;
 		
-		return $view['view'];
+		return $view;
 		
 	}
 
 	public function index_get()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_index';
-		$this->load->event($eventname);
+		
 
 		
 
 		$view = array();
-		$view['view'] = array();
+		
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
 
-		$view['view'] = $this->_index();
+		$view = $this->_index();
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -1361,26 +1358,23 @@ class Mypage extends CB_Controller
         $view['view']['page'] = $page;
         
    
-        return $view['view'];
+        return $view;
 
 		
 	}
 
 	public function review_get()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		
 
 		
 
 		$view = array();
-		$view['view'] = array();
+		
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
 
-		$view['view'] = $this->_review();
+		$view = $this->_review();
 
 		
 
@@ -1554,7 +1548,7 @@ class Mypage extends CB_Controller
         $view['view']['page'] = $page;
         
    
-        return $view['view'];
+        return $view;
 
 		
 	}
@@ -1562,18 +1556,16 @@ class Mypage extends CB_Controller
 	public function likereview_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		
 
 		
 
 		$view = array();
-		$view['view'] = array();
+		
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
 
-		$view['view'] = $this->_likereview();
+		$view = $this->_likereview();
 
 		
 
@@ -1746,7 +1738,7 @@ class Mypage extends CB_Controller
         // $view['view']['page'] = $page;
         
    
-        return $view['view'];
+        return $view;
 
 		
 	}
@@ -1754,18 +1746,17 @@ class Mypage extends CB_Controller
 	public function applyevent_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		
 
 		
 
 		$view = array();
-		$view['view'] = array();
+		
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
+		
 
-		$view['view'] = $this->_applyevent();
+		$view = $this->_applyevent();
 
 		
 
@@ -1938,26 +1929,20 @@ class Mypage extends CB_Controller
         // $view['view']['page'] = $page;
         
    
-        return $view['view'];
+        return $view;
 
 		
 	}
 
 	public function resultevent_get()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		
 
 		
 
 		$view = array();
-		$view['view'] = array();
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
-
-		$view['view'] = $this->_resultevent();
+		$view = $this->_resultevent();
 
 		
 
@@ -2415,9 +2400,7 @@ class Mypage extends CB_Controller
 
 	public function petwrite_get($pet_id = 0)
 	{
-	    // 이벤트 라이브러리를 로딩합니다
-	    $eventname = 'event_admin_member_memberpet_write';
-	    // $this->load->event($eventname);
+	    
 
 	    $view = array();
 	    
@@ -2427,20 +2410,20 @@ class Mypage extends CB_Controller
 
 	    $view = $this->_petwrite($pet_id);
 	    
-	    
+	    $this->data = $view['view'];
 		
-		return $this->response($view['view'], parent::HTTP_OK);
+		return $this->response($this->data, parent::HTTP_OK);
 		
 	}
 
 	public function petwrite_post($pet_id = 0)
 	{
 	    // 이벤트 라이브러리를 로딩합니다
-	    $eventname = 'event_admin_member_memberpet_write';
+	    
 	    // $this->load->event($eventname);
 
 	    $view = array();
-	    $view['view'] = array();
+	    
 
 	    // 이벤트가 존재하면 실행합니다
 	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);
@@ -2452,12 +2435,10 @@ class Mypage extends CB_Controller
 
 	public function petwrite_put($pet_id = 0)
 	{
-	    // 이벤트 라이브러리를 로딩합니다
-	    $eventname = 'event_admin_member_memberpet_write';
-	    // $this->load->event($eventname);
+	    
 
 	    $view = array();
-	    $view['view'] = array();
+	    
 
 	    // 이벤트가 존재하면 실행합니다
 	    // $view['view']['event']['before'] = Events::trigger('before', $eventname);

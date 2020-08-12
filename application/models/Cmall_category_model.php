@@ -71,7 +71,7 @@ class Cmall_category_model extends CB_Model
 			return;
 		}
 
-		$this->db->select('cmall_category.*');
+		$this->db->select('cmall_category.cca_id,cmall_category.cca_value,cmall_category.cca_parent');
 		$this->db->join('cmall_category_rel', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
 		$this->db->where(array('cmall_category_rel.cit_id' => $cit_id));
 		$this->db->order_by('cca_order', 'asc');

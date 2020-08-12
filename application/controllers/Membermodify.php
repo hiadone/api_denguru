@@ -110,7 +110,7 @@ class Membermodify extends CB_Controller
 			
 			
 			
-			$view['data']['mem_email'] = $this->member->item('mem_email');
+			$view['view']['data']['mem_email'] = $this->member->item('mem_email');
 					
 			
 			if(validation_errors()){
@@ -152,11 +152,11 @@ class Membermodify extends CB_Controller
 		
 
 		$view = array();
-		$view['view'] = array();
+		
 
 		
 
-		$view['view'] = $this->_index();
+		$view = $this->_index();
 
 		/**
 		 * 레이아웃을 정의합니다
@@ -929,9 +929,9 @@ class Membermodify extends CB_Controller
 
 	    $view = $this->_modify();
 	    
-	    
+	    $this->data = $view['view'];
 		
-		return $this->response($view['view'], parent::HTTP_OK);
+		return $this->response($this->data, parent::HTTP_OK);
 		
 	}
 

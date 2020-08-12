@@ -508,7 +508,12 @@ class Cmall extends CB_Controller
 		
 		if($swhere && is_array($swhere)){
 			foreach($swhere as $skey => $sval){
-				$where[$skey] = $sval;
+				if(!empty($sval)){
+					if(is_array($sval) )
+						$this->Board_model->where_in = array($skey =>$sval);
+					else
+						$where[$skey] = $sval;
+				}
 			}
 		}
 		$result = $this->Board_model
@@ -524,8 +529,8 @@ class Cmall extends CB_Controller
 		}
 		$view['view'] = $result;
 		if($category_id){
-			$view['view']['category_nav'] = $this->cmalllib->get_nav_category($category_id);
-			$view['view']['category_all'] = $this->cmalllib->get_all_category();
+			// $view['view']['category_nav'] = $this->cmalllib->get_nav_category($category_id);
+			// $view['view']['category_all'] = $this->cmalllib->get_all_category();
 			$view['view']['category_id'] = $category_id;
 		}
 		/**
@@ -626,7 +631,7 @@ class Cmall extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		
-		$this->load->model(array('Board_model','Cmall_item_model','Cmall_review_model','Cmall_storewishlist_model','Cmall_wishlist_model'));
+		$this->load->model(array('Board_model','Cmall_item_model','Cmall_review_model','Cmall_storewishlist_model','Cmall_wishlist_model','Cmall_category_model'));
 
 		$field = array(
 			'board' => array('brd_id','brd_name','brd_image','brd_blind'),
@@ -755,14 +760,24 @@ class Cmall extends CB_Controller
 		$data['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$data));
 
 		$data['ai_keyword'] = array();
-		$data['similaritemlist'] = $this->_itemlists('',element('brd_id',$data),'',array('per_page' => 6));
+
+		$get_category = $this->Cmall_category_model->get_category(element('cit_id', $data));
+		$cca_id_arr =array();
+		if($get_category){
+			foreach($get_category as $gval){
+				array_push($cca_id_arr,element('cca_id',$gval));
+			}
+		}
+		
+
+		$data['similaritemlist_similar'] = $this->_itemlists('',element('brd_id',$data),array('cca_id' => $cca_id_arr),array('per_page' => 6));
 		$data['similaritemlist_type1'] = $this->_itemlists('',element('brd_id',$data),array('cit_type1' => 1),array('per_page' => 6));
 		$data['similaritemlist_type3'] = $this->_itemlists('',element('brd_id',$data),array('cit_type3' => 1),array('per_page' => 6));
 
 		$view['view']['data'] = $data;
 		
 
-
+		
 		
 		
 		return $view['view'];

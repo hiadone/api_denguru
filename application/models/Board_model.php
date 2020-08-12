@@ -178,6 +178,10 @@ class Board_model extends CB_Model
 		}
 		if ($this->where_in) {
 			$this->db->where_in(key($this->where_in),$this->where_in[key($this->where_in)]);
+
+			if(key($this->where_in) === 'cca_id' && empty($category_id)){
+				$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+			}
 		}
 		$category_id = (int) $category_id;
 		if ($category_id) {
@@ -220,6 +224,10 @@ class Board_model extends CB_Model
 		}
 		if ($this->where_in) {
 			$this->db->where_in(key($this->where_in),$this->where_in[key($this->where_in)]);
+
+			if(key($this->where_in) === 'cca_id' && empty($category_id)){
+				$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+			}
 		}
 		if ($category_id) {
 			$this->db->join('cmall_category_rel', 'cmall_item.cbr_id = cmall_category_rel.cit_id', 'inner');
