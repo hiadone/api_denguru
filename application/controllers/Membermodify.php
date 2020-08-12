@@ -52,7 +52,7 @@ class Membermodify extends CB_Controller
 		required_user_login();
 
 		$view = array();
-		$view['view'] = array();
+		
 
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
@@ -103,18 +103,20 @@ class Membermodify extends CB_Controller
 			/**
 			 * 레이아웃을 정의합니다
 			 */
-			$view['msg'] = validation_errors();
+			
             
             
 
 			
-			$k = 0;
 			
-			$view['view']['data']['mem_email'] = $this->member->item('mem_email');
+			
+			$view['data']['mem_email'] = $this->member->item('mem_email');
 					
 			
-			if(validation_errors())
+			if(validation_errors()){
             	$view['http_status_codes'] = 400;
+            	$view['msg'] = validation_errors();
+			}
             else 
             	$view['http_status_codes'] = 200;
             return $view;
@@ -145,16 +147,14 @@ class Membermodify extends CB_Controller
 	public function index_get()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_index';
-		$this->load->event($eventname);
+		
 
 		
 
 		$view = array();
 		$view['view'] = array();
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
 
 		$view['view'] = $this->_index();
 

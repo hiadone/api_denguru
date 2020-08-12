@@ -427,7 +427,7 @@ class Cmall extends CB_Controller
 		
 	}
 
-	protected function _itemlists($category_id = 0,$brd_id = 0,$swhere = array())
+	protected function _itemlists($category_id = 0,$brd_id = 0,$swhere = array(),$config = array())
 	{
 		
 
@@ -463,6 +463,10 @@ class Cmall extends CB_Controller
 		$skeyword = $this->input->get('skeyword', null, '');
 
 		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+
+		
+
+
 		$offset = ($page - 1) * $per_page;
 
 		$this->Board_model->allow_search_field = array('brd_name','cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
@@ -486,7 +490,7 @@ class Cmall extends CB_Controller
 
 		$item_ids = $this->input->get('chk_item_id');
 		if($item_ids && is_array($item_ids)){
-			$this->Board_model->group_where_in('cit_id',$item_ids);
+			$this->Board_model->set_where_in('cit_id',$item_ids);
 			$per_page = 9999;
 			$offset = '';
 		}
@@ -495,6 +499,17 @@ class Cmall extends CB_Controller
 			$where['board.brd_id'] = $brd_id;
 			$per_page = 18;
 			$offset = '';
+		}
+
+		if(element('per_page', $config)){
+			$per_page = element('per_page', $config);
+			$offset = ($page - 1) * $per_page;	
+		}
+		
+		if($swhere && is_array($swhere)){
+			foreach($swhere as $skey => $sval){
+				$where[$skey] = $sval;
+			}
 		}
 		$result = $this->Board_model
 			->get_item_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
@@ -740,7 +755,9 @@ class Cmall extends CB_Controller
 		$data['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$data));
 
 		$data['ai_keyword'] = array();
-		$data['similaritemlist'] = $this->_itemlists('',element('brd_id',$data));
+		$data['similaritemlist'] = $this->_itemlists('',element('brd_id',$data),'',array('per_page' => 6));
+		$data['similaritemlist_type1'] = $this->_itemlists('',element('brd_id',$data),array('cit_type1' => 1),array('per_page' => 6));
+		$data['similaritemlist_type3'] = $this->_itemlists('',element('brd_id',$data),array('cit_type3' => 1),array('per_page' => 6));
 
 		$view['view']['data'] = $data;
 		
