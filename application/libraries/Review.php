@@ -253,7 +253,7 @@ class Review extends CI_Controller
                         );
                         $file = $this->CI->Review_file_model->get_one('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
                         if (element('rfi_filename', $file)) {
-                            $view['view']['list'][$key]['review_image'] = cdn_url('cmall_review', element('rfi_filename', $file));
+                            $view['view']['list'][$key]['review_image'] = thumb_url('cmall_review', element('rfi_filename', $file));
                         }
                     } 
 
@@ -264,7 +264,7 @@ class Review extends CI_Controller
                         );
                         $file = $this->CI->Review_file_model->get_one('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
                         if (element('rfi_filename', $file)) {
-                            $view['view']['list'][$key]['review_file'] = cdn_url('cmall_review', element('rfi_filename', $file));
+                            $view['view']['list'][$key]['review_file'] = thumb_url('cmall_review', element('rfi_filename', $file));
                         }
                     } 
                 

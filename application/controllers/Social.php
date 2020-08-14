@@ -335,25 +335,21 @@ class Social extends CB_Controller
 		// 	alert_close('구글 API 정보가 제대로 입력되지 않았습니다');
 		// }
 
-		if (isset($token_data)) {
+		if ($this->input->post('id')) {
 
-			$google_id = element('sub', element('payload', $token_data));
-			$userinfo = $plus->userinfo->get();
+			$google_id = $this->input->post('id');
+			$email = $this->input->post('email');
+			$nickname = $this->input->post('nickname');
+			
+			
 
-			if ( ! $userinfo->name) {
-				$this->session->unset_userdata('google_access_token');
+			if ( ! $nickname) {				
 				alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
 			}
 
 			$socialdata = array(
-				'email' => $userinfo->email,
-				'familyName' => $userinfo->familyName,
-				'givenName' => $userinfo->givenName,
-				'name' => $userinfo->name,
-				'gender' => $userinfo->gender,
-				'link' => $userinfo->link,
-				'locale' => $userinfo->locale,
-				'picture' => $userinfo->picture,
+				'email' => $email,
+				'familyName' => $nickname,
 				'update_datetime' => cdate('Y-m-d H:i:s'),
 				'ip_address' => $this->input->ip_address(),
 			);
@@ -1199,9 +1195,8 @@ class Social extends CB_Controller
 
 
 	public function _connected_close($stype)
-	{
-		echo '<meta http-equiv="content-type" content="text/html; charset=' . config_item('charset') . '">';
-		echo '<script type="text/javascript"> window.close();window.opener.social_connect_on_done("' . $stype . '");</script>';
-		exit;
+	{	
+		alert('연동되었습니다','',200);
+		
 	}
 }

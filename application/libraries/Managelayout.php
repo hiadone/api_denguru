@@ -231,7 +231,7 @@ class Managelayout extends CI_Controller
 			if ($result) {
 				foreach ($result as $key => $val) {
 
-					$data['banner']['main_middle']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+					$data['banner']['main_middle']['ban_image_url'] = thumb_url('banner',element('ban_image', $val));
 					$data['banner']['main_middle']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
 				}
 			}
@@ -241,7 +241,7 @@ class Managelayout extends CI_Controller
 			if ($result) {
 				foreach ($result as $key => $val) {
 
-					$data['banner']['main_bottom']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+					$data['banner']['main_bottom']['ban_image_url'] = thumb_url('banner',element('ban_image', $val));
 					$data['banner']['main_bottom']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
 				}
 			}

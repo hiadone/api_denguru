@@ -59,39 +59,42 @@ class Popuplib extends CI_Controller
 		if (element('list', element('view', $view))) {
 			foreach (element('list', element('view', $view)) as $key => $value) {
 				
-				if ($this->CI->cbconfig->get_device_view_type() === 'mobile'
-					&& element('pop_device', $value) === 'pc') {
-					continue;
-				}
-				if ($this->CI->cbconfig->get_device_view_type() !== 'mobile'
-					&& element('pop_device', $value) === 'mobile') {
-					continue;
-				}
+				// if ($this->CI->cbconfig->get_device_view_type() === 'mobile'
+				// 	&& element('pop_device', $value) === 'pc') {
+				// 	continue;
+				// }
+				// if ($this->CI->cbconfig->get_device_view_type() !== 'mobile'
+				// 	&& element('pop_device', $value) === 'mobile') {
+				// 	continue;
+				// }
 
-				if ( ! element('pop_page', $value)
-					&& $this->CI->uri->segment(1)) {
-					// continue;
-				}
+				// if ( ! element('pop_page', $value)
+				// 	&& $this->CI->uri->segment(1)) {
+				// 	// continue;
+				// }
 
 				$content = element('pop_content', $value);
-				$thumb_width = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
-					? $this->CI->cbconfig->item('popup_mobile_thumb_width')
-					: $this->CI->cbconfig->item('popup_thumb_width');
-				$autolink = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
-					? $this->CI->cbconfig->item('use_popup_mobile_auto_url')
-					: $this->CI->cbconfig->item('use_popup_auto_url');
-				$popup = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
-					? $this->CI->cbconfig->item('popup_mobile_content_target_blank')
-					: $this->CI->cbconfig->item('popup_content_target_blank');
 
-				$value['content'] = display_html_content(
-					$content,
-					element('pop_content_html_type', $value),
-					$thumb_width,
-					$autolink,
-					$popup,
-					$writer_is_admin = true
-				);
+				$value['pop_image'] = cdn_url('popup',element('pop_image',$value));
+				// 
+				// $thumb_width = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
+				// 	? $this->CI->cbconfig->item('popup_mobile_thumb_width')
+				// 	: $this->CI->cbconfig->item('popup_thumb_width');
+				// $autolink = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
+				// 	? $this->CI->cbconfig->item('use_popup_mobile_auto_url')
+				// 	: $this->CI->cbconfig->item('use_popup_auto_url');
+				// $popup = ($this->CI->cbconfig->get_device_view_type() === 'mobile')
+				// 	? $this->CI->cbconfig->item('popup_mobile_content_target_blank')
+				// 	: $this->CI->cbconfig->item('popup_content_target_blank');
+
+				// $value['content'] = display_html_content(
+				// 	$content,
+				// 	element('pop_content_html_type', $value),
+				// 	$thumb_width,
+				// 	$autolink,
+				// 	$popup,
+				// 	$writer_is_admin = true
+				// );
 
 				$list['list'][] = $value;
 			}

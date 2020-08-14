@@ -60,6 +60,21 @@ class Aws_s3 {
     }
 
 
+    function download_file($file_path,$file_name,$upload_path,$file_type='')
+    {   
+
+        $file_url = $file_path.$file_name;
+        $s3_key = $upload_path.$file_name;
+
+        
+
+        return $this->s3Client->getObject(array(
+          'Bucket' => $this->s3_bucket_name,
+          'Key'    => $s3_key,
+          'SaveAs'   => $s3_key          
+        ));
+    }
+
     function delete_file($file_name)
     {   
 
