@@ -64,13 +64,13 @@ class Cmall_review extends CB_Controller
             }
         }
         $mem_id = (int) $this->member->item('mem_id');
-        $review_flag = false;
+        $review_flag = 0;
 
         $per_page = 1;
         if($mem_id){
             $reviewwhere = array('mem_id' => $mem_id);
             
-            if($this->Cmall_review_model->count_by($reviewwhere)) $review_flag = true;
+            if($this->Cmall_review_model->count_by($reviewwhere)) $review_flag = 1;
             $per_page = 5;
         }
 
