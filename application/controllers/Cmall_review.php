@@ -64,7 +64,17 @@ class Cmall_review extends CB_Controller
             }
         }
         $mem_id = (int) $this->member->item('mem_id');
+        $review_flag = false;
 
+        $per_page = 1;
+        if($mem_id){
+            $reviewwhere = array('mem_id' => $mem_id);
+            
+            if($this->Cmall_review_model->count_by($reviewwhere)) $review_flag = true;
+            $per_page = 5;
+        }
+
+        $view['view']['review_flag'] = $review_flag;
         // $field = array(
         //     'cmall_review' => array('cre_id','cit_id','cre_good','cre_bad','cre_tip','cre_file_1','cre_file_2','cre_file_3','cre_file_4','cre_file_5','cre_file_6','cre_file_7','cre_file_8','cre_file_9','cre_file_10','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
         // );
@@ -83,7 +93,7 @@ class Cmall_review extends CB_Controller
         $sfield = '';
         $skeyword = '';
 
-        $per_page = 5;
+        
         $offset = ($page - 1) * $per_page;
 
         $is_admin = $this->member->is_admin();
@@ -138,7 +148,12 @@ class Cmall_review extends CB_Controller
                 
 
                 $result['list'][$key]['num'] = $list_num--;
+
+                if(!$review_flag){
+                    break;
+                }
                 
+
             }
         }
         $view['view']['data'] = $result;

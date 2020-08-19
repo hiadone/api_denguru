@@ -298,7 +298,7 @@ class Denguruapi extends CI_Controller
             $data['result'] = $result;
             $data['cached'] = '1';
             check_cache_dir('latest');
-            $this->CI->cache->save($cachename, $data, 60);
+            $this->CI->cache->save($cachename, $data, 86400);
 
         }
         return isset($data['result']) ? $data['result'] : array();

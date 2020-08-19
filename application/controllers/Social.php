@@ -65,6 +65,41 @@ class Social extends CB_Controller
 			alert_close('이 앱은  페이스북 로그인 기능을 지원하고 있지 않습니다.');
 		}
 
+		if ($this->input->post('id')) {
+
+			$facebook_id = $this->input->post('id');
+			$email = $this->input->post('email');
+			$nickname = $this->input->post('nickname');
+			
+			
+
+			if ( ! $nickname) {				
+				alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
+			}
+
+			$socialdata = array(
+				'email' => $email,
+				'familyName' => $nickname,
+				'update_datetime' => cdate('Y-m-d H:i:s'),
+				'ip_address' => $this->input->ip_address(),
+			);
+			$this->Social_model->save('facebook', $facebook_id, $socialdata);
+
+			// 이벤트가 존재하면 실행합니다
+			Events::trigger('after', $eventname);
+
+			
+
+			$view = array();
+			// $view['view'] = array();
+			
+			// 이벤트가 존재하면 실행합니다
+			// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+			$view = $this->_common_login('facebook', $facebook_id);
+			
+			return $this->response($view, $view['http_status_codes']);
+		}		
 		// require_once FCPATH . 'plugin/social/libraries/Facebook/autoload.php';
 
 		// $fb = new Facebook\Facebook([
@@ -103,42 +138,42 @@ class Social extends CB_Controller
 		// 	exit;
 		// }
 
-		$userinfo = $response->getGraphUser();
+		// $userinfo = $response->getGraphUser();
 
-		$facebook_id = $userinfo->getProperty('id');
+		// $facebook_id = $userinfo->getProperty('id');
 
-		if ( ! $userinfo->getProperty('name')) {
-			alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
-		}
+		// if ( ! $userinfo->getProperty('name')) {
+		// 	alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
+		// }
 
-		$socialdata = array(
-			'name' => $userinfo->getProperty('name'),
-			'first_name' => $userinfo->getProperty('first_name'),
-			'last_name' => $userinfo->getProperty('last_name'),
-			'email' => $userinfo->getProperty('email'),
-			'link' => $userinfo->getProperty('link'),
-			'gender' => $userinfo->getProperty('gender'),
-			'locale' => $userinfo->getProperty('locale'),
-			'timezone' => $userinfo->getProperty('timezone'),
-			'update_datetime' => cdate('Y-m-d H:i:s'),
-			'ip_address' => $this->input->ip_address(),
-		);
-		$this->Social_model->save('facebook', $facebook_id, $socialdata);
+		// $socialdata = array(
+		// 	'name' => $userinfo->getProperty('name'),
+		// 	'first_name' => $userinfo->getProperty('first_name'),
+		// 	'last_name' => $userinfo->getProperty('last_name'),
+		// 	'email' => $userinfo->getProperty('email'),
+		// 	'link' => $userinfo->getProperty('link'),
+		// 	'gender' => $userinfo->getProperty('gender'),
+		// 	'locale' => $userinfo->getProperty('locale'),
+		// 	'timezone' => $userinfo->getProperty('timezone'),
+		// 	'update_datetime' => cdate('Y-m-d H:i:s'),
+		// 	'ip_address' => $this->input->ip_address(),
+		// );
+		// $this->Social_model->save('facebook', $facebook_id, $socialdata);
 
-		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// // 이벤트가 존재하면 실행합니다
+		// Events::trigger('after', $eventname);
 
 		
 
-		$view = array();
-		// $view['view'] = array();
+		// $view = array();
+		// // $view['view'] = array();
 		
-		// 이벤트가 존재하면 실행합니다
-		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// // 이벤트가 존재하면 실행합니다
+		// // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$view = $this->_common_login('facebook', $facebook_id);
+		// $view = $this->_common_login('facebook', $facebook_id);
 		
-		return $this->response($view, $view['http_status_codes']);
+		// return $this->response($view, $view['http_status_codes']);
 
 	}
 
@@ -392,48 +427,21 @@ class Social extends CB_Controller
 			alert_close('이 웹사이트는 네이버 로그인 기능을 지원하고 있지 않습니다.');
 		}
 
-		if ($this->session->userdata('naver_access_token')) {
-			$url = 'https://apis.naver.com/nidlogin/nid/getUserProfile.xml';
+		if ($this->input->post('id')) {
 
-			$ch = curl_init();
-			curl_setopt ($ch, CURLOPT_URL, $url);
-			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt ($ch, CURLOPT_SSLVERSION, 1);
-			curl_setopt ($ch, CURLOPT_HEADER, 0);
-			curl_setopt ($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $this->session->userdata('naver_access_token')));
-			curl_setopt ($ch, CURLOPT_POST, 0);
-			curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
-			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($ch);
-			curl_close($ch);
+			$naver_id = $this->input->post('id');
+			$email = $this->input->post('email');
+			$nickname = $this->input->post('nickname');
+			
+			
 
-			$xml = simplexml_load_string($result);
-
-			$naver_id = (string) $xml->response->enc_id;
-			$email = (string) $xml->response->email;
-			$nickname = (string) $xml->response->nickname;
-			$profile_image = (string) $xml->response->profile_image;
-			$age = (string) $xml->response->age;
-			$gender = (string) $xml->response->gender;
-			$id = (string) $xml->response->id;
-			$name = (string) $xml->response->name;
-			$birthday = (string) $xml->response->birthday;
-
-			if (empty($nickname)) {
-				$this->session->unset_userdata('naver_access_token');
+			if ( ! $nickname) {				
 				alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
 			}
 
 			$socialdata = array(
 				'email' => $email,
-				'nickname' => $nickname,
-				'profile_image' => $profile_image,
-				'age' => $age,
-				'gender' => $gender,
-				'id' => $id,
-				'name' => $name,
-				'birthday' => $birthday,
+				'familyName' => $nickname,
 				'update_datetime' => cdate('Y-m-d H:i:s'),
 				'ip_address' => $this->input->ip_address(),
 			);
@@ -453,6 +461,68 @@ class Social extends CB_Controller
 			$view = $this->_common_login('naver', $naver_id);
 			
 			return $this->response($view, $view['http_status_codes']);
+
+		// if ($this->session->userdata('naver_access_token')) {
+		// 	$url = 'https://apis.naver.com/nidlogin/nid/getUserProfile.xml';
+
+		// 	$ch = curl_init();
+		// 	curl_setopt ($ch, CURLOPT_URL, $url);
+		// 	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		// 	curl_setopt ($ch, CURLOPT_SSLVERSION, 1);
+		// 	curl_setopt ($ch, CURLOPT_HEADER, 0);
+		// 	curl_setopt ($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $this->session->userdata('naver_access_token')));
+		// 	curl_setopt ($ch, CURLOPT_POST, 0);
+		// 	curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+		// 	curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+		// 	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+		// 	$result = curl_exec($ch);
+		// 	curl_close($ch);
+
+		// 	$xml = simplexml_load_string($result);
+
+		// 	$naver_id = (string) $xml->response->enc_id;
+		// 	$email = (string) $xml->response->email;
+		// 	$nickname = (string) $xml->response->nickname;
+		// 	$profile_image = (string) $xml->response->profile_image;
+		// 	$age = (string) $xml->response->age;
+		// 	$gender = (string) $xml->response->gender;
+		// 	$id = (string) $xml->response->id;
+		// 	$name = (string) $xml->response->name;
+		// 	$birthday = (string) $xml->response->birthday;
+
+		// 	if (empty($nickname)) {
+		// 		$this->session->unset_userdata('naver_access_token');
+		// 		alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
+		// 	}
+
+		// 	$socialdata = array(
+		// 		'email' => $email,
+		// 		'nickname' => $nickname,
+		// 		'profile_image' => $profile_image,
+		// 		'age' => $age,
+		// 		'gender' => $gender,
+		// 		'id' => $id,
+		// 		'name' => $name,
+		// 		'birthday' => $birthday,
+		// 		'update_datetime' => cdate('Y-m-d H:i:s'),
+		// 		'ip_address' => $this->input->ip_address(),
+		// 	);
+		// 	$this->Social_model->save('naver', $naver_id, $socialdata);
+
+		// 	// 이벤트가 존재하면 실행합니다
+		// 	Events::trigger('after', $eventname);
+
+			
+
+		// 	$view = array();
+		// 	// $view['view'] = array();
+			
+		// 	// 이벤트가 존재하면 실행합니다
+		// 	// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		// 	$view = $this->_common_login('naver', $naver_id);
+			
+		// 	return $this->response($view, $view['http_status_codes']);
 		}
 
 		// if ($this->input->get('code')) {
@@ -529,40 +599,21 @@ class Social extends CB_Controller
 		if ( ! $this->cbconfig->item('use_sociallogin_kakao')) {
 			alert_close('이 웹사이트는 카카오 로그인 기능을 지원하고 있지 않습니다.');
 		}
+		if ($this->input->post('id')) {
 
-		if ($this->session->userdata('kakao_access_token')) {
-			$url = 'https://kapi.kakao.com/v1/user/me';
+			$kakao_id = $this->input->post('id');
+			$email = $this->input->post('email');
+			$nickname = $this->input->post('nickname');
+			
+			
 
-			$ch = curl_init();
-			curl_setopt ($ch, CURLOPT_URL, $url);
-			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt ($ch, CURLOPT_SSLVERSION, 1);
-			curl_setopt ($ch, CURLOPT_HEADER, 0);
-			curl_setopt ($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $this->session->userdata('kakao_access_token')));
-			curl_setopt ($ch, CURLOPT_POST, 0);
-			curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
-			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($ch);
-			curl_close($ch);
-
-			$json = json_decode($result, true);
-
-			$kakao_id = element('id', $json);
-			$nickname = element('nickname', element('properties', $json));
-			$profile_image = element('profile_image', element('properties', $json));
-			$thumbnail_image = element('thumbnail_image', element('properties', $json));
-
-			if (empty($nickname)) {
-				$this->session->unset_userdata('kakao_access_token');
+			if ( ! $nickname) {				
 				alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
 			}
 
-
 			$socialdata = array(
-				'nickname' => $nickname,
-				'profile_image' => $profile_image,
-				'thumbnail_image' => $thumbnail_image,
+				'email' => $email,
+				'familyName' => $nickname,
 				'update_datetime' => cdate('Y-m-d H:i:s'),
 				'ip_address' => $this->input->ip_address(),
 			);
@@ -582,6 +633,59 @@ class Social extends CB_Controller
 			$view = $this->_common_login('kakao', $kakao_id);
 			
 			return $this->response($view, $view['http_status_codes']);
+
+		// if ($this->session->userdata('kakao_access_token')) {
+		// 	$url = 'https://kapi.kakao.com/v1/user/me';
+
+		// 	$ch = curl_init();
+		// 	curl_setopt ($ch, CURLOPT_URL, $url);
+		// 	curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		// 	curl_setopt ($ch, CURLOPT_SSLVERSION, 1);
+		// 	curl_setopt ($ch, CURLOPT_HEADER, 0);
+		// 	curl_setopt ($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $this->session->userdata('kakao_access_token')));
+		// 	curl_setopt ($ch, CURLOPT_POST, 0);
+		// 	curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+		// 	curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+		// 	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+		// 	$result = curl_exec($ch);
+		// 	curl_close($ch);
+
+		// 	$json = json_decode($result, true);
+
+		// 	$kakao_id = element('id', $json);
+		// 	$nickname = element('nickname', element('properties', $json));
+		// 	$profile_image = element('profile_image', element('properties', $json));
+		// 	$thumbnail_image = element('thumbnail_image', element('properties', $json));
+
+		// 	if (empty($nickname)) {
+		// 		$this->session->unset_userdata('kakao_access_token');
+		// 		alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
+		// 	}
+
+
+		// 	$socialdata = array(
+		// 		'nickname' => $nickname,
+		// 		'profile_image' => $profile_image,
+		// 		'thumbnail_image' => $thumbnail_image,
+		// 		'update_datetime' => cdate('Y-m-d H:i:s'),
+		// 		'ip_address' => $this->input->ip_address(),
+		// 	);
+		// 	$this->Social_model->save('kakao', $kakao_id, $socialdata);
+
+		// 	// 이벤트가 존재하면 실행합니다
+		// 	Events::trigger('after', $eventname);
+
+			
+
+		// 	$view = array();
+		// 	// $view['view'] = array();
+			
+		// 	// 이벤트가 존재하면 실행합니다
+		// 	// $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+		// 	$view = $this->_common_login('kakao', $kakao_id);
+			
+		// 	return $this->response($view, $view['http_status_codes']);
 		}
 
 		// if ($this->input->get('code')) {
@@ -759,7 +863,7 @@ class Social extends CB_Controller
 				$this->Social_meta_model
 					->save($this->member->item('mem_id'), $metadata);
 			}
-			$this->_connected_close($social_type);
+			return $this->_connected_close($social_type);
 
 		} else {
 
@@ -1146,7 +1250,7 @@ class Social extends CB_Controller
 					'mrg_ip' => $this->input->ip_address(),
 					'mrg_datetime' => cdate('Y-m-d H:i:s'),
 					'mrg_useragent' => $this->agent->agent_string(),
-					'mrg_referer' => $this->session->userdata('site_referer'),
+					'mrg_referer' => '',
 				);
 				$this->load->model('Member_register_model');
 				$this->Member_register_model->insert($member_register_data);
@@ -1196,7 +1300,19 @@ class Social extends CB_Controller
 
 	public function _connected_close($stype)
 	{	
-		alert('연동되었습니다','',200);
+
+		$tokenData = array();
+		$tokenData['mem_id'] = $mem_id; //TODO: Replace with data for token
+		$output['token'] = AUTHORIZATION::generateToken($tokenData);
+
+		$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
+
+		$view['membermodify'] = 0;
+		$view['token'] = $output['token'];
+		$view['http_status_codes'] = 200;
+
+	    return $view;
+		// alert('연동되었습니다','',200);
 		
 	}
 }

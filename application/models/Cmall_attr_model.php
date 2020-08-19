@@ -92,7 +92,7 @@ class Cmall_attr_model extends CB_Model
 
     public function get_popular_attr($brd_id = 0, $limit = '')
     {
-        $this->db->select('count(*) as cnt, cta_tag ', false);
+        $this->db->select('count(*) as cnt, cat_value ', false);
         $this->db->from('cmall_attr');
         $this->db->join('cmall_attr_rel', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
         $this->db->join('cmall_item', 'cmall_item.cit_id = cmall_attr_rel.cit_id', 'inner');

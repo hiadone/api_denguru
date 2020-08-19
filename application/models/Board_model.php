@@ -293,9 +293,10 @@ class Board_model extends CB_Model
 
 	public function get_attr_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
     {
-        $select = 'board.*';
+        $select = $this->_select;
         $join[] = array('table' => 'cmall_item', 'on' => 'board.brd_id = cmall_item.brd_id','type' => 'inner');
-        $join[] = array('table' => 'cmall_attr_rel', 'on' => 'cmall_attr.cat_id = cmall_attr_rel.cat_id','type' => 'inner');
+        $join[] = array('table' => 'cmall_attr_rel', 'on' => 'cmall_item.cit_id = cmall_attr_rel.cit_id','type' => 'inner');
+        $join[] = array('table' => 'cmall_attr', 'on' => 'cmall_attr_rel.cat_id = cmall_attr.cat_id','type' => 'inner');
         $result = $this->_get_list_common($select, $join, $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);
         return $result;
     }
