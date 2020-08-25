@@ -2469,6 +2469,8 @@ class Mypage extends CB_Controller
 
 		$this->load->model(array('Member_pet_model'));
 
+		$mem_id = (int) $this->member->item('mem_id');
+		
 		$pet_id = (int) $pet_id;
 		if (empty($pet_id) OR $pet_id < 1) {
 		    show_404();
