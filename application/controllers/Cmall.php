@@ -650,8 +650,8 @@ class Cmall extends CB_Controller
 
 		$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$data));
 
-		$data['brd_register_url'] = element('brd_register_url',$board_crawl);	
-		$data['brd_order_url'] = element('brd_order_url',$board_crawl);
+		// $data['brd_register_url'] = element('brd_register_url',$board_crawl);	
+		// $data['brd_order_url'] = element('brd_order_url',$board_crawl);
 		// $data['brd_orderstatus_url'] = element('brd_orderstatus_url',$board_crawl);
 
 		if ( ! element('cit_id', $data)) {
@@ -2355,8 +2355,8 @@ class Cmall extends CB_Controller
 
 				$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$result['list'][$key]));
 
-				$result['list'][$key]['brd_register_url'] = element('brd_register_url',$board_crawl);	
-				$result['list'][$key]['brd_order_url'] = element('brd_order_url',$board_crawl);
+				// $result['list'][$key]['brd_register_url'] = element('brd_register_url',$board_crawl);	
+				// $result['list'][$key]['brd_order_url'] = element('brd_order_url',$board_crawl);
 
 				$result['list'][$key]['delete_url'] = site_url('cmallact/wishlist/' . element('cwi_id', $val) . '?' . $param->output());
 				$result['list'][$key]['num'] = $list_num--;
@@ -2709,25 +2709,27 @@ class Cmall extends CB_Controller
   //       
 		$where['brd_blind'] = 0;
 		// $where['cit_status'] = 1;
-		$result = $this->Board_model->get_board_list($where,'brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,cit_updated_datetime');
+		
+		$this->Board_model->_select='board.brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,board.cit_updated_datetime,cat_value';
+		$result = $this->Board_model->get_attr_list('','',$where);
 
 		// $result = $this->Board_model->get_attr_list('','', $where);
 		
 		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
-		if ($result) {
-			foreach ($result as $key => $val) {
+		if (element('list', $result)) {
+			foreach (element('list', $result) as $key => $val) {
 
-				$result[$key] = $this->denguruapi->convert_brd_info($result[$key]);
-				$result[$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
+				$result['list'][$key] = $this->denguruapi->convert_brd_info($result[$key]);
+				// $result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
 
 				
 				// $result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
 				
-				$result[$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
+				$result['list'][$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
 				
 			}
 		}
-		$view['view']['data']['rank']['list'] = $result;
+		$view['view']['data']['rank'] = $result;
 
 		$result = $this->Theme_model->get_theme();
 		$result_= array();
@@ -2762,7 +2764,7 @@ class Cmall extends CB_Controller
         $view['view']['config']['pet_attr'] = element(3,$pet_attr);;
 
 
-  
+  	
             
             
 
@@ -3454,8 +3456,8 @@ class Cmall extends CB_Controller
 		$board = $this->Board_model->get_one($brd_id,'brd_id,brd_blind,cit_updated_datetime');
 		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
 
-		$view['view']['brd_register_url'] = trim(element('brd_register_url',$board_crawl));	
-		$view['view']['brd_order_url'] = trim(element('brd_order_url',$board_crawl));
+		// $view['view']['brd_register_url'] = trim(element('brd_register_url',$board_crawl));	
+		// $view['view']['brd_order_url'] = trim(element('brd_order_url',$board_crawl));
 		$view['view']['brd_updated_datetime'] = element('cit_updated_datetime', $board);
 		
 		if ( ! element('brd_id', $board)) {
@@ -3547,7 +3549,7 @@ class Cmall extends CB_Controller
 
 		$view['view']['data'] = $this->denguruapi->get_brd_info(element('brd_id', $board));
 		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $board),8);
-		$view['view']['data']['brd_attr'] = array();
+		$view['view']['data']['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $board),8);
 		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));
 
 		
@@ -3682,6 +3684,8 @@ class Cmall extends CB_Controller
 		}
 
 		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
+
+		$view['view'] = $board_crawl;
 
 		foreach($board_crawl as $key => $val){
 			if($key ==='brd_register_zipcode')
