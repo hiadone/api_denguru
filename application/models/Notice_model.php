@@ -22,7 +22,7 @@ class Notice_model extends CB_Model
      */
     public $primary_key = 'noti_id'; // 사용되는 테이블의 프라이머리키
 
-    public $_select = 'noti_id,noti_start_date,noti_end_date,noti_title,noti_datetime,noti_content,noti_content_html_type'; // 사용되는 테이블의 프라이머리키
+    public $_select = 'noti_id,noti_start_date,noti_end_date,noti_title,noti_datetime,noti_content,noti_file,is_image,pfi_originname'; // 사용되는 테이블의 프라이머리키
 
     public $cache_prefix = 'notice/notice-model-get-'; // 캐시 사용시 프리픽스
 

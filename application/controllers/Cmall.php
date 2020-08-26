@@ -2719,7 +2719,7 @@ class Cmall extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 
-				$result['list'][$key] = $this->denguruapi->convert_brd_info($result[$key]);
+				$result['list'][$key] = $this->denguruapi->convert_brd_info($val);
 				// $result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
 
 				

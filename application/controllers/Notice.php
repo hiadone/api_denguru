@@ -244,6 +244,9 @@ class Notice extends CB_Controller
                 if (empty($getdata['noti_end_date']) OR $getdata['noti_end_date'] === '0000-00-00') {
                     $getdata['noti_end_date'] = '';
                 }
+
+                if(element('is_image',getdata)) 
+                    $getdata['noti_image'] = cdn_url('notice',element('noti_file',getdata));       
                 $view['view']['data'] = $getdata;
             }
 
