@@ -2711,9 +2711,9 @@ class Cmall extends CB_Controller
 		// $where['cit_status'] = 1;
 		
 		$this->Board_model->_select='board.brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,board.cit_updated_datetime,cat_value';
-		$result = $this->Board_model->get_attr_list('','',$where);
+		// $result = $this->Board_model->get_attr_list('','',$where);
 
-		// $result = $this->Board_model->get_attr_list('','', $where);
+		$result = $this->Board_model->get_board_list($where);
 		
 		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
 		if (element('list', $result)) {
