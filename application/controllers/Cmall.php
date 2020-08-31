@@ -3538,7 +3538,7 @@ class Cmall extends CB_Controller
 			);
 		$view['view']['storewishcount'] = $this->Cmall_storewishlist_model->count_by($where);	
 
-		$view['view']['addstorewish_url'] = base_url('storewish/'.element('brd_id',$board));
+		$view['view']['addstorewish_url'] = site_url('cmall/storewish/'.element('brd_id',$board));
 		$view['view']['storewishstatus'] = 0;
 		if(!empty($mem_id)){
 			$where = array(
