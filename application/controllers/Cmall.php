@@ -1143,7 +1143,7 @@ class Cmall extends CB_Controller
 		return $this->response($this->data, parent::HTTP_OK);
 	}
 
-	public function storewish_delete($brd_id = '',$stype='store'))
+	public function storewish_delete($brd_id = '',$stype='store')
 	{
 
 		
