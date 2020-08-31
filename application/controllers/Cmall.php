@@ -1072,9 +1072,10 @@ class Cmall extends CB_Controller
 
 		$view = array();
 		$view['view'] = array();
-
+		
+		required_user_login();
 		$mem_id = (int) $this->member->item('mem_id');
-
+		
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
