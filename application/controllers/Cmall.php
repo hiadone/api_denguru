@@ -847,7 +847,7 @@ class Cmall extends CB_Controller
 		return $this->response($this->data, parent::HTTP_OK);
 	}
 
-	public function itemwish_post($cit_id = 0)
+	public function itemwish_post($cit_id = 0,$stype='wish')
 	{
 
 		
@@ -864,7 +864,7 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
-		if (empty($cit_id) || empty($this->input->post('stype'))) {
+		if (empty($cit_id) || empty($stype)) {
 			show_404();
 		}
 		$this->load->model(array('Cmall_item_model'));
@@ -898,7 +898,7 @@ class Cmall extends CB_Controller
 			''
 		);
 
-		if ($this->input->post('stype')) {
+		if ($stype) {
 			if ( ! $mem_id) {
 				alert(
 					'로그인 후 이용이 가능합니다',
@@ -910,13 +910,13 @@ class Cmall extends CB_Controller
 
 			
 
-			if ($this->input->post('stype') === 'wish') {
+			if ($stype === 'wish') {
 				$return = $this->cmalllib->addwish($mem_id, $cit_id);
 				if ($return) {
 					$result = array('msg' => 'success');
 					$view['view']=$result;
 				}
-			} elseif ($this->input->post('stype') === 'cart'
+			} elseif ($stype === 'cart'
 				// && $this->input->post('chk_detail')
 				// && is_array($this->input->post('chk_detail'))
 				&& $this->input->post('detail_qty')) {
@@ -930,7 +930,7 @@ class Cmall extends CB_Controller
 					$result = array('msg' => 'success');
 					$view['view']=$result;
 				}
-			} elseif ($this->input->post('stype') === 'order'
+			} elseif ($stype === 'order'
 				// && $this->input->post('chk_detail')
 				// && is_array($this->input->post('chk_detail'))
 				&& $this->input->post('detail_qty')) {
@@ -955,7 +955,7 @@ class Cmall extends CB_Controller
 		return $this->response($this->data, parent::HTTP_OK);
 	}
 
-	public function itemwish_delete($cit_id = 0)
+	public function itemwish_delete($cit_id = 0,$stype ='wish')
 	{
 
 		
@@ -971,7 +971,7 @@ class Cmall extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
-		if (empty($cit_id) || empty($this->input->post('stype'))) {
+		if (empty($cit_id) || empty($stype)) {
 			show_404();
 		}
 		$this->load->model(array('Cmall_item_model'));
@@ -1005,7 +1005,7 @@ class Cmall extends CB_Controller
 			''
 		);
 
-		if ($this->input->post('stype')) {
+		if ($stype) {
 			if ( ! $mem_id) {
 				alert(
 					'로그인 후 이용이 가능합니다',
@@ -1017,13 +1017,13 @@ class Cmall extends CB_Controller
 
 			
 
-			if ($this->input->post('stype') === 'wish') {
+			if ($stype === 'wish') {
 				$return = $this->cmalllib->delwish($mem_id, $cit_id);
 				if ($return) {
 					$result = array('msg' => 'success');
 					$view['view']=$result;
 				}
-			} elseif ($this->input->post('stype') === 'cart'
+			} elseif ($stype === 'cart'
 				// && $this->input->post('chk_detail')
 				// && is_array($this->input->post('chk_detail'))
 				&& $this->input->post('detail_qty')) {
@@ -1037,7 +1037,7 @@ class Cmall extends CB_Controller
 					$result = array('msg' => 'success');
 					$view['view']=$result;
 				}
-			} elseif ($this->input->post('stype') === 'order'
+			} elseif ($stype === 'order'
 				// && $this->input->post('chk_detail')
 				// && is_array($this->input->post('chk_detail'))
 				&& $this->input->post('detail_qty')) {
@@ -1062,7 +1062,7 @@ class Cmall extends CB_Controller
 		return $this->response($this->data, 204);
 	}
 
-	public function storewish_post($brd_id = 0)
+	public function storewish_post($brd_id = 0,$stype='store')
 	{
 
 		
@@ -1079,7 +1079,7 @@ class Cmall extends CB_Controller
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		
-		if (empty($brd_id ) || empty($this->input->post('stype'))) {
+		if (empty($brd_id ) || empty($stype)) {
 			show_404();
 		}
 
@@ -1110,7 +1110,7 @@ class Cmall extends CB_Controller
 			$check
 		);
 
-		if ($this->input->post('stype')) {
+		if ($stype) {
 			if ( ! $mem_id) {
 				alert(
 					'로그인 후 이용이 가능합니다',"",403
@@ -1120,7 +1120,7 @@ class Cmall extends CB_Controller
 
 			
 
-			if ($this->input->post('stype') === 'store') {
+			if ($stype === 'store') {
 				$return = $this->cmalllib->addstore($mem_id, $brd_id);	
 				if ($return) {
 					$result = array('msg' => 'success');
@@ -1143,7 +1143,7 @@ class Cmall extends CB_Controller
 		return $this->response($this->data, parent::HTTP_OK);
 	}
 
-	public function storewish_delete($brd_id = '')
+	public function storewish_delete($brd_id = '',$stype='store'))
 	{
 
 		
@@ -1160,7 +1160,7 @@ class Cmall extends CB_Controller
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		
-		if (empty($brd_id ) || empty($this->input->post('stype'))) {
+		if (empty($brd_id ) || empty($stype)) {
 			show_404();
 		}
 
@@ -1191,7 +1191,7 @@ class Cmall extends CB_Controller
 			$check
 		);
 
-		if ($this->input->post('stype')) {
+		if ($stype) {
 			if ( ! $mem_id) {
 				alert(
 					'로그인 후 이용이 가능합니다',"",403
@@ -1201,7 +1201,7 @@ class Cmall extends CB_Controller
 
 			
 
-			if ($this->input->post('stype') === 'store') {
+			if ($stype === 'store') {
 				$return = $this->cmalllib->delstore($mem_id, $brd_id);	
 				if ($return) {
 					$result = array('msg' => 'success');
