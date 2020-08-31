@@ -1087,7 +1087,10 @@ class Cmall extends CB_Controller
 
 		$board = $this->board->item_all($brd_id);
 
-		
+		if (empty(element('brd_id', $board))) {
+			alert('없는 스토어입니다.',"",406);
+		}
+
 		if (element('brd_blind', $board)) {
 			alert('이 스토어는 현재 운영하지 않습니다',"",406);
 		}
@@ -3535,7 +3538,7 @@ class Cmall extends CB_Controller
 			);
 		$view['view']['storewishcount'] = $this->Cmall_storewishlist_model->count_by($where);	
 
-		$view['view']['addstorewish_url'] = cmall_item_url('storewish/'.element('brd_id',$board));
+		$view['view']['addstorewish_url'] = base_url('storewish/'.element('brd_id',$board));
 		$view['view']['storewishstatus'] = 0;
 		if(!empty($mem_id)){
 			$where = array(

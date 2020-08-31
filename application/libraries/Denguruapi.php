@@ -42,7 +42,7 @@ class Denguruapi extends CI_Controller
         
         $this->CI->load->model(array( 'Cmall_storewishlist_model','Cmall_wishlist_model'));
 
-        $data['addstorewish_url'] = cmall_item_url('storewish/'.element('brd_id',$data));
+        $data['addstorewish_url'] = base_url('storewish/'.element('brd_id',$data));
         $data['storewishstatus'] = 0;
         if(!empty($this->CI->member->is_member())){
             $where = array(
@@ -53,7 +53,7 @@ class Denguruapi extends CI_Controller
         }
         
         
-        $data['additemwish_url'] = cmall_item_url('itemwish/'.element('cit_id',$data));     
+        $data['additemwish_url'] = base_url('itemwish/'.element('cit_id',$data));     
         $data['itemwishstatus'] = 0;
 
         if(!empty($this->CI->member->is_member())){
