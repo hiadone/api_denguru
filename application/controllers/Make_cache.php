@@ -18,7 +18,7 @@ class Make_cache extends CB_Controller
     /**
      * 모델을 로딩합니다
      */
-    protected $models = array('Post', 'Post_meta', 'Post_extra_vars','Crawl_tag','Vision_api_label','Post_link','Cmall_item','Board_crawl');
+    protected $models = array('Board');
 
     /**
      * 헬퍼를 로딩합니다
@@ -42,7 +42,7 @@ class Make_cache extends CB_Controller
      */
     
 
-    public function lists()
+    public function lists_get()
     {   
         $this->make_brd_tags_cache();
         $this->make_brd_attr_cache();
@@ -72,9 +72,9 @@ class Make_cache extends CB_Controller
         
     }
 
-    public function make_brd_tags_cache($cachename,$cachetime = 86400)
+    public function make_brd_tags_cache()
     {   
-        if(!$cachename) return false;
+        
         
 
         $where['brd_blind'] = 0;
@@ -87,6 +87,7 @@ class Make_cache extends CB_Controller
         if (element('list', $result)) {         
             foreach (element('list', $result) as $key => $val) {                
                 $cachename = 'latest/get_popular_brd_tags' . element('brd_id',$val) . '_10';
+                $cachetime = 86400;
                 $data = array();
 
                 $this->load->model(array('Crawl_tag_model'));
@@ -104,9 +105,9 @@ class Make_cache extends CB_Controller
     }
 
 
-    public function make_brd_attr_cache($cachename,$cachetime = 86400)
+    public function make_brd_attr_cache()
     {   
-        if(!$cachename) return false;
+        
         
 
         $where['brd_blind'] = 0;
@@ -119,6 +120,7 @@ class Make_cache extends CB_Controller
         if (element('list', $result)) {         
             foreach (element('list', $result) as $key => $val) {                
                 $cachename = 'latest/get_popular_brd_attr' . element('brd_id',$val) . '_10';
+                $cachetime = 86400;
                 $data = array();
 
                 $this->load->model(array('Cmall_attr_model'));
