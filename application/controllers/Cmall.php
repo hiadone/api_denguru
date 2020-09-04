@@ -78,7 +78,7 @@ class Cmall extends CB_Controller
 		$config = array(
 			'cit_type1' => '1',
 			'limit' => '5',
-			'cache_minute' => 10,
+			'cache_minute' => 86400,
 			// 'select' => $select,
 		);
 		$result_1 = $this->denguruapi->cit_latest($config);
@@ -131,7 +131,7 @@ class Cmall extends CB_Controller
 		$config = array(
 			'cit_type2' => '2',
 			'limit' => '20',
-			'cache_minute' => 10,
+			'cache_minute' => 86400,
 			// 'select' => $select,
 		);
 
@@ -2390,7 +2390,7 @@ class Cmall extends CB_Controller
 					else
 						$data['list'][element('brd_id',$val)]['cnt']++;
 					
-					$data['list'][element('brd_id',$val)]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
+					$data['list'][element('brd_id',$val)]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val));
 
 					
 				}
@@ -2566,7 +2566,7 @@ class Cmall extends CB_Controller
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
 				$result['list'][$key] = $this->denguruapi->get_brd_info(element('brd_id', $val),$result['list'][$key]);
-				$result['list'][$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val),8);
+				// $result['list'][$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val));
 
 				
 				$result['list'][$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
@@ -3249,7 +3249,7 @@ class Cmall extends CB_Controller
 		$config = array(
 			'cit_type1' => '1',
 			'limit' => '30',
-			'cache_minute' => 10
+			'cache_minute' => 86400
 		);
 
 		$result_1 = $this->denguruapi->cit_latest($config);
@@ -3553,8 +3553,8 @@ class Cmall extends CB_Controller
 		
 
 		$view['view']['data'] = $this->denguruapi->get_brd_info(element('brd_id', $board));
-		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $board),8);
-		$view['view']['data']['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $board),8);
+		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $board));
+		$view['view']['data']['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $board));
 		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));
 
 		

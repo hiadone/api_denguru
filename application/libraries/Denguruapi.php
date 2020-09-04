@@ -106,23 +106,22 @@ class Denguruapi extends CI_Controller
 
         $cmall_item = $this->convert_cit_info($cit_info);
 
-        if(empty($cmall_item)) $cmall_item = array();
-        // $cmall_item['cit_id'] = $cit_id;
-        // $cmall_item['cit_name'] = $this->item_id('cit_name',$cit_id);
-        // $cmall_item['cit_review_average'] = $this->item_id('cit_review_average',$cit_id);
-        // $cmall_item['cit_price'] = $this->item_id('cit_price',$cit_id);
-        // $cmall_item['cit_price_sale'] = $this->item_id('cit_price_sale',$cit_id);
-        // $cmall_item['cit_name'] = $this->item_id('cit_name',$cit_id);
+        if(empty($cmall_item)) {
+            $cmall_item['cit_id'] = 0;
+            $cmall_item['cit_name'] = '없는 상품입니다';
+            $cmall_item['cit_review_average'] = 0;
+            $cmall_item['cit_price'] = 0;
+            $cmall_item['cit_price_sale'] = 0;            
 
-        // $cmall_item['cit_image'] = cdn_url('cmallitem',$this->item_id('cit_file_1',$cit_id));
-        // $cmall_item['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
-        // $cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
-        // if(empty($this->item_id('cit_price_sale',$cit_id)))
-        //  $cmall_item['cit_price_sale_percent'] = 0;
-        // else $cmall_item['cit_price_sale_percent'] = number_format(($this->item_id('cit_price',$cit_id) - $this->item_id('cit_price_sale',$cit_id)) / $this->item_id('cit_price',$cit_id) * 100);
+            $cmall_item['cit_image'] = cdn_url('cmallitem',element('cit_file_1',$cmall_item));
+            $cmall_item['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
+            $cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
+            if(empty(element('cit_price_sale',$cmall_item)))
+             $cmall_item['cit_price_sale_percent'] = 0;
+            else $cmall_item['cit_price_sale_percent'] = number_format((element('cit_price',$cmall_item) - element('cit_price_sale',$cmall_item)) / element('cit_price',$cmall_item) * 100);
 
-        // $cmall_item['cit_brand'] = $this->item_id('cbr_value_kr',$cit_id) ? $this->item_id('cbr_value_kr',$cit_id) : $this->item_id('cbr_value_en',$cit_id);
-
+            $cmall_item['cit_brand'] = element('cbr_value_kr',$cmall_item) ? element('cbr_value_kr',$cmall_item) : element('cbr_value_en',$cmall_item);
+        }
         $cmall_item = array_merge($arr, $cmall_item);
 
         return $cmall_item;
@@ -203,7 +202,7 @@ class Denguruapi extends CI_Controller
         if ( ! $result = $this->CI->cache->get($cachename)) {
             $this->CI->db->select($select);
             $this->CI->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
-            $this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'left');
+            $this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
             $this->CI->db->where($where);
             $this->CI->db->limit($limit);
             $this->CI->db->order_by('cit_order', 'asc');
@@ -255,18 +254,26 @@ class Denguruapi extends CI_Controller
         $this->CI->load->library(array('board'));
 
         $board = array();
-        $board['brd_id'] = $brd_id;
-        $board['brd_name'] = $this->CI->board->item_id('brd_name',$brd_id);
-        $board['brd_image'] = cdn_url('board',$this->CI->board->item_id('brd_image',$brd_id));
-        $board['brd_outlink_url'] = base_url('postact/brd_link/'.$brd_id);
-        $board['brd_inlink_url'] = base_url('cmall/store/'.$brd_id);
+        if($this->CI->board->item_id('brd_id',$brd_id)){
+            $board['brd_id'] = $brd_id;
+            $board['brd_name'] = $this->CI->board->item_id('brd_name',$brd_id);
+            $board['brd_image'] = cdn_url('board',$this->CI->board->item_id('brd_image',$brd_id));
+            $board['brd_outlink_url'] = base_url('postact/brd_link/'.$brd_id);
+            $board['brd_inlink_url'] = base_url('cmall/store/'.$brd_id);
+        } else {
+            $board['brd_id'] = 0;
+            $board['brd_name'] = '없는 스토어 입니다.';
+            $board['brd_image'] = thumb_url('board');
+            $board['brd_outlink_url'] = '';
+            $board['brd_inlink_url'] = '';
+        }
 
         $board = array_merge($board, $arr);
 
         return $board;
     }
 
-    public function get_popular_brd_tags($brd_id = 0, $limit = '')
+    public function get_popular_brd_tags($brd_id = 0, $limit = 10)
     {
         $cachename = 'latest/get_popular_brd_tags' . $brd_id . '_' . $limit;
         $data = array();
@@ -285,7 +292,7 @@ class Denguruapi extends CI_Controller
         return isset($data['result']) ? $data['result'] : array();
     }
 
-    public function get_popular_brd_attr($brd_id = 0, $limit = '')
+    public function get_popular_brd_attr($brd_id = 0, $limit = 10)
     {
         $cachename = 'latest/get_popular_brd_attr' . $brd_id . '_' . $limit;
         $data = array();

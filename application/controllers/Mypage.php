@@ -1495,6 +1495,7 @@ class Mypage extends CB_Controller
 
         $result = $this->Like_model
             ->get_review_like_list($per_page, $offset, $where, '', $findex, $forder);
+        
         $list_num = $result['total_rows'] - ($page - 1) * $per_page;
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {

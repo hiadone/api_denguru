@@ -64,14 +64,17 @@ class Cmall_review extends CB_Controller
             }
         }
         $mem_id = (int) $this->member->item('mem_id');
-        $review_flag = 0;
+        $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
 
         $per_page = 1;
         if($mem_id){
             $reviewwhere = array('mem_id' => $mem_id);
             
-            if($this->Cmall_review_model->count_by($reviewwhere)) $review_flag = 1;
-            $per_page = 5;
+            if($this->Cmall_review_model->count_by($reviewwhere)) {
+                $review_flag = 1;
+                $per_page = 5;
+            }
+            
         }
 
         $view['view']['review_flag'] = $review_flag;
@@ -116,7 +119,9 @@ class Cmall_review extends CB_Controller
             : $this->cbconfig->item('cmall_product_review_content_target_blank');
 
         $result = $this->Cmall_review_model
-            ->get_list($per_page, $offset, $where, '', $findex, $forder);
+            ->get_admin_list($per_page, $offset, $where, '', $findex, $forder);
+
+
         $list_num = $result['total_rows'] - ($page - 1) * $per_page;
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
@@ -348,7 +353,7 @@ class Cmall_review extends CB_Controller
         // $this->Cmall_review_model->_select = $select;
 
         $result = $this->Cmall_review_model
-            ->get_list($per_page, $offset, $where, '', $findex, $forder);
+            ->get_admin_list($per_page, $offset, $where, '', $findex, $forder);
 
         // $result = $this->Cmall_attr_model->get_review_list($per_page, $offset, $where, '', $findex, $forder);
         // 

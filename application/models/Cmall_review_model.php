@@ -31,10 +31,12 @@ class Cmall_review_model extends CB_Model
 
 	public function get_admin_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
 	{
-		$select = 'cmall_review.*, member.mem_id, member.mem_userid, member.mem_nickname, member.mem_is_admin, member.mem_icon,member_pet.*';
+		// $select = 'cmall_review.*, member.mem_id, member.mem_userid, member.mem_nickname, member.mem_is_admin, member.mem_icon,member_pet.*';
+
+		$select = 'cmall_review.*, member.mem_id, member.mem_userid, member.mem_nickname, member.mem_is_admin, member.mem_icon';
 
 		$join[] = array('table' => 'member', 'on' => 'cmall_review.mem_id = member.mem_id', 'type' => 'inner');
-		$join[] = array('table' => 'member_pet', 'on' => 'member.mem_id = member_pet.mem_id and member_pet.pet_main=1', 'type' => 'left');
+		$join[] = array('table' => 'cmall_item', 'on' => 'cmall_review.cit_id = cmall_item.cit_id ', 'type' => 'inner');
 		$result = $this->_get_list_common($select, $join, $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop);
 		return $result;
 	}
