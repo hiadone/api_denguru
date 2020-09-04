@@ -64,20 +64,20 @@ class Cmall_review extends CB_Controller
             }
         }
         $mem_id = (int) $this->member->item('mem_id');
-        $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
+        // $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
 
-        $per_page = 1;
-        if($mem_id){
-            $reviewwhere = array('mem_id' => $mem_id);
+        // $per_page = 1;
+        // if($mem_id){
+        //     $reviewwhere = array('mem_id' => $mem_id);
             
-            if($this->Cmall_review_model->count_by($reviewwhere)) {
-                $review_flag = 1;
-                $per_page = 5;
-            }
+        //     if($this->Cmall_review_model->count_by($reviewwhere)) {
+        //         $review_flag = 1;
+        //         $per_page = 5;
+        //     }
             
-        }
+        // }
 
-        $view['view']['review_flag'] = $review_flag;
+        // $view['view']['review_flag'] = $review_flag;
         // $field = array(
         //     'cmall_review' => array('cre_id','cit_id','cre_good','cre_bad','cre_tip','cre_file_1','cre_file_2','cre_file_3','cre_file_4','cre_file_5','cre_file_6','cre_file_7','cre_file_8','cre_file_9','cre_file_10','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
         // );
@@ -95,7 +95,7 @@ class Cmall_review extends CB_Controller
         $forder = $this->input->get('forder', null, 'desc');
         $sfield = '';
         $skeyword = '';
-
+        $per_page = 5;
         
         $offset = ($page - 1) * $per_page;
 
@@ -154,9 +154,9 @@ class Cmall_review extends CB_Controller
 
                 $result['list'][$key]['num'] = $list_num--;
 
-                if(!$review_flag){
-                    break;
-                }
+                // if(!$review_flag){
+                //     break;
+                // }
                 
 
             }
@@ -280,7 +280,21 @@ class Cmall_review extends CB_Controller
 
         $data['item']['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$item));
 
-        $view['view']['data'] = $data;
+        $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
+
+        $per_page = 1;
+        if($mem_id){
+            $reviewwhere = array('mem_id' => $mem_id);
+            
+            if($this->Cmall_review_model->count_by($reviewwhere)) {
+                $review_flag = 1;
+                $per_page = 5;
+            }
+            
+        }
+
+        $view['view']['review_flag'] = $review_flag;
+        
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
          */
