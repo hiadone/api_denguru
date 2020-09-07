@@ -123,14 +123,15 @@ class Event extends CB_Controller
                 
                 if (element('eve_image', $val)) {
                     
-                    $result['list'][$key]['eve_image_url'] = thumb_url('event', element('eve_image', $val));
+                    $result['list'][$key]['eve_image_url'] = cdn_url('event', element('eve_image', $val));
                     
-                } else {
-                    $thumb_url = get_post_image_url(element('eve_content', $val));
-                    $result['list'][$key]['eve_image_url'] = $thumb_url
-                        ? $thumb_url
-                        : thumb_url('', '');
-                }
+                } 
+                // else {
+                //     $thumb_url = get_post_image_url(element('eve_content', $val));
+                //     $result['list'][$key]['eve_image_url'] = $thumb_url
+                //         ? $thumb_url
+                //         : thumb_url('', '');
+                // }
               
 
                 if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
@@ -310,7 +311,7 @@ class Event extends CB_Controller
 
 
 
-             $view['view']['data']['image_url'] = thumb_url(config_item('uploads_dir') . '/event/' . element('eve_image', $getdata));
+             $view['view']['data']['image_url'] = cdn_url('event' , element('eve_image', $getdata));
                         
                     
             $event_rel = $this->{$this->modelname}->get_event($pid);

@@ -618,7 +618,7 @@ class Denguruapi extends CI_Controller
 
         $this->CI->load->model(
             array(
-                'Member_pet_model','Reviewer_model','Pet_attr_model','Pet_allergy_model'
+                'Member_pet_model','Reviewer_model','Pet_attr_model','Pet_allergy_model','Cmall_kind_model'
             )
         );
 
@@ -642,11 +642,20 @@ class Denguruapi extends CI_Controller
         $member = $this->CI->Member_model->get_by_memid($_mem_id);
         
         
+        
+
+        
+        
         $pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
         
         if (is_array($pet)) {
             $member = array_merge($member, $pet);
         }
+
+        $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pet_form',$member));
+
+        $pet_kind = $this->CI->Cmall_kind_model->get_kind_info(element('pet_kind',$member));
+        
 
         $data['mem_id'] = element('mem_id',$member);
         $data['mem_userid'] = element('mem_userid',$member);
@@ -661,8 +670,8 @@ class Denguruapi extends CI_Controller
         $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
         $data['pet_neutral'] = element('pet_neutral',$member);
         $data['pet_weight'] = element('pet_weight',$member);
-        $data['pet_form'] = element(element('pet_form',$member),config_item('pet_form'),'');
-        $data['pet_kind'] = element('pet_kind',$member);
+        $data['pet_form'] = element('pat_value',$pet_form,'');
+        $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
 
         $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$member));
         
