@@ -866,8 +866,8 @@ class Cmall_review extends CB_Controller
                     if ($value) {
                         $uploadconfig = array();
                         $uploadconfig['upload_path'] = $upload_path;
-                        $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|mp4|m4v|f4v|mov|flv|webm';
-                        $uploadconfig['max_size'] = '100000';
+                        $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|acc|flv|f4a|f4v|mov|mp3|mp4|m4a|m4v|oga|ogg|rss|webm';
+                        $uploadconfig['max_size'] = 100 * 1024;
                         $uploadconfig['encrypt_name'] = true;
 
                         $this->upload->initialize($uploadconfig);
@@ -934,8 +934,8 @@ class Cmall_review extends CB_Controller
                     if ($value) {
                         $uploadconfig = array();
                         $uploadconfig['upload_path'] = $upload_path;
-                        $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|mp4|m4v|f4v|mov|flv|webm';
-                        $uploadconfig['max_size'] = '100000';
+                        $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|acc|flv|f4a|f4v|mov|mp3|mp4|m4a|m4v|oga|ogg|rss|webm';
+                        $uploadconfig['max_size'] = 100 * 1024;
                         $uploadconfig['encrypt_name'] = true;
                         $this->upload->initialize($uploadconfig);
                         $_FILES['userfile']['name'] = $_FILES['cre_file_update']['name'][$i];
@@ -947,7 +947,7 @@ class Cmall_review extends CB_Controller
                             $filedata = $this->upload->data();
 
                             $oldcrefile = $this->Review_file_model->get_one($i);
-                            if ((int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $post)) {
+                            if ((int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $item)) {
                                 alert('잘못된 접근입니다');
                             }
                             @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $oldcrefile));

@@ -58,21 +58,61 @@ class Aws_s3 {
           'ContentType'=> $file_type
         ));
     }
-
-
-    function download_file($file_path,$file_name,$upload_path,$file_type='')
+ 
+    function download_file($s3_file,$source_file)
     {   
 
-        $file_url = $file_path.$file_name;
-        $s3_key = $upload_path.$file_name;
-
+        
+        $s3_key = $s3_file;
+        
         
 
         return $this->s3Client->getObject(array(
           'Bucket' => $this->s3_bucket_name,
           'Key'    => $s3_key,
-          'SaveAs'   => $s3_key          
+          'SaveAs' => $source_file,
         ));
+    }
+
+    function is_file($file_path)
+    {   
+
+        
+        $s3_key = $file_path;
+
+        
+
+        return $this->s3Client->doesObjectExist(
+          $this->s3_bucket_name,
+          $s3_key
+          
+        );
+    }
+
+
+
+
+    function get_listObjects()
+    {   
+
+        try {
+          return $this->s3Client->getPaginator('ListObjects', array(
+                    'Bucket' => $this->s3_bucket_name,'Prefix' => 'denguru_uploads/cmallitem'
+                ));
+
+          
+
+
+        } catch (S3Exception $e) {
+            echo $e->getMessage();
+            exit;
+        }
+
+
+
+        
+
+        
     }
 
     function delete_file($file_name)

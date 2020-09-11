@@ -173,9 +173,10 @@ if ( ! function_exists('document_url')) {
 if ( ! function_exists('cdn_url')) {
 	function cdn_url($type = '',$uri = '', $protocol = 'http://')
 	{	
-		if (empty($type) OR empty($uri)) 
-			return thumb_url($type);
-		else 
+		
+		if (get_instance()->aws_s3->is_file(config_item('uploads_dir')."/".$type."/".$uri))
 			return get_instance()->config->cdn_url($type."/".$uri, $protocol);
+		else 
+			return thumb_url();
 	}
 }

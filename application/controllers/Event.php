@@ -24,12 +24,12 @@ class Event extends CB_Controller
     /**
      * 모델을 로딩합니다
      */
-    protected $models = array('Event');
+    protected $models = array('Event','Event_group','Event_rel');
 
     /**
      * 이 컨트롤러의 메인 모델 이름입니다
      */
-    protected $modelname = 'Event_model';
+    protected $modelname = 'Event_group_model';
 
     /**
      * 헬퍼를 로딩합니다
@@ -67,7 +67,7 @@ class Event extends CB_Controller
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
         
 
-        $findex = '(CASE WHEN eve_order=0 THEN -999 ELSE eve_order END),eve_id';
+        $findex = 'egr_order,egr_id';
         $forder = 'desc';
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
@@ -80,16 +80,16 @@ class Event extends CB_Controller
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
-        $this->{$this->modelname}->allow_search_field = array('eve_id', 'eve_title', 'eve_content'); // 검색이 가능한 필드
-        $this->{$this->modelname}->search_field_equal = array('eve_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
-        $this->{$this->modelname}->allow_order_field = array('eve_title', 'eve_id', 'eve_start_date', 'eve_end_date', 'eve_activated','(CASE WHEN eve_order=0 THEN -999 ELSE eve_order END),eve_id'); // 정렬이 가능한 필드
+        $this->{$this->modelname}->allow_search_field = array('egr_id', 'egr_title', 'egr_content'); // 검색이 가능한 필드
+        $this->{$this->modelname}->search_field_equal = array('egr_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
+        $this->{$this->modelname}->allow_order_field = array('egr_title', 'egr_id', 'egr_start_date', 'egr_end_date', 'egr_activated','egr_order,egr_id'); // 정렬이 가능한 필드
 
         $where = array();
         
-        $where['eve_activated'] = '1';
+        $where['egr_activated'] = '1';
         
         $field = array(
-            'event' => array('eve_id','eve_start_date','eve_end_date','eve_title','eve_datetime','eve_image','eve_content,eve_content_html_type,eve_width'),
+            'event_group' => array('egr_id','egr_start_date','egr_end_date','egr_title','egr_datetime','egr_image','egr_content'),
             
         );
         
@@ -106,43 +106,39 @@ class Event extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key]['post_url'] = base_url('event/post/'.element('eve_id', $val));
+                $result['list'][$key]['post_url'] = base_url('event/post/'.element('egr_id', $val));
 
                 $result['list'][$key]['display_datetime'] = display_datetime(
-                    element('eve_datetime', $val),'full'
+                    element('egr_datetime', $val),'full'
                 );
 
                 $result['list'][$key]['display_content'] = display_html_content(
-                    element('eve_content', $val),
-                    element('eve_content_html_type', $val),
-                    element('eve_width', $val),
+                    element('egr_content', $val),
                     
                 );
                 
-                $result['list'][$key]['eve_image_url'] = '';
+                $result['list'][$key]['egr_image_url'] = '';
                 
-                if (element('eve_image', $val)) {
+                if (element('egr_image', $val)) {
                     
-                    $result['list'][$key]['eve_image_url'] = cdn_url('event', element('eve_image', $val));
+                    $result['list'][$key]['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $val));
                     
                 } 
                 // else {
-                //     $thumb_url = get_post_image_url(element('eve_content', $val));
-                //     $result['list'][$key]['eve_image_url'] = $thumb_url
+                //     $thumb_url = get_post_image_url(element('egr_content', $val));
+                //     $result['list'][$key]['egr_image_url'] = $thumb_url
                 //         ? $thumb_url
                 //         : thumb_url('', '');
                 // }
               
 
-                if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
-                    $result['list'][$key]['eve_start_date'] = display_datetime(
-                                        element('eve_datetime', $val),'full'
-                                        );
+                if (empty($val['egr_start_date']) OR $val['egr_start_date'] === '0000-00-00') {
+                    $result['list'][$key]['egr_start_date'] = '0000-00-00';
 
 
                 }
-                if (empty($val['eve_end_date']) OR $val['eve_end_date'] === '0000-00-00') {
-                    $result['list'][$key]['eve_end_date'] = '지속';
+                if (empty($val['egr_end_date']) OR $val['egr_end_date'] === '0000-00-00') {
+                    $result['list'][$key]['egr_end_date'] = '0000-00-00';
                 }
                 // $result['list'][$key]['num'] = $list_num--;
             }
@@ -231,7 +227,7 @@ class Event extends CB_Controller
     /**
      * 게시판 글쓰기 또는 수정 페이지를 가져오는 메소드입니다
      */
-    public function _post($pid = 0)
+    public function _post($pid)
     {
         // 이벤트 라이브러리를 로딩합니다
         // $eventname = 'event_event_post';
@@ -246,22 +242,63 @@ class Event extends CB_Controller
         /**
          * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
          */
-        if ($pid) {
+        // if ($pid) {
             $pid = (int) $pid;
             if (empty($pid) OR $pid < 1) {
                 show_404();
             }
-        }
+        // }
         $primary_key = $this->{$this->modelname}->primary_key;
 
         /**
          * 수정 페이지일 경우 기존 데이터를 가져옵니다
          */
-        $getdata = array();
-        if ($pid) {
+        // $getdata = array();
+        // if ($pid) {
             $getdata = $this->{$this->modelname}->get_one($pid);
 
-        }
+
+            $getdata['display_datetime'] = display_datetime(
+                element('egr_datetime', $getdata),'full'
+            );
+
+            $getdata['display_content'] = display_html_content(
+                element('egr_content', $getdata),
+                
+            );
+            
+            $getdata['egr_image_url'] = '';
+            
+            if (element('egr_image', $getdata)) {
+                
+                $getdata['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $getdata));
+                
+            } 
+
+            $getdata['egr_detail_image_url'] = '';
+            
+            if (element('egr_detail_image', $getdata)) {
+                
+                $getdata['egr_detail_image_url'] = cdn_url('eventgroup', element('egr_detail_image', $getdata));
+                
+            } 
+            // else {
+            //     $thumb_url = get_post_image_url(element('egr_content', $val));
+            //     $result['list'][$key]['egr_image_url'] = $thumb_url
+            //         ? $thumb_url
+            //         : thumb_url('', '');
+            // }
+            
+
+            if (empty($getdata['egr_start_date']) OR $getdata['egr_start_date'] === '0000-00-00') {
+                $getdata['egr_start_date'] = '0000-00-00';
+
+
+            }
+            if (empty($getdata['egr_end_date']) OR $getdata['egr_end_date'] === '0000-00-00') {
+                $getdata['egr_end_date'] = '0000-00-00';
+            }
+        // }
 
 
         /**
@@ -276,20 +313,7 @@ class Event extends CB_Controller
          */
     
 
-            // 이벤트가 존재하면 실행합니다
-            // $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
-
-            if ($pid) {
-                if (empty($getdata['eve_start_date']) OR $getdata['eve_start_date'] === '0000-00-00') {
-                    $getdata['eve_start_date'] = display_datetime(
-                    element('eve_datetime', $getdata),'full'
-                    );
-                }
-                if (empty($getdata['eve_end_date']) OR $getdata['eve_end_date'] === '0000-00-00') {
-                    $getdata['eve_end_date'] = '지속';
-                }
-                $view['view']['data'] = $getdata;
-            }
+            
 
             /**
              * primary key 정보를 저장합니다
@@ -300,36 +324,74 @@ class Event extends CB_Controller
             // $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
 
             $view['view']['list_url'] = base_url('/event/lists');
+                        
             
+            $where = array(
+                'egr_id' => $pid,
+            );
 
+            $result = $this->Event_model->get_today_list($pid);
 
-            $view['view']['data']['display_content'] = display_html_content(
-                        element('eve_content', $getdata),
-                        element('eve_content_html_type', $getdata)
+            if (element('list', $result)) {
+                foreach (element('list', $result) as $key => $val) {
+
+                    $result['list'][$key]['display_datetime'] = display_datetime(
+                        element('eve_datetime', $val),'full'
                     );
 
-
-
-
-             $view['view']['data']['image_url'] = cdn_url('event' , element('eve_image', $getdata));
+                    $result['list'][$key]['display_content'] = display_html_content(
+                        element('eve_content', $val),
                         
+                    );
                     
-            $event_rel = $this->{$this->modelname}->get_event($pid);
-            
-            if($event_rel){
-                $eveval_id =array();
-                foreach($event_rel as $eveval){
-                    array_push($eveval_id,element('cit_id',$eveval));
-                }
+                    $result['list'][$key]['eve_image_url'] = '';
+                    
+                    if (element('eve_image', $val)) {
+                        
+                        $result['list'][$key]['eve_image_url'] = cdn_url('event', element('eve_image', $val));
+                        
+                    } 
+                    // else {
+                    //     $thumb_url = get_post_image_url(element('egr_content', $val));
+                    //     $result['list'][$key]['egr_image_url'] = $thumb_url
+                    //         ? $thumb_url
+                    //         : thumb_url('', '');
+                    // }
+                  
 
-                if(!empty($eveval_id)){
+                    if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
+                        $result['list'][$key]['eve_start_date'] = '0000-00-00';
 
-                    $this->load->library('cmalllib');
 
-                    $view['view']['data']['itemlists'] = $this->cmalllib->_itemlists('','',array('cit_id' =>$eveval_id));
+                    }
+                    if (empty($val['eve_end_date']) OR $val['eve_end_date'] === '0000-00-00') {
+                        $result['list'][$key]['eve_end_date'] = '0000-00-00';
+                    }
+
+                    $event_rel = $this->Event_model->get_event(element('eve_id',$val));
+                    
+                    if($event_rel){
+                        $eveval_id =array();
+                        foreach($event_rel as $eveval){
+                            array_push($eveval_id,element('cit_id',$eveval));
+                        }
+
+                        if(!empty($eveval_id)){
+
+                            $this->load->library('cmalllib');
+                            $_itemlists = $this->cmalllib->_itemlists('','',array('cit_id' =>$eveval_id));
+                            $result['list'][$key]['itemlists'] = element('list',$_itemlists);
+                        }
+                    }
+
+
+                    // $result['list'][$key]['num'] = $list_num--;
                 }
             }
+
             
+            $view['view']['data'] = $getdata;
+            $view['view']['data']['secionlist'] = $result['list'];
 
             
             $view['view']['next_post'] = '';
@@ -339,37 +401,38 @@ class Event extends CB_Controller
             $use_prev_next = true;
             $param =& $this->querystring;
            
-            
+
             
 
             
             if ($use_prev_next) {
+
                 $where = array();
-                $where['eve_activated'] =1;
+                $where['egr_activated'] =1;
 
                 $view['view']['next_post'] = $next_post
                     = $this->{$this->modelname}
                     ->get_prev_next_post(
-                        element('eve_id', $getdata),
+                        element('egr_id', $getdata),
                         '',
                         'next',
                         $where
                     );
 
-                if (element('eve_id', $next_post)) {
-                    $view['view']['next_post']['url'] = document_post_url('event', element('eve_id', $next_post)) . '?' . $param->output();
+                if (element('egr_id', $next_post)) {
+                    $view['view']['next_post']['url'] = base_url('event/post/'. element('egr_id', $next_post)) . '?' . $param->output();
                 }
 
                 $view['view']['prev_post'] = $prev_post
                     = $this->{$this->modelname}
                     ->get_prev_next_post(
-                        element('eve_id', $getdata),
+                        element('egr_id', $getdata),
                         '',
                         'prev',
                         $where                        
                     );
-                if (element('eve_id', $prev_post)) {
-                    $view['view']['prev_post']['url'] = document_post_url('event', element('eve_id', $prev_post)) . '?' . $param->output();
+                if (element('egr_id', $prev_post)) {
+                    $view['view']['prev_post']['url'] = base_url('event/post/'. element('egr_id', $prev_post)) . '?' . $param->output();
                 }
             }
             
