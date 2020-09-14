@@ -79,6 +79,10 @@ class Cmall_review_model extends CB_Model
 		// $this->db->select('cre_content');
 		$this->db->where('cre_status', 1);
 		$this->db->where('cit_id', $cit_id);
+		$this->db->group_start();
+		$this->db->or_where('cre_image >',0);
+		$this->db->or_where('cre_file >',0);
+		$this->db->group_end();
 		$this->db->order_by('cre_like', 'desc');
 		$qry = $this->db->get($this->_table);
 		if($limit) $this->db->limit($limit);

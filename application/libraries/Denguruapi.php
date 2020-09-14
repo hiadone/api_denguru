@@ -578,9 +578,12 @@ class Denguruapi extends CI_Controller
                             'cre_id' => element('cre_id', $value),
                             'rfi_is_image' => 1,
                         );
-                        $file = $this->CI->Review_file_model->get_one('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
-                        if (element('rfi_filename', $file)) {
-                            $view['view']['list']['review_image'][] = cdn_url('cmall_review', element('rfi_filename', $file));
+                        $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
+
+                        foreach($file as $fval){
+                            if (element('rfi_filename', $fval)) {
+                                $view['view']['list']['review_image'][] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                            }
                         }
                     } 
 
@@ -589,9 +592,12 @@ class Denguruapi extends CI_Controller
                             'cre_id' => element('cre_id', $value),
                             'rfi_is_image' => 0,
                         );
-                        $file = $this->CI->Review_file_model->get_one('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
-                        if (element('rfi_filename', $file)) {
-                            $view['view']['list']['review_file'][] = cdn_url('cmall_review', element('rfi_filename', $file));
+                        $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
+
+                        foreach($file as $fval){
+                            if (element('rfi_filename', $fval)) {
+                                $view['view']['list']['review_file'][] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                            }
                         }
                     } 
                 

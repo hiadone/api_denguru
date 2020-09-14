@@ -441,7 +441,7 @@ class Cmall_review extends CB_Controller
 
         $view['view']['config']['pet_age'] = element(3,$pet_attr);;
         $view['view']['config']['pet_form'] = element(2,$pet_attr);
-        $view['view']['config']['pet_kind'] = $this->Cmall_kind_model->get_all_kind();
+        $view['view']['config']['pet_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
         $view['view']['config']['pet_attr'] = element(3,$pet_attr);;
         
 
@@ -722,7 +722,7 @@ class Cmall_review extends CB_Controller
 
 
         $view = array();
-        $view['view'] = array();
+        // $view['view'] = array();
 
         $mem_id = (int) $this->member->item('mem_id');
 
@@ -747,6 +747,7 @@ class Cmall_review extends CB_Controller
             }
         }
         
+        $item = array();
         if ($cit_id) {
             $item = $this->Cmall_item_model->get_one($cit_id,'cit_id,cit_status');
             
