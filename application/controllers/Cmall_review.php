@@ -549,7 +549,7 @@ class Cmall_review extends CB_Controller
         $offset = ($page - 1) * $per_page;
 
         $is_admin = $this->member->is_admin();
-
+        $mem_id = (int) $this->member->item('mem_id');
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
