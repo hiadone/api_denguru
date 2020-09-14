@@ -29,6 +29,8 @@ class Faq_model extends CB_Model
 	function __construct()
 	{
 		parent::__construct();
+
+        
 	}
 
 
@@ -53,7 +55,7 @@ class Faq_model extends CB_Model
 
             $data['result'] = $result;
             $data['cached'] = '1';
-
+            check_cache_dir('faq');
             $this->cache->save($cachename, $data, $this->cache_time);
         }
         return isset($data['result']) ? $data['result'] : false;

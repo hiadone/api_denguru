@@ -90,26 +90,6 @@ class Cmall_attr_model extends CB_Model
         return $result;
     }
 
-    public function get_popular_attr($brd_id = 0, $limit = '')
-    {
-        $this->db->select('count(*) as cnt, cat_value ', false);
-        $this->db->from('cmall_attr');
-        $this->db->join('cmall_attr_rel', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
-        $this->db->join('cmall_item', 'cmall_item.cit_id = cmall_attr_rel.cit_id', 'inner');
-
-        // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
-        if($brd_id)
-            $this->db->where('cmall_item.brd_id', $brd_id);
-        $this->db->where('cit_status', 1);
-        $this->db->group_by('cat_value');
-        $this->db->order_by('cnt', 'desc');
-        if ($limit) {
-            $this->db->limit($limit);
-        }
-        $qry = $this->db->get();
-        $result = $qry->result_array();
-
-        return $result;
-    }
+    
 }
 

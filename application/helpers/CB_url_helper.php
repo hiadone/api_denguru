@@ -174,9 +174,16 @@ if ( ! function_exists('cdn_url')) {
 	function cdn_url($type = '',$uri = '', $protocol = 'http://')
 	{	
 		
-		if (get_instance()->aws_s3->is_file(config_item('uploads_dir')."/".$type."/".$uri))
-			return get_instance()->config->cdn_url($type."/".$uri, $protocol);
-		else 
-			return thumb_url();
+		// if (get_instance()->aws_s3->is_file(config_item('uploads_dir')."/".$type."/".$uri))
+		// 	return get_instance()->config->cdn_url($type."/".$uri, $protocol);
+		// else 
+		// 	return thumb_url();
+
+
+			if(empty($type) || empty($uri))
+				return thumb_url();
+			else 
+				return get_instance()->config->cdn_url($type."/".$uri, $protocol);
+		
 	}
 }

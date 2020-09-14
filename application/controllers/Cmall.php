@@ -53,8 +53,8 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
-		$this->load->model(array('Cmall_item_model','Other_model','Cmall_review_model','Banner_model'));
-		$this->load->library('popuplib');
+		$this->load->model(array('Cmall_item_model','Other_model','Cmall_review_model'));
+		
 		$mem_id = (int) $this->member->item('mem_id');
 
 		
@@ -76,7 +76,7 @@ class Cmall extends CB_Controller
 		// $select = get_selected($field);
 
 		$config = array(
-			'cit_type1' => '1',
+			'cit_type' => '1',
 			'limit' => '5',
 			'cache_minute' => 86400,
 			// 'select' => $select,
@@ -129,7 +129,7 @@ class Cmall extends CB_Controller
 
 
 		$config = array(
-			'cit_type2' => '2',
+			'cit_type' => '2',
 			'limit' => '20',
 			'cache_minute' => 86400,
 			// 'select' => $select,
@@ -366,7 +366,6 @@ class Cmall extends CB_Controller
 			}
 		}
 		$view['view'] = $result;
-		
 		
 		return $view['view'];
 		
@@ -2661,7 +2660,7 @@ class Cmall extends CB_Controller
 
 		$view = array();
 		$view['view'] = array();
-
+		
 		$this->load->model(array('Board_model','Cmall_item_model','Pet_attr_model','Cmall_kind_model','Theme_model'));
 
 
@@ -2675,7 +2674,7 @@ class Cmall extends CB_Controller
 
 		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
 		$offset = ($page - 1) * $per_page;
-
+		
 		/**
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
@@ -2715,7 +2714,7 @@ class Cmall extends CB_Controller
 		// $where['cit_status'] = 1;
 		
 		$this->Board_model->_select='board.brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,board.cit_updated_datetime,cat_value';
-		$result = $this->Board_model->get_attr_list('','',$where);
+		// $result = $this->Board_model->get_attr_list('','',$where);
 
 		$result['list'] = $this->Board_model->get_board_list($where);
 		
@@ -3247,7 +3246,7 @@ class Cmall extends CB_Controller
 		$this->load->model('Cmall_item_model');
 
 		$config = array(
-			'cit_type1' => '1',
+			'cit_type' => '1',
 			'limit' => '30',
 			'cache_minute' => 86400
 		);

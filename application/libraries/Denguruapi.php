@@ -182,24 +182,25 @@ class Denguruapi extends CI_Controller
             
         $cache_minute = element('cache_minute', $config);
         $where['cit_status'] = 1;
-        if (element('cit_type1', $config)) {
+        if (element('cit_type', $config) =='1') {
             $where['cit_type1'] = 1;
         }
-        if (element('cit_type2', $config)) {
+        if (element('cit_type', $config) =='2') {
             $where['cit_type2'] = 1;
         }
-        if (element('cit_type3', $config)) {
+        if (element('cit_type', $config) =='3') {
             $where['cit_type3'] = 1;
         }
-        if (element('cit_type4', $config)) {
+        if (element('cit_type', $config) =='4') {
             $where['cit_type4'] = 1;
         }
         $limit = element('limit', $config) ? element('limit', $config) : 4;
         $select = element('select', $config) ? element('select', $config) : $this->CI->Board_model->_select;
 
-        $cachename = 'cmall/main-' . element('cit_type1', $config) . '-' . $limit . '-' . cdate('Y-m-d');
+        $cachename = 'cmall/main-' . element('cit_type', $config) . '-' . $limit . '-' . cdate('Y-m-d');
 
         if ( ! $result = $this->CI->cache->get($cachename)) {
+
             $this->CI->db->select($select);
             $this->CI->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
             $this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
@@ -208,6 +209,7 @@ class Denguruapi extends CI_Controller
             $this->CI->db->order_by('cit_order', 'asc');
             $qry = $this->CI->db->get('board');
             $result = $qry->result_array();
+            check_cache_dir('cmall');
             $this->CI->cache->save($cachename, $result, $cache_minute);
         }
         return $result;
@@ -280,8 +282,8 @@ class Denguruapi extends CI_Controller
 
         if ( ! $data = $this->CI->cache->get($cachename)) {
 
-            $this->CI->load->model( array('Crawl_tag_model'));
-            $result = $this->CI->Crawl_tag_model->get_popular_tags($brd_id, $limit);
+            $this->CI->load->model( array('Cmall_item_model'));
+            $result = $this->CI->Cmall_item_model->get_popular_tags($brd_id, $limit);
 
             $data['result'] = $result;
             $data['cached'] = '1';
@@ -299,8 +301,8 @@ class Denguruapi extends CI_Controller
 
         if ( ! $data = $this->CI->cache->get($cachename)) {
 
-            $this->CI->load->model( array('Cmall_attr_model'));
-            $result = $this->CI->Cmall_attr_model->get_popular_attr($brd_id, $limit);
+            $this->CI->load->model( array('Cmall_item_model'));
+            $result = $this->CI->Cmall_item_model->get_popular_attr($brd_id, $limit);
 
             $data['result'] = $result;
             $data['cached'] = '1';
