@@ -2259,7 +2259,7 @@ class Mypage extends CB_Controller
 
             
 	        $view['view']['config']['pet_form'] = element(2,$pet_attr);
-	        $view['view']['config']['pet_kind'] = $this->Cmall_kind_model->get_all_kind();
+	        $view['view']['config']['pet_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
 	        $view['view']['config']['pet_attr'] = element(1,$pet_attr);
 	        $view['view']['config']['pet_age'] = element(3,$pet_attr);;
             
