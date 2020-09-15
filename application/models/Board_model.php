@@ -260,29 +260,35 @@ class Board_model extends CB_Model
 	{
 		$use_cache = false;
 		if ($primary_value && empty($select) && empty($where)) {
-			$use_cache = true;
+			// $use_cache = true;
 		}
 
 		if ($use_cache) {
 			$cachename = $this->cache_prefix .'cit-'. $primary_value;
-			// if ( ! $result = $this->cache->get($cachename)) {
+			if ( ! $result = $this->cache->get($cachename)) {
 
 				$this->db->select($this->_select);
 				$this->db->from($this->_table);
 				$this->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
 				$this->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
 				$this->db->where('cmall_item.cit_id', $primary_value);
-
+				if ($where) {
+					$this->db->where($where);
+				}
 				$res = $this->db->get();
 				$result = $res->row_array();
 				$this->cache->save($cachename, $result, $this->cache_time);
-			// }
+			}
 		} else {
 			$this->db->select($this->_select);
 			$this->db->from($this->_table);
 			$this->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
 			$this->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
-			$this->db->where($where);
+			$this->db->where('cmall_item.cit_id', $primary_value);
+			if ($where) {
+				$this->db->where($where);
+			}
+			
 			
 			$res = $this->db->get();
 			$result = $res->row_array();

@@ -63,9 +63,9 @@ class Cmall extends CB_Controller
 		
 		$view['view']['type1_url'] = base_url('cmall/cit_type1_lists');
 		
-		if ($this->member->is_member()) {
-				$view['view']['data']['ai_recom'] = $this->_itemairecomlists($mem_id);
-			}
+		// if ($this->member->is_member()) {
+		$view['view']['data']['ai_recom'] = $this->_itemairecomlists($mem_id);
+			// }
 		
 		// $field = array(
 		// 	'board' => array('brd_name'),
@@ -76,7 +76,7 @@ class Cmall extends CB_Controller
 		// $select = get_selected($field);
 
 		$config = array(
-			'cit_type' => '1',
+			'cit_type1' => '1',
 			'limit' => '5',
 			'cache_minute' => 86400,
 			// 'select' => $select,
@@ -129,7 +129,7 @@ class Cmall extends CB_Controller
 
 
 		$config = array(
-			'cit_type' => '2',
+			'cit_type2' => '1',
 			'limit' => '20',
 			'cache_minute' => 86400,
 			// 'select' => $select,
@@ -172,9 +172,9 @@ class Cmall extends CB_Controller
 		}
 
 
-		if ($this->member->is_member()) {
+		// if ($this->member->is_member()) {
 				$view['view']['data']['denguru_recom'] = $this->_itemdengururecomlists($mem_id);
-			}
+			// }
 
 		// $param =& $this->querystring;
 		// $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
@@ -326,6 +326,7 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
+		if(empty($mem_id)) return false;
 
 		$this->load->model(array('Board_model'));
 		/**
@@ -377,7 +378,7 @@ class Cmall extends CB_Controller
 
 		$view = array();
 		$view['view'] = array();
-
+		if(empty($mem_id)) return false;
 
 		$this->load->model(array('Board_model'));
 		/**
@@ -430,127 +431,127 @@ class Cmall extends CB_Controller
 	{
 		
 
-		$view = array();
-		$view['view'] = array();
+		// $view = array();
+		// $view['view'] = array();
 
-		$this->load->model(array('Board_model'));
-		/**
-		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
-		 */
-		$param =& $this->querystring;
-		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+		// $this->load->model(array('Board_model'));
+		// /**
+		//  * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+		//  */
+		// $param =& $this->querystring;
+		// $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
 
-		$alertmessage = $this->member->is_member()
-			? '회원님은 상품 목록을 볼 수 있는 권한이 없습니다'
-			: '비회원은 상품목록에 접근할 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
-		$access_list = $this->cbconfig->item('access_cmall_list');
-		$access_list_level = $this->cbconfig->item('access_cmall_list_level');
-		$access_list_group = $this->cbconfig->item('access_cmall_list_group');
-		$this->accesslevel->check(
-			$access_list,
-			$access_list_level,
-			$access_list_group,
-			$alertmessage,
-			''
-		);
-
-		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
-		$sfield = $this->input->get('sfield', null, '');
-		if ($sfield === 'cit_both') {
-			$sfield = array('cit_name', 'cit_content');
-		}
-		$skeyword = $this->input->get('skeyword', null, '');
-
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
-
-		
-
-
-		$offset = ($page - 1) * $per_page;
-
-		$this->Board_model->allow_search_field = array('brd_name','cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
-		$this->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
-
-		/**
-		 * 게시판 목록에 필요한 정보를 가져옵니다.
-		 */
-		$where = array();
-		$where['cit_status'] = 1;
-		$where['brd_blind'] = 0;
-		// $field = array(
-		// 	'board' => array('brd_name'),
-		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
-		// 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// $alertmessage = $this->member->is_member()
+		// 	? '회원님은 상품 목록을 볼 수 있는 권한이 없습니다'
+		// 	: '비회원은 상품목록에 접근할 권한이 없습니다.\\n\\n회원이시라면 로그인 후 이용해 보십시오';
+		// $access_list = $this->cbconfig->item('access_cmall_list');
+		// $access_list_level = $this->cbconfig->item('access_cmall_list_level');
+		// $access_list_group = $this->cbconfig->item('access_cmall_list_group');
+		// $this->accesslevel->check(
+		// 	$access_list,
+		// 	$access_list_level,
+		// 	$access_list_group,
+		// 	$alertmessage,
+		// 	''
 		// );
-		
-		// $select = get_selected($field);
 
-		// $this->Board_model->select = $select;
+		// $findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
+		// $sfield = $this->input->get('sfield', null, '');
+		// if ($sfield === 'cit_both') {
+		// 	$sfield = array('cit_name', 'cit_content');
+		// }
+		// $skeyword = $this->input->get('skeyword', null, '');
 
-		$item_ids = $this->input->get('chk_item_id');
-		if($item_ids && is_array($item_ids)){
-			$this->Board_model->set_where_in('cit_id',$item_ids);
-			$per_page = 9999;
-			$offset = '';
-		}
-
-		if($brd_id){
-			$where['board.brd_id'] = $brd_id;
-			$per_page = 18;
-			$offset = '';
-		}
-
-		if(element('per_page', $config)){
-			$per_page = element('per_page', $config);
-			$offset = ($page - 1) * $per_page;	
-		}
-		
-		if($swhere && is_array($swhere)){
-			foreach($swhere as $skey => $sval){
-				if(!empty($sval)){
-					if(is_array($sval) )
-						$this->Board_model->set_where_in($skey,$sval);
-					else
-						$where[$skey] = $sval;
-				}
-			}
-		}
-		$result = $this->Board_model
-			->get_item_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
-		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
-		if (element('list', $result)) {
-			foreach (element('list', $result) as $key => $val) {
-
-				$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
-				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
-				$result['list'][$key]['num'] = $list_num--;
-			}
-		}
-		$view['view'] = $result;
-		if($category_id){
-			// $view['view']['category_nav'] = $this->cmalllib->get_nav_category($category_id);
-			// $view['view']['category_all'] = $this->cmalllib->get_all_category();
-			$view['view']['category_id'] = $category_id;
-		}
-		/**
-		 * 페이지네이션을 생성합니다
-		 */
-		if(empty($brd_id)){
-			$config['base_url'] = site_url('cmall/itemlists/' . $category_id.'/' . $brd_id) . '?' . $param->replace('page');
-			$config['total_rows'] = $result['total_rows'];
-			$config['per_page'] = $per_page;
-			$this->pagination->initialize($config);
-			// $view['view']['paging'] = $this->pagination->create_links();
-			$view['view']['next_link'] = $this->pagination->get_next_link();
-			$view['view']['page'] = $page;
-
-
-		}
-		
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
 
 		
+
+
+		// $offset = ($page - 1) * $per_page;
+
+		// $this->Board_model->allow_search_field = array('brd_name','cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
+		// $this->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
+
+		// /**
+		//  * 게시판 목록에 필요한 정보를 가져옵니다.
+		//  */
+		// $where = array();
+		// $where['cit_status'] = 1;
+		// $where['brd_blind'] = 0;
+		// // $field = array(
+		// // 	'board' => array('brd_name'),
+		// // 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+		// // 	'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+		// // );
 		
-		return $view['view'];
+		// // $select = get_selected($field);
+
+		// // $this->Board_model->select = $select;
+
+		// $item_ids = $this->input->get('chk_item_id');
+		// if($item_ids && is_array($item_ids)){
+		// 	$this->Board_model->set_where_in('cit_id',$item_ids);
+		// 	$per_page = 9999;
+		// 	$offset = '';
+		// }
+
+		// if($brd_id){
+		// 	$where['board.brd_id'] = $brd_id;
+		// 	$per_page = 18;
+		// 	$offset = '';
+		// }
+
+		// if(element('per_page', $config)){
+		// 	$per_page = element('per_page', $config);
+		// 	$offset = ($page - 1) * $per_page;	
+		// }
+		
+		// if($swhere && is_array($swhere)){
+		// 	foreach($swhere as $skey => $sval){
+		// 		if(!empty($sval)){
+		// 			if(is_array($sval) )
+		// 				$this->Board_model->set_where_in($skey,$sval);
+		// 			else
+		// 				$where[$skey] = $sval;
+		// 		}
+		// 	}
+		// }
+		// $result = $this->Board_model
+		// 	->get_item_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
+		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		// if (element('list', $result)) {
+		// 	foreach (element('list', $result) as $key => $val) {
+
+		// 		$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+		// 		$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+		// 		$result['list'][$key]['num'] = $list_num--;
+		// 	}
+		// }
+		// $view['view'] = $result;
+		// if($category_id){
+		// 	// $view['view']['category_nav'] = $this->cmalllib->get_nav_category($category_id);
+		// 	// $view['view']['category_all'] = $this->cmalllib->get_all_category();
+		// 	$view['view']['category_id'] = $category_id;
+		// }
+		// /**
+		//  * 페이지네이션을 생성합니다
+		//  */
+		// if(empty($brd_id)){
+		// 	$config['base_url'] = site_url('cmall/itemlists/' . $category_id.'/' . $brd_id) . '?' . $param->replace('citpage');
+		// 	$config['total_rows'] = $result['total_rows'];
+		// 	$config['per_page'] = $per_page;
+		// 	$this->pagination->initialize($config);
+		// 	// $view['view']['paging'] = $this->pagination->create_links();
+		// 	$view['view']['next_link'] = $this->pagination->get_next_link();
+		// 	$view['view']['citpage'] = $citpage;
+
+
+		// }
+		
+
+		
+		
+		// return $view['view'];
 		
 	}
 
@@ -563,7 +564,15 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 
-		$view['view']['data'] = $this->_itemlists($category_id,$brd_id);	
+		
+		// if(!is_array($item_ids)) $item_ids = array($item_ids);
+		$swhere = array();
+		if($this->input->get('chk_item_id')){
+			$item_ids = $this->input->get('chk_item_id');
+			$swhere  = array('cit_id' => $item_ids);
+		}
+
+		$view['view']['data'] = $this->cmalllib->_itemlists($category_id,$brd_id,$swhere);	
 			
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
@@ -769,9 +778,9 @@ class Cmall extends CB_Controller
 		}
 		
 
-		$data['similaritemlist_similar'] = $this->_itemlists('',element('brd_id',$data),array('cca_id' => $cca_id_arr),array('per_page' => 6));
-		$data['similaritemlist_type1'] = $this->_itemlists('',element('brd_id',$data),array('cit_type1' => 1),array('per_page' => 6));
-		$data['similaritemlist_type3'] = $this->_itemlists('',element('brd_id',$data),array('cit_type3' => 1),array('per_page' => 6));
+		$data['similaritemlist_similar'] = $this->cmalllib->_itemlists('',element('brd_id',$data),array('cca_id' => $cca_id_arr),array('per_page' => 6));
+		$data['similaritemlist_type1'] = $this->cmalllib->_itemlists('',element('brd_id',$data),array('cit_type1' => 1),array('per_page' => 6));
+		$data['similaritemlist_type3'] = $this->cmalllib->_itemlists('',element('brd_id',$data),array('cit_type3' => 1),array('per_page' => 6));
 
 		$view['view']['data'] = $data;
 		
@@ -3246,7 +3255,7 @@ class Cmall extends CB_Controller
 		$this->load->model('Cmall_item_model');
 
 		$config = array(
-			'cit_type' => '1',
+			'cit_type1' => '1',
 			'limit' => '30',
 			'cache_minute' => 86400
 		);
@@ -3554,7 +3563,7 @@ class Cmall extends CB_Controller
 		$view['view']['data'] = $this->denguruapi->get_brd_info(element('brd_id', $board));
 		$view['view']['data']['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $board));
 		$view['view']['data']['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $board));
-		$view['view']['data']['similaritemlist'] = $this->_itemlists('',$brd_id,array('cit_type3' => 1));
+		$view['view']['data']['similaritemlist'] = $this->cmalllib->_itemlists('',$brd_id,array('cit_type3' => 1));
 
 		
 		

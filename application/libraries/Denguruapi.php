@@ -182,26 +182,25 @@ class Denguruapi extends CI_Controller
             
         $cache_minute = element('cache_minute', $config);
         $where['cit_status'] = 1;
-        if (element('cit_type', $config) =='1') {
+        if (element('cit_type1', $config)) {
             $where['cit_type1'] = 1;
         }
-        if (element('cit_type', $config) =='2') {
+        if (element('cit_type2', $config)) {
             $where['cit_type2'] = 1;
         }
-        if (element('cit_type', $config) =='3') {
+        if (element('cit_type3', $config)) {
             $where['cit_type3'] = 1;
         }
-        if (element('cit_type', $config) =='4') {
+        if (element('cit_type4', $config)) {
             $where['cit_type4'] = 1;
         }
         $limit = element('limit', $config) ? element('limit', $config) : 4;
-        $select = element('select', $config) ? element('select', $config) : $this->CI->Board_model->_select;
+        
 
-        $cachename = 'cmall/main-' . element('cit_type', $config) . '-' . $limit . '-' . cdate('Y-m-d');
+        $cachename = 'latest/cit-' . element('cit_type1', $config).element('cit_type2', $config).element('cit_type3', $config).element('cit_type4', $config) . '-' . $limit . '-' . cdate('Y-m-d');
 
         if ( ! $result = $this->CI->cache->get($cachename)) {
-
-            $this->CI->db->select($select);
+            
             $this->CI->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
             $this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
             $this->CI->db->where($where);
@@ -209,7 +208,7 @@ class Denguruapi extends CI_Controller
             $this->CI->db->order_by('cit_order', 'asc');
             $qry = $this->CI->db->get('board');
             $result = $qry->result_array();
-            check_cache_dir('cmall');
+            check_cache_dir('latest');
             $this->CI->cache->save($cachename, $result, $cache_minute);
         }
         return $result;

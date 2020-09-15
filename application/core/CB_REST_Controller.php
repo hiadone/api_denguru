@@ -834,7 +834,7 @@ class REST_Controller extends CI_Controller {
 
         // Output the data
         $this->output->set_output($output);
-
+        
         ob_end_flush();
 
         // Otherwise dump the output automatically

@@ -127,7 +127,7 @@ class CB_Pagination extends CI_Pagination
 		$first_url = $this->first_url;
 		
 		$query_string = '';
-		$query_string_sep = (strpos($base_url, '?') === FALSE) ? '?' : '&amp;';
+		$query_string_sep = (strpos($base_url, '?') === FALSE) ? '?' : '&';
 
 		// Are we using query strings?
 		if ($this->page_query_string === TRUE)

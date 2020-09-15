@@ -207,6 +207,7 @@ class Managelayout extends CI_Controller
 
 			$CI->load->model(array('Banner_model'));
 			$CI->load->library('popuplib');
+			$data['member'] = false;
 			if ($CI->member->is_member()) {
 				$CI->load->library('denguruapi');
 				$data['member'] = $CI->member->get_member();					
