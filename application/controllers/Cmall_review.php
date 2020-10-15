@@ -749,7 +749,7 @@ class Cmall_review extends CB_Controller
         
         $item = array();
         if ($cit_id) {
-            $item = $this->Cmall_item_model->get_one($cit_id,'cit_id,cit_status');
+            $item = $this->Cmall_item_model->get_one($cit_id,'cit_id,cit_status,cit_is_del');
             
             
             if ( ! element('cit_id', $item) )
@@ -758,6 +758,9 @@ class Cmall_review extends CB_Controller
             if(! element('cit_status', $item)) 
                 alert('이 상품은 현재 판매하지 않습니다',"",406);
             
+            if (!empty(element('cit_is_del', $item))) {
+                alert('이 상품은 현재 판매하지 않습니다',"",406);
+            }
 
             $item = $this->denguruapi->get_cit_info($cit_id);
         }
@@ -1298,7 +1301,7 @@ class Cmall_review extends CB_Controller
         return $this->response($view, $view['http_status_codes']);
     }
 
-    public function reviewwrite_post($cit_id = 0)
+    public function reviewwrite_post($cit_id = 0, $cre_id = 0)
     {
 
          // 이벤트 라이브러리를 로딩합니다
@@ -1317,7 +1320,7 @@ class Cmall_review extends CB_Controller
 
         // 이벤트가 존재하면 실행합니다
 
-        $view = $this->_reviewwrite($cit_id);
+        $view = $this->_reviewwrite($cit_id, $cre_id);
 
 
         return $this->response($view, $view['http_status_codes']);

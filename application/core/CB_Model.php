@@ -43,7 +43,13 @@ class CB_Model extends CI_Model
 	 */
 	public $search_field_equal = array();
 
+	public $or_where = array();
+
 	public $where_in = array();
+
+	public $set_where = array();
+
+	public $_join = array();
 
 	/* --------------------------------------------------------------
 	 * GENERIC METHODS
@@ -322,8 +328,8 @@ class CB_Model extends CI_Model
 
 
 	public function update($primary_value = '', $updatedata = '', $where = '')
-	{
-		if ( ! empty($updatedata)) {
+	{	
+		if ( ! empty($updatedata) && (!empty($primary_value) || !empty($where))) {		
 			if ( ! empty($primary_value)) {
 				$this->db->where($this->primary_key, $primary_value);
 			}
@@ -398,17 +404,17 @@ class CB_Model extends CI_Model
 		$this->db->order_by($orderby, $direction, $escape);
 	}
 
-	public function group_or_where_in($field_key,$or_where = array())
+	
+
+	
+
+	public function group_by($by, $escape = NULL)
 	{
-		if (empty($field_key)) {
+		if (empty($by)) {
 			return false;
 		}
 
-		if ($or_where && is_array($or_where)) {
-			$this->db->group_start();			
-			$this->db->or_where_in($field_key, $or_where);
-			$this->db->group_end();
-		}
+		$this->db->group_by($by,$escape);
 	}
 
 	public function group_where_in($field_key,$where = array())
@@ -432,18 +438,34 @@ class CB_Model extends CI_Model
 
 		if ($where && is_array($where)) {
 			
-			$this->where_in = array($field_key => $where);
+			$this->where_in[] = array($field_key => $where);
 			
 		}
 	}
 
-	public function group_by($by, $escape = NULL)
+	public function set_where($key, $value = NULL, $escape = NULL)
 	{
-		if (empty($by)) {
+		if (empty($key)) {
 			return false;
 		}
 
-		$this->db->group_by($by,$escape);
+		$this->set_where = array($key => $value);
+		
+			
+			
+		
 	}
 
+	public function set_join($join = array())
+	{
+		if (empty($join)) {
+			return false;
+		}
+
+		
+			
+		$this->_join[] = $join;
+			
+		
+	}
 }

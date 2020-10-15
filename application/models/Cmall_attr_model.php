@@ -32,7 +32,7 @@ class Cmall_attr_model extends CB_Model
     {
         $cachename = 'cmall-attr-all';
         if ( ! $result = $this->cache->get($cachename)) {
-            $return = $this->get($primary_value = '', $select = '', $where = '', $limit = '', $offset = 0, $findex = 'cat_order', $forder = 'asc');
+            $return = $this->get($primary_value = '', $select = 'cat_id,cat_value,cat_parent,cat_order', $where = '', $limit = '', $offset = 0, $findex = 'cat_order', $forder = 'asc');
             if ($return) {
                 foreach ($return as $key => $value) {
                     $result[$value['cat_parent']][] = $value;

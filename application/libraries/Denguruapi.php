@@ -182,6 +182,7 @@ class Denguruapi extends CI_Controller
             
         $cache_minute = element('cache_minute', $config);
         $where['cit_status'] = 1;
+        $where['cit_is_del'] = 0;
         if (element('cit_type1', $config)) {
             $where['cit_type1'] = 1;
         }
@@ -490,7 +491,7 @@ class Denguruapi extends CI_Controller
 
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_image'][] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
+                    $review['review_image'][element('rfi_id', $fvalue)] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
                 }
             }
             
@@ -505,7 +506,7 @@ class Denguruapi extends CI_Controller
             $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_file'][] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
+                    $review['review_file'][element('rfi_id', $fvalue)] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
                 }
             }
         } 
@@ -581,7 +582,7 @@ class Denguruapi extends CI_Controller
 
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
-                                $view['view']['list']['review_image'][] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                                $view['view']['list']['review_image'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
                             }
                         }
                     } 
@@ -595,7 +596,7 @@ class Denguruapi extends CI_Controller
 
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
-                                $view['view']['list']['review_file'][] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                                $view['view']['list']['review_file'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
                             }
                         }
                     } 

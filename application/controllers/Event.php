@@ -106,7 +106,7 @@ class Event extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key]['post_url'] = base_url('event/post/'.element('egr_id', $val));
+                $result['list'][$key]['post_url'] = base_url('postact/event_link/'.element('egr_id', $val));
 
                 $result['list'][$key]['display_datetime'] = display_datetime(
                     element('egr_datetime', $val),'full'
@@ -420,7 +420,7 @@ class Event extends CB_Controller
                     );
 
                 if (element('egr_id', $next_post)) {
-                    $view['view']['next_post']['url'] = base_url('event/post/'. element('egr_id', $next_post)) . '?' . $param->output();
+                    $view['view']['next_post']['url'] = base_url('postact/event_link/'. element('egr_id', $next_post)) . '?' . $param->output();
                 }
 
                 $view['view']['prev_post'] = $prev_post
@@ -432,7 +432,7 @@ class Event extends CB_Controller
                         $where                        
                     );
                 if (element('egr_id', $prev_post)) {
-                    $view['view']['prev_post']['url'] = base_url('event/post/'. element('egr_id', $prev_post)) . '?' . $param->output();
+                    $view['view']['prev_post']['url'] = base_url('postact/event_link/'. element('egr_id', $prev_post)) . '?' . $param->output();
                 }
             }
             

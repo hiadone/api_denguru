@@ -32,7 +32,7 @@ class Cmall_category_model extends CB_Model
 	{
 		$cachename = 'cmall-category-all';
 		if ( ! $result = $this->cache->get($cachename)) {
-			$return = $this->get($primary_value = '', $select = '', $where = '', $limit = '', $offset = 0, $findex = 'cca_order', $forder = 'asc');
+			$return = $this->get($primary_value = '', $select = 'cca_id,cca_value,cca_parent,cca_order', $where = '', $limit = '', $offset = 0, $findex = 'cca_order', $forder = 'asc');
 			if ($return) {
 				foreach ($return as $key => $value) {
 					$result[$value['cca_parent']][] = $value;
@@ -91,7 +91,7 @@ class Cmall_category_model extends CB_Model
 		$where = array(
 			'cca_parent' => $cca_parent
 		);
-		$return = $this->get($primary_value = '', $select = '', $where, $limit = '', $offset = 0, $findex = 'cca_order', $forder = 'asc');
+		$return = $this->get($primary_value = '', $select = 'cca_id,cca_value,cca_parent,cca_order', $where, $limit = '', $offset = 0, $findex = 'cca_order', $forder = 'asc');
 
 		
 		

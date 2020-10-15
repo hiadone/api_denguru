@@ -177,11 +177,10 @@ class Board_model extends CB_Model
 			$this->db->where($search_where);
 		}
 		if ($this->where_in) {
-			$this->db->where_in(key($this->where_in),$this->where_in[key($this->where_in)]);
-
-			if(key($this->where_in) === 'cca_id' && empty($category_id)){
-				$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
 			}
+			
 		}
 		$category_id = (int) $category_id;
 		if ($category_id) {
@@ -367,23 +366,17 @@ class Board_model extends CB_Model
 			}
 		}
 
-		$this->db->select('cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale, board.brd_key, board.brd_name, board.brd_order, board.brd_search, cmall_attr.cat_id, cmall_attr.cat_value, cmall_attr.cat_parent, cmall_category.cca_id, cmall_category.cca_value, cmall_category.cca_parent ');
+		// $this->db->select('cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale, board.brd_key, board.brd_name, board.brd_order, board.brd_search, cmall_attr.cat_id, cmall_attr.cat_value, cmall_attr.cat_parent, cmall_category.cca_id, cmall_category.cca_value, cmall_category.cca_parent ');
+		$this->db->select('board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale');
 		$this->db->from('board');
-		$this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
-		$this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
-		$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
-		$this->db->join('cmall_brand', 'cmall_brand.cbr_id = cmall_item.cbr_id', 'inner');
-
-
-		// if($skeyword){
-			$this->db->join('crawl_tag', 'crawl_tag.brd_id = board.brd_id', 'inner');
-			// if (empty($category_id)) {
-				$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
-			// }
-			$this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
+		// $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
+		
+		if ($this->_join) {
 			
-
-		// }
+			foreach($this->_join as $jval){
+				$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
+			}
+		}
 
 		if ($where) {
 			$this->db->where($where);
@@ -392,6 +385,18 @@ class Board_model extends CB_Model
 			$this->db->where($search_where);
 		}
 
+		if ($this->set_where) {			
+			foreach ($this->set_where as $skey => $sval) {
+				$this->db->where($skey, $sval,false);				
+			}
+		}
+
+		if ($this->where_in) {
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
+			}
+			
+		}
 		// $category_id = (int) $category_id;
 		// if ($category_id) {
 		// 	$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
@@ -416,12 +421,7 @@ class Board_model extends CB_Model
 				}
 			}
 			$this->db->group_end();
-		}
-		$this->db->where( array('brd_search' => 1));
-		// $board_id = (int) $board_id;
-		// if ($board_id)	{
-		// 	$this->db->where( array('b.brd_id' => $board_id));
-		// }
+		}		
 
 		$this->db->order_by($orderby);
 		if ($limit) {
@@ -430,22 +430,21 @@ class Board_model extends CB_Model
 		$qry = $this->db->get();
 		$result['list'] = $qry->result_array();
 
-		$this->db->select('count(*) cnt, board.brd_id');
+		$this->db->select('count(*) rownum');
 		$this->db->from('board');
-		$this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
-		$this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
-		$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
-		$this->db->join('cmall_brand', 'cmall_brand.cbr_id = cmall_item.cbr_id', 'inner');
-		
-		// if($skeyword){
-			$this->db->join('crawl_tag', 'crawl_tag.brd_id = board.brd_id', 'inner');
-			// if (empty($category_id)) {
-				$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
-			// }
-			$this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
-			
+		// $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
 
-		// }
+		if ($this->_join) {
+
+			foreach($this->_join as $jval){
+				$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
+			}
+		}
+		// $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
+		// $this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
+		// $this->db->join('crawl_tag', 'crawl_tag.brd_id = board.brd_id', 'inner');
+		// $this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+		// $this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
 
 		if ($where) {
 			$this->db->where($where);
@@ -454,6 +453,17 @@ class Board_model extends CB_Model
 			$this->db->where($search_where);
 		}
 
+		if ($this->set_where) {			
+			foreach ($this->set_where as $skey => $sval) {
+				$this->db->where($skey, $sval,false);				
+			}
+		}
+		if ($this->where_in) {
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
+			}
+			
+		}
 		// if ($category_id) {
 		// 	$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
 		// 	$this->db->where('cca_id', $category_id);
@@ -477,24 +487,10 @@ class Board_model extends CB_Model
 				}
 			}
 			$this->db->group_end();
-		}
-		$this->db->where( array('brd_search' => 1));
-		$this->db->group_by('board.brd_id');
+		}		
 		$qry = $this->db->get();
-		$cnt = $qry->result_array();
-		$result['total_rows'] = 0;
-		if ($cnt) {
-			foreach ($cnt as $key => $value) {
-				if (element('brd_id', $value)) {
-					$result['board_rows'][$value['brd_id']] = element('cnt', $value);
-				}
-			}
-			if ($board_id) {
-				$result['total_rows'] = $result['board_rows'][$board_id];
-			} else {
-				$result['total_rows'] = array_sum($result['board_rows']);
-			}
-		}
+		$rows = $qry->row_array();
+		$result['total_rows'] = $rows['rownum'];
 
 		return $result;
 	}
@@ -502,7 +498,7 @@ class Board_model extends CB_Model
 	/**
 	 * List 페이지 커스테마이징 함수
 	 */
-	public function get_search_count_by($limit = '', $offset = '', $where = '', $like = '', $category_id = 0, $orderby = '', $sfield = '', $skeyword = '', $sop = 'OR')
+	public function get_search_count($limit = '', $offset = '', $where = '', $like = '', $category_id = 0, $orderby = '', $sfield = '', $skeyword = '', $sop = 'OR')
 	{
 		if ( ! in_array(strtolower($orderby), $this->allow_order)) {
 			$orderby = 'cit_order asc';
@@ -510,7 +506,7 @@ class Board_model extends CB_Model
 
 		$sop = (strtoupper($sop) === 'AND') ? 'AND' : 'OR';
 		if (empty($sfield)) {
-			$sfield = array('post_title', 'post_content');
+			$sfield = array('cit_name', 'cta_tag', 'cca_value','cbr_value_kr','cbr_value_en');
 		}
 
 		$search_where = array();
@@ -557,21 +553,24 @@ class Board_model extends CB_Model
 				}
 			}
 		}
-		$this->db->select('count(*) cnt, board.brd_id');
-		$this->db->from('board');
-		$this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
-		$this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
-		$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
-		$this->db->join('cmall_brand', 'cmall_brand.cbr_id = cmall_item.cbr_id', 'inner');
-		if($skeyword){
-			$this->db->join('crawl_tag', 'crawl_tag.brd_id = board.brd_id', 'inner');
-			if (empty($category_id)) {
-				$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
-			}
-			$this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
-			
 
+		// $this->db->select('cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale, board.brd_key, board.brd_name, board.brd_order, board.brd_search, cmall_attr.cat_id, cmall_attr.cat_value, cmall_attr.cat_parent, cmall_category.cca_id, cmall_category.cca_value, cmall_category.cca_parent ');		
+
+		$this->db->select('count(DISTINCT cb_cmall_item.cit_id ) rownum');
+		$this->db->from('board');
+		// $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
+
+		if ($this->_join) {
+
+			foreach($this->_join as $jval){
+				$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
+			}
 		}
+		// $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
+		// $this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
+		// $this->db->join('crawl_tag', 'crawl_tag.brd_id = board.brd_id', 'inner');
+		// $this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+		// $this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
 
 		if ($where) {
 			$this->db->where($where);
@@ -580,10 +579,21 @@ class Board_model extends CB_Model
 			$this->db->where($search_where);
 		}
 
-		if ($category_id) {
-			$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
-			$this->db->where('cca_id', $category_id);
+		if ($this->set_where) {			
+			foreach ($this->set_where as $skey => $sval) {
+				$this->db->where($skey, $sval,false);				
+			}
 		}
+		if ($this->where_in) {
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
+			}
+			
+		}
+		// if ($category_id) {
+		// 	$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+		// 	$this->db->where('cca_id', $category_id);
+		// }
 		
 		if ($like) {
 			$this->db->like($like);
@@ -603,26 +613,13 @@ class Board_model extends CB_Model
 				}
 			}
 			$this->db->group_end();
-		}
-		$this->db->where( array('brd_search' => 1));
-		$this->db->group_by('board.brd_id');
-		$qry = $this->db->get();
-		$cnt = $qry->result_array();
-		$result['total_rows'] = 0;
-		if ($cnt) {
-			foreach ($cnt as $key => $value) {
-				if (element('brd_id', $value)) {
-					$result['board_rows'][$value['brd_id']] = element('cnt', $value);
-				}
-			}
-			if ($board_id) {
-				$result['total_rows'] = $result['board_rows'][$board_id];
-			} else {
-				$result['total_rows'] = array_sum($result['board_rows']);
-			}
-		}
+		}		
 
-		return $result;
+		$qry = $this->db->get();
+		$rows = $qry->row_array();
+		$result['total_rows'] = $rows['rownum'];
+
+		return $result['total_rows'];
 	}
 }
 

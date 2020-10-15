@@ -3595,6 +3595,10 @@ class Postact extends CB_Controller
 			alert('이 상품은 현재 판매하지 않습니다',"",406);
 		}
 
+		if (!empty(element('cit_is_del', $link))) {
+                alert('이 상품은 현재 판매하지 않습니다',"",406);
+            }
+
 		$post = $this->Post_model->get_one(element('post_id', $link));
 		$board = $this->board->item_all(element('brd_id', $post));
 		
@@ -3659,6 +3663,12 @@ class Postact extends CB_Controller
 		if ( element('brd_blind', $board)) {
 			alert('이 스토어는 현재 판매하지 않습니다',"",406);
 		}
+
+		$this->load->library(array('denguruapi'));
+		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
+		if ( ! element('brd_id', $board_crawl)) {
+		    alert('이 스토어는 현재 존재하지 않습니다',"",406);
+		}
 		
 		if ( ! $this->cb_jwt->userdata('brd_outlink_click_' . element('brd_id', $board))) {
 
@@ -3692,11 +3702,7 @@ class Postact extends CB_Controller
 		Events::trigger('after', $eventname);
 
 		
-		$this->load->library(array('denguruapi'));
-		$board_crawl = $this->denguruapi->get_all_crawl($brd_id);
-		if ( ! element('brd_id', $board_crawl)) {
-		    alert('이 스토어는 현재 존재하지 않습니다',"",406);
-		}
+		
 
 
 		redirect(prep_url(strip_tags(element('brd_url', $board_crawl))));
@@ -4221,6 +4227,64 @@ class Postact extends CB_Controller
 
 		// 이벤트가 존재하면 실행합니다
 		return $this->response('', 201);
+
+	}
+
+
+	public function event_link_get($egr_id = 0)
+	{
+
+		
+
+		$egr_id = (int) $egr_id;
+		$mem_id = (int) $this->member->item('mem_id');
+		if (empty($egr_id) OR $egr_id < 1) {
+			show_404();
+		}
+
+		$this->load->model('Event_group_model');
+		
+		
+		$getdata = $this->Event_group_model->get_one($egr_id);
+
+		
+		if ( ! element('egr_id', $getdata)) {
+			alert('이 이벤트는 현재 존재하지 않습니다',"",406);
+		}
+		
+		if (! element('egr_activated', $getdata)) {
+			alert('이 이벤트는 현재 진행하지 않습니다',"",406);
+		}
+		
+		if ( ! $this->cb_jwt->userdata('event_group_click_' . element('egr_id', $getdata))) {
+
+			$this->cb_jwt->set_userdata(
+				'event_group_click_' . element('egr_id', $getdata),
+				'1'
+			);
+
+
+			if($mem_id){
+				$insertdata = array(
+					'egr_id' => element('egr_id', $getdata),
+					'mem_id' => $mem_id,
+					'ecl_datetime' => cdate('Y-m-d H:i:s'),
+					'ecl_ip' => $this->input->ip_address(),
+					'ecl_referer' => $this->agent->referrer(),					
+					'ecl_useragent' => $this->agent->agent_string(),
+				);
+
+				$this->load->model('Event_group_click_log_model');
+				$this->Event_group_click_log_model->insert($insertdata);
+			}
+			
+			$this->Event_group_model->update_plus(element('egr_id', $getdata), 'egr_hit', 1);
+		}
+
+		// 이벤트가 존재하면 실행합니다
+		Events::trigger('after', $eventname);
+
+		redirect(base_url('event/post/'. element('egr_id', $getdata)));
 
 	}
 }

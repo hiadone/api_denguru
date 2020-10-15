@@ -50,6 +50,7 @@ class Cmall_cart_model extends CB_Model
 		}
 		$this->db->where(array('cmall_cart.cct_cart' => 1));
 		$this->db->where(array('cmall_item.cit_status' => 1));
+		$this->db->where(array('cmall_item.cit_is_del' => 0));
 		$this->db->order_by($findex, $forder);
 		$this->db->group_by('cmall_cart.cit_id');
 		if ($limit) {

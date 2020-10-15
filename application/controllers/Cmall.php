@@ -342,6 +342,7 @@ class Cmall extends CB_Controller
 		 */
 		$where = array();
 		$where['cit_status'] = 1;
+		$where['cit_is_del'] = 0;
 		$where['brd_blind'] = 0;
 
 		// $field = array(
@@ -372,6 +373,24 @@ class Cmall extends CB_Controller
 		
 	}
 
+	protected function itemdengururecomlists_get()
+	{
+		
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+		
+		$view['view'] = $this->_itemdengururecomlists($mem_id);	
+		
+
+		$this->data = $view['view'];
+		
+		// print_r2($this->data);
+		return $this->response($this->data, parent::HTTP_OK);
+		
+	}
+
 	protected function _itemdengururecomlists($mem_id)
 	{
 		
@@ -394,6 +413,7 @@ class Cmall extends CB_Controller
 		 */
 		$where = array();
 		$where['cit_status'] = 1;
+		$where['cit_is_del'] = 0;
 		$where['brd_blind'] = 0;
 
 		
@@ -671,6 +691,9 @@ class Cmall extends CB_Controller
 		if ( ! element('cit_status', $data)) {
 			alert('이 상품은 현재 판매하지 않습니다',"",406);
 		}
+		if (!empty(element('cit_is_del', $data))) {
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
 
 		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
 		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
@@ -778,7 +801,7 @@ class Cmall extends CB_Controller
 		}
 		
 
-		$data['similaritemlist_similar'] = $this->cmalllib->_itemlists('',element('brd_id',$data),array('cca_id' => $cca_id_arr),array('per_page' => 6));
+		$data['similaritemlist_similar'] = $this->cmalllib->_itemlists(element(0,$cca_id_arr),element('brd_id',$data),'',array('per_page' => 6));
 		$data['similaritemlist_type1'] = $this->cmalllib->_itemlists('',element('brd_id',$data),array('cit_type1' => 1),array('per_page' => 6));
 		$data['similaritemlist_type3'] = $this->cmalllib->_itemlists('',element('brd_id',$data),array('cit_type3' => 1),array('per_page' => 6));
 
@@ -888,7 +911,9 @@ class Cmall extends CB_Controller
 		if ( ! element('cit_status', $data)) {
 			alert('이 상품은 현재 판매하지 않습니다',"",406);
 		}
-
+		if (!empty(element('cit_is_del', $data))) {
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
 		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
 		// $data['detail'] = $this->Cmall_item_detail_model->get_all_detail(element('cit_id', $data));
 
@@ -991,9 +1016,11 @@ class Cmall extends CB_Controller
 		if ( ! element('cit_id', $data)) {
 			alert('이 상품은 현재 존재하지 않습니다',"",406);
 		}
-		
+		if (!empty(element('cit_is_del', $data))) {
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
 		if ( ! element('cit_status', $data)) {
-			// alert('이 상품은 현재 판매하지 않습니다',"",406);
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
 		}
 
 		// $data['meta'] = $this->Cmall_item_meta_model->get_all_meta(element('cit_id', $data));
@@ -3058,7 +3085,9 @@ class Cmall extends CB_Controller
 		if(! element('cit_status', $item)) 
 		    alert('이 상품은 현재 판매하지 않습니다',"",406);
 
-		
+		if (!empty(element('cit_is_del', $data))) {
+			alert('이 상품은 현재 판매하지 않습니다',"",406);
+		}
 
 
 

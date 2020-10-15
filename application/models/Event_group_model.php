@@ -22,7 +22,7 @@ class Event_group_model extends CB_Model
      */
     public $primary_key = 'egr_id'; // 사용되는 테이블의 프라이머리키
 
-    public $_select = 'egr_id,egr_start_date,egr_end_date,egr_title,egr_datetime,egr_image,egr_detail_image,egr_content'; // 사용되는 테이블의 프라이머리키
+    public $_select = 'egr_id,egr_start_date,egr_end_date,egr_title,egr_datetime,egr_image,egr_detail_image,egr_content,egr_activated'; // 사용되는 테이블의 프라이머리키
 
     public $cache_prefix = 'event_group/event-group-model-get-'; // 캐시 사용시 프리픽스
 
