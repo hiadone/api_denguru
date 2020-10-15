@@ -48,7 +48,7 @@ class Search extends CB_Controller
 
 		$oth_id = element('oth_id', $config) ? element('oth_id', $config) : '0';
 		$stype = element('stype', $config) ? element('stype', $config) : '0';
-		$ssort = element('ssort', $config) ? element('ssort', $config) : 'cit_hit';
+		$ssort = element('ssort', $config) ? element('ssort', $config) : 'cit_type2';
 		$option = element('option', $config) ? element('option', $config) : 'show_list';
 		$scategory = element('scategory', $config) ? element('scategory', $config) : '0';
 		$skeyword = element('skeyword', $config) ? element('skeyword', $config) : '';
@@ -280,7 +280,7 @@ class Search extends CB_Controller
 				}
 			}
 
-			$config['base_url'] = site_url('search?' . $param->replace('page'));
+			$config['base_url'] = site_url('search/show_list?' . $param->replace('page'));
 			$config['total_rows'] = $result['total_rows'];
 			$config['per_page'] = $per_page;
 			if ($this->cbconfig->get_device_view_type() === 'mobile') {
@@ -295,10 +295,55 @@ class Search extends CB_Controller
 			
 			// print_r2($result);
 			$view['view']['data'] = $result;
+			$view['view']['data']['member'] ='';
+			if($mem_id)
+				$view['view']['data']['member'] = $this->denguruapi->get_mem_info($this->member->item('mem_id'));					
+
+			if ( ! $this->cb_jwt->userdata('skeyword_'.$oth_id.'_'. urlencode($skeyword))) {
+				$sfieldarray = array('post_title', 'post_content', 'post_both');
+				// if (in_array($sfield2, $sfieldarray)) {
+				if ($skeyword) {
+					if ($mem_id) {
+						$searchinsert = array(
+							'sek_keyword' => $skeyword,
+							'sek_datetime' => cdate('Y-m-d H:i:s'),
+							'sek_ip' => $this->input->ip_address(),
+							'mem_id' => $mem_id,
+							'oth_id' => $oth_id,
+						);
+						$this->Search_keyword_model->insert($searchinsert);
+						$this->cb_jwt->set_userdata(
+							'skeyword_'.$oth_id.'_'. urlencode($skeyword),
+							1
+						);
+					}
+				}
+				if ($oth_id) {
+					$this->load->model(array('Other_model','Other_keyword_model'));
+
+					if ($mem_id) {
+						$otherinsert = array(
+							'okw_keyword' => $skeyword,
+							'okw_datetime' => cdate('Y-m-d H:i:s'),
+							'okw_ip' => $this->input->ip_address(),
+							'mem_id' => $mem_id,
+							'oth_id' => $oth_id,
+						);
+						$this->Other_keyword_model->insert($otherinsert);
+						$this->cb_jwt->set_userdata(
+							'skeyword_'.$oth_id.'_'. urlencode($skeyword),
+							1
+						);
+					}
+					
+					$this->Other_model->update_plus($oth_id, 'oth_hit', 1);
+				}
+			}
 		} else {
 			
 			$result = $this->Board_model
 				->get_search_count($per_page, $offset, $where, $like, '', $findex);
+			$view['view']['data']['total_rows'] = $result;
 			// echo $result;	
 			// echo "<br>";
 
@@ -1326,49 +1371,32 @@ class Search extends CB_Controller
 							$all_category[$key][$key_]['rownum'] =  0;
 					}
 		        }
+
+        		$i=0;
+
+
+        		foreach($all_category as $akey => $a_cvalue){
+
+                    foreach($a_cvalue as $a_cvalue_){
+                    	if($akey ==0){
+                    		$cmall_category[] = array(
+                    			'cca_id' =>element('cca_id',$a_cvalue_),
+                    			'cca_value' =>element('cca_value',$a_cvalue_),            			
+                    			'rownum' =>element('rownum',$a_cvalue_),            			
+                    			'cca_child' =>element(element('cca_id',$a_cvalue_),$all_category),
+
+                    			);
+                    	}    
+                       
+                    }
+                    $i++;
+                }
 		        // print_r2($all_category);exit;
 		    }
 
 			
 
-			if ( ! $this->cb_jwt->userdata('skeyword_'.$oth_id.'_'. urlencode($skeyword))) {
-				$sfieldarray = array('post_title', 'post_content', 'post_both');
-				// if (in_array($sfield2, $sfieldarray)) {
-				if ($mem_id) {
-					$searchinsert = array(
-						'sek_keyword' => $skeyword,
-						'sek_datetime' => cdate('Y-m-d H:i:s'),
-						'sek_ip' => $this->input->ip_address(),
-						'mem_id' => $mem_id,
-						'oth_id' => $oth_id,
-					);
-					$this->Search_keyword_model->insert($searchinsert);
-					$this->cb_jwt->set_userdata(
-						'skeyword_' . urlencode($skeyword),
-						1
-					);
-				}
-				if ($oth_id) {
-					$this->load->model(array('Other_model','Other_keyword_model'));
-
-					if ($mem_id) {
-						$otherinsert = array(
-							'okw_keyword' => $skeyword,
-							'okw_datetime' => cdate('Y-m-d H:i:s'),
-							'okw_ip' => $this->input->ip_address(),
-							'mem_id' => $mem_id,
-							'oth_id' => $oth_id,
-						);
-						$this->Other_keyword_model->insert($otherinsert);
-						$this->cb_jwt->set_userdata(
-							'skeyword_' . urlencode($skeyword),
-							1
-						);
-					}
-					
-					$this->Other_model->update_plus($oth_id, 'oth_hit', 1);
-				}
-			}
+			
 			// $highlight_keyword = '';
 			// if ($skeyword) {
 			// 	$key_explode = explode(' ', $skeyword);
@@ -1396,25 +1424,7 @@ class Search extends CB_Controller
 			
 
 			
-			$i=0;
-
-
-			foreach($all_category as $akey => $a_cvalue){
-
-	            foreach($a_cvalue as $a_cvalue_){
-	            	if($akey ==0){
-	            		$cmall_category[] = array(
-	            			'cca_id' =>element('cca_id',$a_cvalue_),
-	            			'cca_value' =>element('cca_value',$a_cvalue_),            			
-	            			'rownum' =>element('rownum',$a_cvalue_),            			
-	            			'cca_child' =>element(element('cca_id',$a_cvalue_),$all_category),
-
-	            			);
-	            	}    
-	               
-	            }
-	            $i++;
-	        }
+			
 			
 
 			
@@ -1461,13 +1471,21 @@ class Search extends CB_Controller
 	        $view['view']['config']['cmall_color'] = $cmall_color;
 	        $view['view']['config']['cmall_age'] = $cmall_age;        
 			$view['view']['config']['cmall_category'] = $cmall_category;
-	        $view['view']['config']['cmall_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
+	        // $view['view']['config']['cmall_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
+	        $view['view']['search_url'] = site_url('search/show_list?' . $param->output());
+	        $view['view']['search_price_url'] = site_url('search/price?' . $param->output());
+	        $view['view']['search_size_url'] = site_url('search/size?' . $param->output());
+	        $view['view']['search_color_url'] = '';
+	        if($is_color)
+	        	$view['view']['search_color_url'] = site_url('search/color?' . $param->output());
+	        $view['view']['search_age_url'] = site_url('search/age?' . $param->output());
+	        $view['view']['search_category_url'] = site_url('search/category/?' . $param->output());
 	    }
-	    
+
 		return $view['view'];
 	}
 
-	public function index_get($oth_id = 0,$option = 'show_list')
+	public function index_get($option = 'show_list',$oth_id = 0)
 	{
 
 		// 이벤트 라이브러리를 로딩합니다

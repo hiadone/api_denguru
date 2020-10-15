@@ -754,6 +754,7 @@ class Denguruapi extends CI_Controller
 
             if(element('pet',$member))
                 foreach(element('list',element('pet',$member)) as $key => $value){
+                    $data['pet']['list'][$key]['pet_main'] = element('pet_main',$value);
                     $data['pet']['list'][$key]['petmodify_url'] = base_url('mypage/petwrite/'.element('pet_id',$value));
                     $data['pet']['list'][$key]['pet_id'] = element('pet_id',$value);
                     $data['pet']['list'][$key]['pet_name'] = element('pet_name',$value);
@@ -766,13 +767,13 @@ class Denguruapi extends CI_Controller
                     $data['pet']['list'][$key]['pet_form'] = element(element('pet_form',$value),config_item('pet_form'),'');
                     $data['pet']['list'][$key]['pet_kind'] = element('pet_kind',$value);
 
-                    $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$value));
+                    $data['pet']['list'][$key]['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$value));
                             
                             
                             
-                    $data['pet_allergy'] = element('pet_allergy',$member);
+                    $data['pet']['list'][$key]['pet_allergy'] = element('pet_allergy',$value);
 
-                    $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$value));
+                    $data['pet']['list'][$key]['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$value));
                 }
             
         

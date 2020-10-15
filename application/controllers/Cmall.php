@@ -122,7 +122,7 @@ class Cmall extends CB_Controller
 		if ($result_2_top) {
 			foreach ($result_2_top as $key => $val) {
 				$result_2_top[$key]['oth_image'] = cdn_url('other',element('oth_image',$val));
-				$result_2_top[$key]['search_url'] = base_url('search/'.element('oth_id',$val).'?skeyword='.element('oth_title',$val));
+				$result_2_top[$key]['search_url'] = base_url('search/show_list/'.element('oth_id',$val).'?skeyword='.element('oth_title',$val));
 			}
 			$view['view']['data']['type2']['top']['list'] = $result_2_top;
 		}
@@ -3396,7 +3396,7 @@ class Cmall extends CB_Controller
 		
 		$data['list'][$key]['cca_id'] = 0;
 		$data['list'][$key]['cca_value'] = '전체';
-		$data['list'][$key]['category_url'] = base_url('cmall/itemlists');
+		$data['list'][$key]['category_url'] = base_url('search/show_list');
 		$data['list'][$key]['category_image_url'] = cdn_url('category','icon-cate-0.svg');
 		$category = $this->cmalllib->get_all_category();
 		if (element(0, $category)) {
@@ -3404,7 +3404,7 @@ class Cmall extends CB_Controller
 				$key++;
 				$data['list'][$key]['cca_id'] = html_escape(element('cca_id', $value));
 				$data['list'][$key]['cca_value'] = html_escape(element('cca_value', $value));
-				$data['list'][$key]['category_url'] = base_url('cmall/itemlists/' . element('cca_id', $value));
+				$data['list'][$key]['category_url'] = base_url('search/show_list?sscategory[]=' . element('cca_id', $value));
 				$data['list'][$key]['category_image_url'] = cdn_url('category','icon-cate-'.element('cca_id', $value).'.svg');
 
 				// if (element(element('cca_id', $value), $category)) {
