@@ -71,7 +71,7 @@ class Cmall_attr_model extends CB_Model
             return;
         }
 
-        $this->db->select('cmall_attr.*');
+        $this->db->select('cmall_attr.cat_id,cmall_attr.cat_value,cmall_attr.cat_parent,cmall_attr.cat_order');
         $this->db->join('cmall_attr_rel', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
         $this->db->where(array('cmall_attr_rel.cit_id' => $cit_id));
         $this->db->order_by('cat_order', 'asc');

@@ -71,7 +71,7 @@ class Notice extends CB_Controller
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
 
-        $per_page = 1;
+        $per_page = 10;
         $offset = ($page - 1) * $per_page;
 
         /**
@@ -95,8 +95,8 @@ class Notice extends CB_Controller
         // $this->{$this->modelname}->select = $select;
 
         $result = $this->{$this->modelname}
-            ->get_today_list();
-        // $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+            ->get_admin_list($per_page,$offset, $where, '', $findex, $forder);
+        $list_num = $result['total_rows'] - ($page - 1) * $per_page;
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
@@ -126,18 +126,19 @@ class Notice extends CB_Controller
         /**
          * primary key 정보를 저장합니다
          */
-        $view['view']['primary_key'] = $this->{$this->modelname}->primary_key;
+        // $view['view']['primary_key'] = $this->{$this->modelname}->primary_key;
 
         /**
          * 페이지네이션을 생성합니다
          */
-        // $config['base_url'] = site_url('/notice/lists') . '?' . $param->replace('page');
-        // $config['total_rows'] = $result['total_rows'];
-        // $config['per_page'] = $per_page;
-        // $this->pagination->initialize($config);
-        // // $view['view']['paging'] = $this->pagination->create_links();
-        // $view['view']['next_link'] = $this->pagination->get_next_link();
-        // $view['view']['page'] = $page;
+        $config['base_url'] = site_url('/notice/lists') . '?' . $param->replace('page');
+        $config['total_rows'] = $result['total_rows'];
+        $config['per_page'] = $per_page;
+        $this->pagination->initialize($config);
+        // $view['view']['paging'] = $this->pagination->create_links();
+        $view['view']['next_link'] = $this->pagination->get_next_link();
+        $view['view']['page'] = $page;
+
 
         return $view['view'];
 
@@ -245,15 +246,15 @@ class Notice extends CB_Controller
                     $getdata['noti_end_date'] = '';
                 }
 
-                if(element('is_image',getdata)) 
-                    $getdata['noti_image'] = cdn_url('notice',element('noti_file',getdata));       
+                // if(element('is_image',$getdata)) 
+                $getdata['noti_file_url'] = cdn_url('notice',element('noti_file',$getdata));       
                 $view['view']['data'] = $getdata;
             }
 
             /**
              * primary key 정보를 저장합니다
              */
-            $view['view']['primary_key'] = $primary_key;
+            // $view['view']['primary_key'] = $primary_key;
 
             
 

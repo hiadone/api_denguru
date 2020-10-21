@@ -51,6 +51,8 @@ class CB_Model extends CI_Model
 
 	public $_join = array();
 
+	public $_group_by = '';
+
 	/* --------------------------------------------------------------
 	 * GENERIC METHODS
 	 * ------------------------------------------------------------ */
@@ -207,12 +209,22 @@ class CB_Model extends CI_Model
 		if ($where) {
 			$this->db->where($where);
 		}
+		if ($this->set_where) {			
+			foreach ($this->set_where as $skey => $sval) {
+				$this->db->where($skey, $sval,false);				
+			}
+		}
 		if ($search_where) {
 			$this->db->where($search_where);
 		}
 
+		
+
 		if ($this->where_in) {
-			$this->db->where_in(key($this->where_in),$this->where_in[key($this->where_in)]);
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
+			}
+			
 		}
 		if ($like) {
 			$this->db->like($like);
@@ -264,11 +276,23 @@ class CB_Model extends CI_Model
 		if ($where) {
 			$this->db->where($where);
 		}
+		if ($this->set_where) {			
+			foreach ($this->set_where as $skey => $sval) {
+				$this->db->where($skey, $sval,false);				
+			}
+		}
 		if ($search_where) {
 			$this->db->where($search_where);
 		}
+		// if ($this->where_in) {
+		// 	$this->db->where_in(key($this->where_in),$this->where_in[key($this->where_in)]);
+		// }
+
 		if ($this->where_in) {
-			$this->db->where_in(key($this->where_in),$this->where_in[key($this->where_in)]);
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
+			}
+			
 		}
 		if ($like) {
 			$this->db->like($like);
@@ -465,6 +489,17 @@ class CB_Model extends CI_Model
 		
 			
 		$this->_join[] = $join;
+			
+		
+	}
+
+	public function set_group_by($group_by)
+	{
+		if (empty($group_by)) {
+			return false;
+		}
+			
+		$this->_group_by = $group_by;
 			
 		
 	}

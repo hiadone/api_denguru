@@ -313,6 +313,66 @@ class Denguruapi extends CI_Controller
         return isset($data['result']) ? $data['result'] : array();
     }
 
+    public function get_popular_cit_tags($cit_id = 0, $limit = 10)
+    {
+        $cachename = 'latest/get_popular_cit_tags' . $cit_id . '_' . $limit;
+        $data = $view = $return = $return2 = $arr1 = $arr2 = array();
+
+        if ( ! $data = $this->CI->cache->get($cachename)) {
+
+            $this->CI->load->model( array('Cmall_item_model'));
+            $result = $this->CI->Cmall_item_model->get_popular_cit_tags($cit_id);
+
+            $data['result'] = $result;
+            $data['cached'] = '1';
+            check_cache_dir('latest');
+            $this->CI->cache->save($cachename, $data, 86400);
+
+        }
+
+        foreach($data['result'] as $val){
+            if(element(element('ckd_value_kr',$val),element('ckd_value_kr',$view)))
+                $view['ckd_value_kr'][element('ckd_value_kr',$val)]++;
+            else
+                $view['ckd_value_kr'][element('ckd_value_kr',$val)]=1;
+
+            if(element(element('pag_value',$val),element('pag_value',$view)))
+                $view['pag_value'][element('pag_value',$val)]++;
+            else
+                $view['pag_value'][element('pag_value',$val)]=1;
+
+            if(element(element('cat_value',$val),element('cat_value',$view)))
+                $view['cat_value'][element('cat_value',$val)]++;
+            else
+                $view['cat_value'][element('cat_value',$val)]=1;
+        }
+        
+        
+        
+        $i=0;
+        foreach($view as  $value){
+            asort($value);
+            $lastValue = end($value);
+            $lastKey = key($value); 
+            $arr2[$lastKey] = $lastValue;
+            array_pop($value);
+            $arr1 = array_merge($arr1,$value);
+            
+
+        }
+        arsort($arr1);
+        arsort($arr2);
+        
+        $return = array_merge($arr2,$arr1);
+        $return = array_slice($return,0,10);
+        foreach($return as $key => $val){
+            array_push($return2,$key);
+        }
+        
+        
+        return isset($return2) ? $return2 : array();
+    }
+
     public function get_all_crawl($brd_id = 0)
     {
         $brd_id = (int) $brd_id;
@@ -491,7 +551,10 @@ class Denguruapi extends CI_Controller
 
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_image'][element('rfi_id', $fvalue)] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
+
+                    
+
+                    $review['review_image'][] = array('rfi_id' =>element('rfi_id', $fvalue),'uri' =>cdn_url('cmall_review', element('rfi_filename', $fvalue)));
                 }
             }
             
@@ -506,7 +569,7 @@ class Denguruapi extends CI_Controller
             $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_file'][element('rfi_id', $fvalue)] = cdn_url('cmall_review', element('rfi_filename', $fvalue));
+                    $review['review_file'][] = array('rfi_id' =>element('rfi_id', $fvalue),'uri' =>cdn_url('cmall_review', element('rfi_filename', $fvalue)));
                 }
             }
         } 
@@ -582,7 +645,10 @@ class Denguruapi extends CI_Controller
 
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
-                                $view['view']['list']['review_image'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                                $view['view']['list']['review_image'][] =
+                                    array('rfi_id' =>element('rfi_id', $fval),'uri' =>cdn_url('cmall_review', element('rfi_filename', $fval)));
+                                
+                                // $view['view']['list']['review_image'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
                             }
                         }
                     } 
@@ -596,7 +662,11 @@ class Denguruapi extends CI_Controller
 
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
-                                $view['view']['list']['review_file'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                                $view['view']['list']['review_file'][] = 
+                                    array('rfi_id' =>element('rfi_id', $fval),'uri' =>cdn_url('cmall_review', element('rfi_filename', $fval)));
+
+                                // [element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
+                                // $view['view']['list']['review_file'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
                             }
                         }
                     } 
@@ -632,21 +702,21 @@ class Denguruapi extends CI_Controller
 
         $data = array();
 
+        if($this->CI->member->is_member() !== $_mem_id){
+            $data['member_reviewer_url']= base_url('/profile/reviewer/'.$_mem_id);
 
-        $data['member_reviewer_url']= base_url('/profile/reviewer/'.$_mem_id);
+            
+            $data['reviewerstatus'] = 0; //리뷰어로 선정했는지 여부 
 
-        
-        $data['reviewerstatus'] = 0; //리뷰어로 선정했는지 여부 
-
-        if(!empty($this->CI->member->is_member())){
-            $countwhere = array(
-            'mem_id' => $this->CI->member->is_member(),
-            'target_mem_id' => $_mem_id,
-            );
-            $data['reviewerstatus'] = $this->CI->Reviewer_model
-            ->count_by($countwhere);  
+            if(!empty($this->CI->member->is_member())){
+                $countwhere = array(
+                'mem_id' => $this->CI->member->is_member(),
+                'target_mem_id' => $_mem_id,
+                );
+                $data['reviewerstatus'] = $this->CI->Reviewer_model
+                ->count_by($countwhere);  
+            }
         }
-
         $member = $this->CI->Member_model->get_by_memid($_mem_id);
         
         
@@ -660,9 +730,9 @@ class Denguruapi extends CI_Controller
             $member = array_merge($member, $pet);
         }
 
-        $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pet_form',$member));
+        $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pat_id',$member));
 
-        $pet_kind = $this->CI->Cmall_kind_model->get_kind_info(element('pet_kind',$member));
+        $pet_kind = $this->CI->Cmall_kind_model->get_kind_info(element('ckd_id',$member));
         
 
         $data['mem_id'] = element('mem_id',$member);
@@ -670,6 +740,8 @@ class Denguruapi extends CI_Controller
         $data['mem_email'] = element('mem_email',$member);
         $data['mem_username'] = element('mem_username',$member);
         $data['mem_nickname'] = element('mem_nickname',$member);
+        $data['petwrite_url'] = base_url('mypage/petwrite');
+
         $data['pet_id'] = element('pet_id',$member);
         $data['pet_name'] = element('pet_name',$member);
         $data['pet_birthday'] = element('pet_birthday',$member);
@@ -678,14 +750,19 @@ class Denguruapi extends CI_Controller
         $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
         $data['pet_neutral'] = element('pet_neutral',$member);
         $data['pet_weight'] = element('pet_weight',$member);
-        $data['pet_form'] = element('pat_value',$pet_form,'');
-        $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
 
+        $data['pat_id'] = element('pat_id',$member);
+        $data['pet_form_str'] = element('pat_value',$pet_form);
+
+        $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
+        
+
+        $data['ckd_id'] = element('ckd_id',$member);
+        
         $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$member));
         
         
-        
-        $data['pet_allergy'] = element('pet_allergy',$member);
+        $data['pet_is_allergy'] = element('pet_is_allergy',$member);
 
         $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$member));
 
@@ -697,11 +774,11 @@ class Denguruapi extends CI_Controller
         return $data;
     }
 
-    public function convert_mem_info($member = array())
+    public function get_mem_pet_info($mem_id)
     {
         
         
-        $mem_id = (int) element('mem_id',$member);
+        $mem_id = (int) $mem_id;
         if (empty($mem_id) OR $mem_id < 1) {
             return false;
         }
@@ -740,40 +817,40 @@ class Denguruapi extends CI_Controller
 
            $this->CI->load->model(
                array(
-                   'Pet_attr_model','Pet_allergy_model'
+                   'Pet_attr_model','Pet_allergy_model','Member_pet_model'
                )
            );
 
-            $data['mem_id'] = element('mem_id',$member);
-            $data['mem_userid'] = element('mem_userid',$member);
-            $data['mem_email'] = element('mem_email',$member);
-            $data['mem_username'] = element('mem_username',$member);
-            $data['mem_nickname'] = element('mem_nickname',$member);
+           $data = array();
+           $petlist = $this->CI->Member_pet_model->get('','',array('mem_id' => $this->CI->member->item('mem_id')),'','','pet_main','desc');
 
-            $data['petwrite_url'] = base_url('mypage/petwrite');
+           
+            if($petlist)
+                foreach($petlist as $key => $value){
 
-            if(element('pet',$member))
-                foreach(element('list',element('pet',$member)) as $key => $value){
-                    $data['pet']['list'][$key]['pet_main'] = element('pet_main',$value);
-                    $data['pet']['list'][$key]['petmodify_url'] = base_url('mypage/petwrite/'.element('pet_id',$value));
-                    $data['pet']['list'][$key]['pet_id'] = element('pet_id',$value);
-                    $data['pet']['list'][$key]['pet_name'] = element('pet_name',$value);
-                    $data['pet']['list'][$key]['pet_birthday'] = element('pet_birthday',$value);
-                    $data['pet']['list'][$key]['pet_age'] = date('Y') - cdate('Y',strtotime(element('pet_birthday',$value)));
-                    $data['pet']['list'][$key]['pet_sex'] = element('pet_sex',$value);
-                    $data['pet']['list'][$key]['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$value));
-                    $data['pet']['list'][$key]['pet_neutral'] = element('pet_neutral',$value);
-                    $data['pet']['list'][$key]['pet_weight'] = element('pet_weight',$value);
-                    $data['pet']['list'][$key]['pet_form'] = element(element('pet_form',$value),config_item('pet_form'),'');
-                    $data['pet']['list'][$key]['pet_kind'] = element('pet_kind',$value);
+                    $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pat_id',$value));
 
-                    $data['pet']['list'][$key]['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$value));
+                    $data['list'][$key]['pet_main'] = element('pet_main',$value);
+                    $data['list'][$key]['petmodify_url'] = base_url('mypage/petwrite/'.element('pet_id',$value));
+                    $data['list'][$key]['pet_id'] = element('pet_id',$value);
+                    $data['list'][$key]['pet_name'] = element('pet_name',$value);
+                    $data['list'][$key]['pet_birthday'] = element('pet_birthday',$value);
+                    $data['list'][$key]['pet_age'] = date('Y') - cdate('Y',strtotime(element('pet_birthday',$value)));
+                    $data['list'][$key]['pet_sex'] = element('pet_sex',$value);
+                    $data['list'][$key]['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$value));
+                    $data['list'][$key]['pet_neutral'] = element('pet_neutral',$value);
+                    $data['list'][$key]['pet_weight'] = element('pet_weight',$value);
+                    $data['list'][$key]['cat_id'] = element('cat_id',$value);
+                    $data['list'][$key]['pet_form_str'] = element('pat_value',$pet_form);
+                    $data['list'][$key]['ckd_id'] = element('ckd_id',$value);
+
+                    $data['list'][$key]['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$value));
                             
                             
                             
-                    $data['pet']['list'][$key]['pet_allergy'] = element('pet_allergy',$value);
+                    $data['list'][$key]['pet_is_allergy'] = element('pet_is_allergy',$value);
 
-                    $data['pet']['list'][$key]['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$value));
+                    $data['list'][$key]['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$value));
                 }
             
         

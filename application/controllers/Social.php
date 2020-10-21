@@ -845,7 +845,7 @@ class Social extends CB_Controller
 
 			$mem_id = $this->Social_meta_model
 				->get_mem_id_by_social($social_type, $social_id);
-
+				
 			if ($mem_id) {
 				if ((int) $mem_id === (int) $this->member->item('mem_id')) {
 					// 나의 계정과 같으므로, 고의로 접근한 경우임
@@ -863,7 +863,7 @@ class Social extends CB_Controller
 				$this->Social_meta_model
 					->save($this->member->item('mem_id'), $metadata);
 			}
-			return $this->_connected_close($social_type);
+			return $this->_connected_close($social_type,$mem_id);
 
 		} else {
 
@@ -1298,7 +1298,7 @@ class Social extends CB_Controller
 	}
 
 
-	public function _connected_close($stype)
+	public function _connected_close($social_type,$mem_id)
 	{	
 
 		$tokenData = array();

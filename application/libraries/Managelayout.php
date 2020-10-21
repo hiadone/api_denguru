@@ -208,16 +208,24 @@ class Managelayout extends CI_Controller
 		// 	$data['member'] = $CI->member->get_member();					
 		// 	$data['member'] = $CI->denguruapi->convert_mem_info($data['member']);
 		// }
+		$CI->load->library('denguruapi');
+		$data['member'] = false;
+		if ($CI->member->is_member()) {
+			
+			$data['member'] = $CI->denguruapi->get_mem_info($CI->member->item('mem_id'));			
+		}
 
 		if(element('path', $config) == 'cmall' && element('skin', $config) == 'main' ){
 
 			$CI->load->model(array('Banner_model'));
-			$CI->load->library('popuplib');
-			$data['member'] = false;
-			if ($CI->member->is_member()) {
-				$CI->load->library('denguruapi');
-				$data['member'] = $CI->member->get_member();					
-				$data['member'] = $CI->denguruapi->convert_mem_info($data['member']);
+			$CI->load->library('popuplib');			
+			if ($CI->member->is_member()) {		
+				$CI->load->model(
+					array(
+						'Member_pet_model',
+					)
+				);
+				$data['member']['petlist']= $CI->denguruapi->get_mem_pet_info($CI->member->item('mem_id'));
 			}
 		
 			$data['popup'] = $CI->popuplib->display_popup();

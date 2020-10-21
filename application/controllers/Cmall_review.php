@@ -250,16 +250,24 @@ class Cmall_review extends CB_Controller
     }
 
     
-    protected function _itemreviewpost($cit_id = 0,$cre_id = 0)
+    protected function _itemreviewpost($cit_id = 0,$cre_id = 0,$config)
     {
         
     
         
+        $sattr = element('sattr', $config) ? element('sattr', $config) : array();
+        $skind = element('skind', $config) ? element('skind', $config) : 0;
+        $sform = element('sform', $config) ? element('sform', $config) : array();
+        $sscore = element('sscore', $config) ? element('sscore', $config) : array();
+        $sage = element('sage', $config) ? element('sage', $config) : array();
+        $is_mypet_match = element('is_mypet_match', $config) ? element('is_mypet_match', $config) : 0;
 
         $view = $data = array();
         $view['view'] = array();
 
-        $view['view']['reviewmmodify_url'] = base_url('cmall_review/reviewwrite/'.$cit_id);
+        $view['view']['reviewmodify_url'] = base_url('cmall_review/reviewwrite/'.$cit_id);
+
+
     
         $this->load->model(array('Cmall_item_model', 'Cmall_review_model', 'Cmall_attr_model','Pet_attr_model','Cmall_kind_model'));
 
@@ -305,40 +313,55 @@ class Cmall_review extends CB_Controller
         $sfield = '';
         $skeyword = '';
 
-        $per_page = 5;
+        // $per_page = 5;
         $offset = ($page - 1) * $per_page;
 
         $is_admin = $this->member->is_admin();
+
+        $all_kind = $this->Cmall_kind_model->get_all_kind();
+        
 
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
         $where = array();
-
         
 
-        if($this->input->get('sage')){
-            if($this->input->get('sage') === 1)
-                $where['pet_birthday > '] = cdate('Y-m-d',strtotime("-1 years"));
-            if($this->input->get('sage') === 2){
-                $where['pet_birthday >= '] = cdate('Y-m-d',strtotime("-1 years"));
-                $where['pet_birthday <= '] = cdate('Y-m-d',strtotime("-6 years"));
-            }
-            if($this->input->get('sage') === 1)
-                $where['pet_birthday < '] = cdate('Y-m-d',strtotime("-7 years"));
+        if($skind){            
+            $where['ckd_id'] = $skind;
+            
+                
+        }
+        if($sform){    
+            $this->Cmall_review_model->set_where_in('pat_id',$sform);        
+                
         }
 
-        if($this->input->get('sform')){            
-                $where['pet_form'] = $this->input->get('sform');
+        if($sage && is_array($sage)){
+
+            $set_where = array();
+            foreach($sage as $val){
+                if($val === '17')
+                    $set_where[] = 'pet_birthday > '.cdate('Y-m-d',strtotime("-1 years"));
+
+                if($val === '18'){
+                    $set_where[]= '(pet_birthday >= '.cdate('Y-m-d',strtotime("-1 years")).' and pet_birthday <= '.cdate('Y-m-d',strtotime("-6 years")).')';
+                }
+                if($val === '19')
+                    $set_where[] = 'pet_birthday < '.cdate('Y-m-d',strtotime("-7 years"));                    
+            }
+
+            if(!empty($set_where))
+                $this->Cmall_review_model->set_where('('.implode(' or ',$set_where).')',false);
         }
-        if($this->input->get('skind')){            
-                $where['pet_kind'] = $this->input->get('skind');
+
+        
+        if($sattr){            
+                $this->Cmall_review_model->set_where_in('pat_id',$sattr);
         }
-        if($this->input->get('sattr')){            
-                $where['pet_attr'] = $this->input->get('sattr');
-        }
-        if($this->input->get('sscore')){            
-                $where['cre_score'] = $this->input->get('sscore');
+        if($sscore){            
+            $this->Cmall_review_model->set_where_in('cre_score',$sscore);        
+                
         }
         $where['cre_status'] = 1;
         // $where['cit_status'] = 1;
@@ -371,7 +394,7 @@ class Cmall_review extends CB_Controller
 
         // $result = $this->Cmall_attr_model->get_review_list($per_page, $offset, $where, '', $findex, $forder);
         // 
-        $data['item']['total_rows'] = $result['total_rows'];
+        // echo $result['total_rows'];
         $view['view']['data'] = $data;
 
         
@@ -410,9 +433,15 @@ class Cmall_review extends CB_Controller
                 
             }
         }
-        $view['view']['data']['list'] = $result['list'];
         
+        $view['view']['data']['list'] = $result['list'];
+        $view['view']['data']['total_rows'] = $result['total_rows'];
 
+        $score = array();
+        $score[1] = $score[2] = $score[3] = $score[4] = $score[5] = 0;
+        foreach($view['view']['data']['list'] as $val){            
+                $score[element('cre_score',$val)]++;
+        }
         /**
          * 페이지네이션을 생성합니다
          */
@@ -442,7 +471,8 @@ class Cmall_review extends CB_Controller
         $view['view']['config']['pet_age'] = element(3,$pet_attr);;
         $view['view']['config']['pet_form'] = element(2,$pet_attr);
         $view['view']['config']['pet_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
-        $view['view']['config']['pet_attr'] = element(3,$pet_attr);;
+        $view['view']['config']['pet_attr'] = element(3,$pet_attr);
+        $view['view']['config']['score'] = $score;
         
 
         
@@ -467,7 +497,94 @@ class Cmall_review extends CB_Controller
         // 이벤트가 존재하면 실행합니다
         // $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-        $view['view'] = $this->_itemreviewpost($cit_id,$cre_id);
+        $mem_id = (int) $this->member->item('mem_id');
+
+        if($mem_id)
+            $view['view']['data']['member'] = $this->denguruapi->get_mem_info($mem_id);
+
+
+        $sattr = $sform = $sage = $sscore = array();
+        $skind =  '';
+        if($this->input->get('sattr') && is_array($this->input->get('sattr'))){
+            foreach($this->input->get('sattr') as $val){
+                
+                if($val === '14') array_push($sform,$val);
+                elseif($val === '15') array_push($sform,$val);
+                elseif($val === '16') array_push($sform,$val);
+                elseif($val === '17') array_push($sage,$val);
+                elseif($val === '18') array_push($sage,$val);
+                elseif($val === '19') array_push($sage,$val);
+                else array_push($sattr,$val);
+                // if($val === '4') array_push($sattr,79);
+                // if($val === '5') array_push($sattr,80);
+                // if($val === '6') array_push($sattr,81);
+
+                // if($val === '7') array_push($sattr,82);
+                // if($val === '8') array_push($sattr,83);
+                // if($val === '9') array_push($sattr,84);
+
+                // if($val === '10') array_push($sattr,85);
+                // if($val === '11') array_push($sattr,86);
+                // if($val === '12') array_push($sattr,87);
+
+                // if($val === '13') array_push($sattr,88);
+            }
+        }
+
+        $skind = $this->input->get('skind');
+        $sscore = $this->input->get('sscore');
+        
+
+        if($mem_id && $this->input->get('is_mypet_match')){
+
+            
+            $sattr = $sform = $sage = array();
+            $skind =  '';
+            if((int) $view['view']['data']['member']['pet_age'] < 1) array_push($sage,'17');
+            elseif((int) $view['view']['data']['member']['pet_age'] < 7) array_push($sage,'18');
+            elseif((int) $view['view']['data']['member']['pet_age'] > 7) array_push($sage,'19');
+
+            
+            array_push($sform,$view['view']['data']['member']['pat_id']);            
+            $skind = $view['view']['data']['member']['ckd_id'];
+
+
+            if($view['view']['data']['member']['pet_attr']){
+                foreach($view['view']['data']['member']['pet_attr'] as $val){
+
+                    if(element('pat_id',$val) === '14') array_push($sform,element('pat_id',$val));
+                    elseif(element('pat_id',$val) === '15') array_push($sform,element('pat_id',$val));
+                    elseif(element('pat_id',$val) === '16') array_push($sform,element('pat_id',$val));
+                    elseif(element('pat_id',$val) === '17') array_push($sage,element('pat_id',$val));
+                    elseif(element('pat_id',$val) === '18') array_push($sage,element('pat_id',$val));
+                    elseif(element('pat_id',$val) === '19') array_push($sage,element('pat_id',$val));
+                    else array_push($sattr,element('pat_id',$val));
+                    // if(element('pat_id',$val) === '7') array_push($sattr,82);
+                    // if(element('pat_id',$val) === '8') array_push($sattr,83);
+                    // if(element('pat_id',$val) === '9') array_push($sattr,84);
+
+                    // if(element('pat_id',$val) === '10') array_push($sattr,85);
+                    // if(element('pat_id',$val) === '11') array_push($sattr,86);
+                    // if(element('pat_id',$val) === '12') array_push($sattr,87);
+
+                    // if(element('pat_id',$val) === '13') array_push($sattr,88);
+                }
+            }
+        }
+
+
+        $config = array(
+            'sattr' => $sattr,
+            'skind' => $skind,
+            'sform' => $sform,
+            'sage' => $sage,
+            'is_mypet_match' => $this->input->get('is_mypet_match'),
+            'sscore' => $sscore,
+
+        );
+
+        
+        $view['view'] = $this->_itemreviewpost($cit_id,$cre_id,$config);
 
         /**
          * 레이아웃을 정의합니다
@@ -534,7 +651,9 @@ class Cmall_review extends CB_Controller
 
        $data = $this->denguruapi->get_mem_info($_mem_id);
         
-       $view['view']['mem_info'] = $data;
+       $view['view']['mem_info'] = $data;   
+       $is_admin = $this->member->is_admin();
+        $mem_id = (int) $this->member->item('mem_id');
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
          */
@@ -545,11 +664,25 @@ class Cmall_review extends CB_Controller
         $sfield = '';
         $skeyword = '';
 
-        $per_page = 5;
+        $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
+
+        $per_page = 1;
+        if($mem_id){
+            $reviewwhere = array('mem_id' => $mem_id);
+            
+            if($this->Cmall_review_model->count_by($reviewwhere)) {
+                $review_flag = 1;
+                $per_page = 5;
+            }
+            
+        }
+
+        $view['view']['review_flag'] = $review_flag;
+
+        // $per_page = 5;
         $offset = ($page - 1) * $per_page;
 
-        $is_admin = $this->member->is_admin();
-        $mem_id = (int) $this->member->item('mem_id');
+        
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
@@ -1019,7 +1152,7 @@ class Cmall_review extends CB_Controller
                 /**
                  * primary key 정보를 저장합니다
                  */
-                $view['primary_key'] = $primary_key;
+                // $view['primary_key'] = $primary_key;
 
                 $view['http_status_codes'] = parent::HTTP_OK;
             }

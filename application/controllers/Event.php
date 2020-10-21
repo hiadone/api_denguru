@@ -149,7 +149,7 @@ class Event extends CB_Controller
         /**
          * primary key 정보를 저장합니다
          */
-        $view['view']['primary_key'] = $this->{$this->modelname}->primary_key;
+        // $view['view']['primary_key'] = $this->{$this->modelname}->primary_key;
 
         /**
          * 페이지네이션을 생성합니다
@@ -248,7 +248,7 @@ class Event extends CB_Controller
                 show_404();
             }
         // }
-        $primary_key = $this->{$this->modelname}->primary_key;
+        // $primary_key = $this->{$this->modelname}->primary_key;
 
         /**
          * 수정 페이지일 경우 기존 데이터를 가져옵니다
@@ -318,7 +318,7 @@ class Event extends CB_Controller
             /**
              * primary key 정보를 저장합니다
              */
-            $view['view']['primary_key'] = $primary_key;
+            // $view['view']['primary_key'] = $primary_key;
 
             // 이벤트가 존재하면 실행합니다
             // $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);

@@ -682,7 +682,7 @@ class Membermodify extends CB_Controller
 					'meta_change_pw_datetime' => cdate('Y-m-d H:i:s'),
 				);
 			}
-			$updatedata['mem_email'] = $this->input->post('mem_email');
+			// $updatedata['mem_email'] = $this->input->post('mem_email');
 			if ($this->member->item('mem_email') !== $this->input->post('mem_email')) {
 				$updatedata['mem_email_cert'] = 0;
 				$metadata['meta_email_cert_datetime'] = '';
@@ -1621,13 +1621,16 @@ class Membermodify extends CB_Controller
 				'rules' => 'trim|required|min_length[' . $password_length . ']|callback__cur_password_check',
 			),
 		);
+
+		
+		
 		$this->form_validation->set_rules($config);
 		/**
 		 * 유효성 검사를 하지 않는 경우, 또는 유효성 검사에 실패한 경우입니다.
 		 * 즉 글쓰기나 수정 페이지를 보고 있는 경우입니다
 		 */
-		if ($this->form_validation->run() === false) {
-
+		// if ($this->form_validation->run() === false) {
+		if (false) {
 			// 이벤트가 존재하면 실행합니다
 			// $view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
 
@@ -1647,6 +1650,7 @@ class Membermodify extends CB_Controller
             
 
 		} else {
+			
 			/**
 			 * 유효성 검사를 통과한 경우입니다.
 			 * 즉 데이터의 insert 나 update 의 process 처리가 필요한 상황입니다

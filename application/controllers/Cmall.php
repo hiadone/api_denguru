@@ -790,7 +790,7 @@ class Cmall extends CB_Controller
 		// $data['reviewscore'] = $this->Cmall_review_model->get_review_count(element('cit_id',$data));
 		$data['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$data));
 
-		$data['ai_keyword'] = array();
+		$data['ai_keyword'] = $this->denguruapi->get_popular_cit_tags(element('cit_id',$data));
 
 		$get_category = $this->Cmall_category_model->get_category(element('cit_id', $data));
 		$cca_id_arr =array();
@@ -2403,7 +2403,10 @@ class Cmall extends CB_Controller
 		}
 
 		$view['view']['data'] = $result;
-		$view['view']['storeby_wishlist'] = site_url('cmall/wishlist/0/store');
+		if($type==='store')
+			$view['view']['storeby_wishlist_url'] = site_url('cmall/wishlist');
+		else
+			$view['view']['storeby_wishlist_url'] = site_url('cmall/wishlist/0/store');
 
 		if($type==='store'){
 			$data=array();
@@ -2416,7 +2419,7 @@ class Cmall extends CB_Controller
 					$data['list'][element('brd_id',$val)]['brd_image'] = element('brd_image',$_data);
 					$data['list'][element('brd_id',$val)]['brd_outlink_url'] = element('brd_outlink_url',$_data);
 					$data['list'][element('brd_id',$val)]['brd_inlink_url'] = element('brd_inlink_url',$_data);
-					$data['list'][element('brd_id',$val)]['brd_wishlist'] = site_url('cmall/wishlist/'.element('brd_id',$val));
+					$data['list'][element('brd_id',$val)]['brd_wishlist_url'] = site_url('cmall/wishlist/'.element('brd_id',$val));
 
 					$data['list'][element('brd_id',$val)]['brd_id'] = element('brd_id',$val);
 
@@ -2425,7 +2428,7 @@ class Cmall extends CB_Controller
 					else
 						$data['list'][element('brd_id',$val)]['cnt']++;
 					
-					$data['list'][element('brd_id',$val)]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val));
+					$data['list'][element('brd_id',$val)]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val));
 
 					
 				}
@@ -2602,7 +2605,7 @@ class Cmall extends CB_Controller
 			foreach (element('list', $result) as $key => $val) {
 				$result['list'][$key] = $this->denguruapi->get_brd_info(element('brd_id', $val),$result['list'][$key]);
 				// $result['list'][$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val));
-
+				$result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
 				
 				$result['list'][$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
 				$result['list'][$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
@@ -2688,7 +2691,7 @@ class Cmall extends CB_Controller
 	}
 
 	
-	protected function _storeranklist()
+	protected function _storeranklist($config)
 	{
 		
 
@@ -2697,44 +2700,93 @@ class Cmall extends CB_Controller
 		$view = array();
 		$view['view'] = array();
 		
-		$this->load->model(array('Board_model','Cmall_item_model','Pet_attr_model','Cmall_kind_model','Theme_model'));
 
+		
+		$this->load->model(array('Board_model','Cmall_attr_model','Pet_attr_model','Cmall_kind_model','Theme_model'));
 
+		$sattr = element('sattr', $config) ? element('sattr', $config) : false;
+		$skind = element('skind', $config) ? element('skind', $config) : false;
+		$is_mypet_match = element('is_mypet_match', $config) ? element('is_mypet_match', $config) : false;
 
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
 		$param =& $this->querystring;
-		$page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+		// $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
 		
+		$mem_id = (int) $this->member->item('mem_id');
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
-		$offset = ($page - 1) * $per_page;
-		
+
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $offset = ($page - 1) * $per_page;
+
+		$all_kind = $this->Cmall_kind_model->get_all_kind();
+		$all_attr = $this->Cmall_attr_model->get_all_attr();
 		/**
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
-		$where = array();
+		$where = array(
+				'brd_search' => 1,
+				'brd_blind' => 0,				
+				);
+
 		
-		if($this->input->get('sage')){
-            if($this->input->get('sage') === 1)
-                $where['pet_birthday > '] = cdate('Y-m-d',strtotime("-1 years"));
-            if($this->input->get('sage') === 2){
-                $where['pet_birthday >= '] = cdate('Y-m-d',strtotime("-1 years"));
-                $where['pet_birthday <= '] = cdate('Y-m-d',strtotime("-6 years"));
-            }
-            if($this->input->get('sage') === 1)
-                $where['pet_birthday < '] = cdate('Y-m-d',strtotime("-7 years"));
+
+		
+		if($sattr || $skind){
+			$cmallwhere = 'where
+				cit_status = 1
+				AND cit_is_del = 0
+			';
+			$this->Board_model->_select = 'board.*';
+
+			$this->Board_model->set_join(array("
+				(select cit_id,brd_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+		}
+		if($sattr && is_array($sattr)){
+		    			
+			$sattr_id = array();
+			foreach($all_attr as $akey => $aval){
+				
+				foreach($aval as  $aaval){	
+					foreach($sattr as $cval){
+						if($cval == element('cat_id',$aaval)){
+							$sattr_id[$akey][] = $cval;
+						}
+					}	
+	        	}
+        	}
+
+        	
+        	$_join = '';
+        	foreach($sattr_id as $skey => $sval){
+        	
+        		if(empty($_join))
+        			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+        		else 
+        			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+        			
+        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+        		
+        	}
+        	
+
+        	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+
+
+        	
+        	
         }
 
-        if($this->input->get('sform')){            
-                $where['pet_form'] = $this->input->get('sform');
-        }
-        if($this->input->get('skind')){            
-                $where['pet_kind'] = $this->input->get('skind');
-        }
-        if($this->input->get('sattr')){            
-                $where['pet_attr'] = $this->input->get('sattr');
+        if($skind){
+
+            // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
+            // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
+            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+
+    //         if(empty($sattr))
+				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
+            
         }
 		// if($this->input->get('sform')){            
   //               $where['pet_form'] = $this->input->get('sform');
@@ -2746,24 +2798,32 @@ class Cmall extends CB_Controller
   //               $where['pet_attr'] = $this->input->get('sattr');
   //       }
   //       
-		$where['brd_blind'] = 0;
-		// $where['cit_status'] = 1;
 		
-		$this->Board_model->_select='board.brd_id,brd_name,brd_image,brd_storewish_count,brd_hit,board.cit_updated_datetime,cat_value';
+		
+		
+		
 		// $result = $this->Board_model->get_attr_list('','',$where);
 
-		$result['list'] = $this->Board_model->get_board_list($where);
+        
 		
+		if($sattr || $skind){			
+			$this->Board_model->group_by('brd_id');
+			$result = $this->Board_model
+				->get_rank_list('','', $where, '', '', 'brd_order asc');
+		} else 
+			$result['list'] = $this->Board_model->get_board_list($where);
+
+		// echo count($result['list']);
 		// $list_num = $result['total_rows'] - ($page - 1) * $per_page;
 		if (element('list', $result)) {			
 			foreach (element('list', $result) as $key => $val) {				
 				$result['list'][$key] = $this->denguruapi->convert_brd_info($val);
-				// $result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
+				$result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
 
 				
 				// $result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
 				
-				$result['list'][$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
+				// $result['list'][$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
 				
 			}
 		}
@@ -2801,7 +2861,7 @@ class Cmall extends CB_Controller
 		$view['view']['config']['pet_age'] = element(3,$pet_attr);;
         $view['view']['config']['pet_form'] = element(2,$pet_attr);
         $view['view']['config']['pet_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
-        $view['view']['config']['pet_attr'] = element(3,$pet_attr);;
+        $view['view']['config']['pet_attr'] = element(1,$pet_attr);;
 
 
   	
@@ -2825,18 +2885,86 @@ class Cmall extends CB_Controller
 
 	public function storeranklist_get()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_cmall_wishlist';
-		//$this->load->event($eventname);
+		
 
 		
 		$view = array();
 		$view['view'] = array();
 
+		$mem_id = (int) $this->member->item('mem_id');
+
+		if($mem_id)
+			$view['view']['data']['member'] = $this->denguruapi->get_mem_info($mem_id);
+
+
+		$sattr =  array();
+		$skind = '';
+		if($this->input->get('sattr') && is_array($this->input->get('sattr'))){
+			foreach($this->input->get('sattr') as $val){
+				if($val === '17') array_push($sattr,12);
+				if($val === '18') array_push($sattr,13);
+				if($val === '19') array_push($sattr,14);
+
+				if($val === '4') array_push($sattr,79);
+				if($val === '5') array_push($sattr,80);
+				if($val === '6') array_push($sattr,81);
+
+				if($val === '7') array_push($sattr,82);
+				if($val === '8') array_push($sattr,83);
+				if($val === '9') array_push($sattr,84);
+
+				if($val === '10') array_push($sattr,85);
+				if($val === '11') array_push($sattr,86);
+				if($val === '12') array_push($sattr,87);
+
+				if($val === '13') array_push($sattr,88);
+			}
+		}
+		
+		$skind = $this->input->get('skind');
+
+		if($mem_id && $this->input->get('is_mypet_match')){
+
+			$sattr =  array();
+			$skind = '';
+			if((int) $view['view']['data']['member']['pet_age'] < 1) array_push($sattr,12);
+			elseif((int) $view['view']['data']['member']['pet_age'] < 7) array_push($sattr,13);
+			elseif((int) $view['view']['data']['member']['pet_age'] > 7) array_push($sattr,14);
+
+			$skind = $view['view']['data']['member']['ckd_id'];
+
+			if($view['view']['data']['member']['pet_attr']){
+				foreach($view['view']['data']['member']['pet_attr'] as $val){
+					
+					if(element('pat_id',$val) === '4') array_push($sattr,79);
+					if(element('pat_id',$val) === '5') array_push($sattr,80);
+					if(element('pat_id',$val) === '6') array_push($sattr,81);
+
+					if(element('pat_id',$val) === '7') array_push($sattr,82);
+					if(element('pat_id',$val) === '8') array_push($sattr,83);
+					if(element('pat_id',$val) === '9') array_push($sattr,84);
+
+					if(element('pat_id',$val) === '10') array_push($sattr,85);
+					if(element('pat_id',$val) === '11') array_push($sattr,86);
+					if(element('pat_id',$val) === '12') array_push($sattr,87);
+
+					if(element('pat_id',$val) === '13') array_push($sattr,88);
+				}
+			}
+		}
+
+
+		$config = array(
+			'sattr' => $sattr,
+			'skind' => $skind,
+			// 'is_mypet_match' => $this->input->get('is_mypet_match'),
+		);
+
+		// print_r2($config);
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 		
-		$view['view'] = $this->_storeranklist();
+		$view['view'] = $this->_storeranklist($config);
 		
 		/**
 		 * 레이아웃을 정의합니다

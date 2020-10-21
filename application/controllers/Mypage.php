@@ -1228,9 +1228,9 @@ class Mypage extends CB_Controller
 
 	protected function _review()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		// // 이벤트 라이브러리를 로딩합니다
+		// $eventname = 'event_mypage_post';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1243,7 +1243,7 @@ class Mypage extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array( 'Cmall_review_model'));
 
@@ -1420,8 +1420,8 @@ class Mypage extends CB_Controller
 	protected function _likereview()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		// $eventname = 'event_mypage_post';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1434,7 +1434,7 @@ class Mypage extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Like_model', 'Cmall_review_model'));
 
@@ -1613,8 +1613,8 @@ class Mypage extends CB_Controller
 	protected function _applyevent()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		// $eventname = 'event_mypage_post';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1627,7 +1627,7 @@ class Mypage extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Event_model'));
 
@@ -1804,8 +1804,8 @@ class Mypage extends CB_Controller
 	protected function _resultevent()
 	{
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_mypage_post';
-		$this->load->event($eventname);
+		// $eventname = 'event_mypage_post';
+		// $this->load->event($eventname);
 
 		/**
 		 * 로그인이 필요한 페이지입니다
@@ -1818,7 +1818,7 @@ class Mypage extends CB_Controller
 		$view['view'] = array();
 
 		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
 		$this->load->model(array('Event_model'));
 
@@ -1996,8 +1996,8 @@ class Mypage extends CB_Controller
 	    
 
 	    // 이벤트 라이브러리를 로딩합니다
-        $eventname = 'event_admin_member_memberpet_write';
-        $this->load->event($eventname);
+        // $eventname = 'event_admin_member_memberpet_write';
+        // $this->load->event($eventname);
 
         $view = array();
         $view['view'] = array();
@@ -2080,14 +2080,14 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|numeric',
 	        ),
 	        array(
-	            'field' => 'pet_form',
+	            'field' => 'pat_id',
 	            'label' => '체형 ',
 	            'rules' => 'trim|numeric|required',
 	        ),
 	        array(
-	            'field' => 'pet_kind',
+	            'field' => 'ckd_Id',
 	            'label' => '품종',
-	            'rules' => 'trim|numeric',
+	            'rules' => 'trim|numeric|required',
 	        ),
 	        array(
 	            'field' => 'pet_attr',
@@ -2100,9 +2100,9 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|numeric',
 	        ),
 	        array(
-	            'field' => 'pet_allergy',
+	            'field' => 'pet_is_allergy',
 	            'label' => '알레르기',
-	            'rules' => 'trim|numeric|required|callback__pet_allergy',
+	            'rules' => 'trim|numeric|required|callback__pet_is_allergy',
 	        ),
 	        
 	        array(
@@ -2266,7 +2266,7 @@ class Mypage extends CB_Controller
             $view['view']['config']['pet_allergy_rel'] = $this->Pet_allergy_model->get_all_allergy();
             
 
-            $view['view']['primary_key'] = $primary_key;
+            // $view['view']['primary_key'] = $primary_key;
 
             $view['http_status_codes'] = parent::HTTP_OK;
 
@@ -2282,14 +2282,14 @@ class Mypage extends CB_Controller
 	         */
 
 	        // 이벤트가 존재하면 실행합니다
-	        $view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
+	        // $view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
 	        
 	        $pet_sex = $this->input->post_put('pet_sex') ? $this->input->post_put('pet_sex') : 0;
 	        $pet_neutral = $this->input->post_put('pet_neutral') ? $this->input->post_put('pet_neutral') : 0;
 	        $pet_weight = $this->input->post_put('pet_weight') ? $this->input->post_put('pet_weight') : 0;
-	        $pet_form = $this->input->post_put('pet_form') ? $this->input->post_put('pet_form') : 0;
-	        $pet_kind = $this->input->post_put('pet_kind') ? $this->input->post_put('pet_kind') : 0;
-	        $pet_allergy = $this->input->post_put('pet_allergy') ? $this->input->post_put('pet_allergy') : 0;
+	        $pat_id = $this->input->post_put('pat_id') ? $this->input->post_put('pat_id') : 0;
+	        $ckd_id = $this->input->post_put('ckd_id') ? $this->input->post_put('ckd_id') : 0;
+	        $pet_is_allergy = $this->input->post_put('pet_is_allergy') ? $this->input->post_put('pet_is_allergy') : 0;
 
 	        $updatedata = array(
 	            
@@ -2298,9 +2298,9 @@ class Mypage extends CB_Controller
 	            'pet_sex' => $pet_sex,
 	            'pet_neutral' => $pet_neutral,
 	            'pet_weight' => $pet_weight,                
-	            'pet_allergy' => $pet_allergy,
-	            'pet_form' => $pet_form,
-	            'pet_kind' => $pet_kind,
+	            'pet_is_allergy' => $pet_is_allergy,
+	            'pat_id' => $pat_id,
+	            'ckd_id' => $ckd_id,
 	            
 	        );
 
@@ -2507,7 +2507,7 @@ class Mypage extends CB_Controller
         return $this->response(array('msg' => '정상적으로 삭제되었습니다'),204);
     }
 
-    public function _pet_allergy($str)
+    public function _pet_is_allergy($str)
     {   
 
         
@@ -2516,7 +2516,7 @@ class Mypage extends CB_Controller
         if(!empty($str)){
         	if(empty($this->input->post('pet_allergy_rel'))){
         		$this->form_validation->set_message(
-        		    '_pet_allergy',
+        		    '_pet_is_allergy',
         		    '상세한 알레르기를 선택해 주세요.'
         		);
         		return false;

@@ -121,8 +121,39 @@ class Cmall_item_model extends CB_Model
             $this->db->where('cmall_item.brd_id', $brd_id);
         $this->db->where('cit_status', 1);
         $this->db->where('cit_is_del', 0);
+        $this->db->where('cat_parent >', 0);
         $this->db->group_by('cat_value');
         $this->db->order_by('cnt', 'desc');
+        if ($limit) {
+            $this->db->limit($limit);
+        }
+        $qry = $this->db->get();
+        $result = $qry->result_array();
+
+        return $result;
+    }
+
+    public function get_popular_cit_tags($cit_id = 0, $limit = '')
+    {
+        $this->db->select('ckd_value_kr,pag_value,cat_value', false);
+        $this->db->from('crawl_link_click_log');
+        $this->db->join('member_pet', 'crawl_link_click_log.mem_id = member_pet.mem_id', 'inner');
+        $this->db->join('pet_attr', 'pet_attr.pat_id = member_pet.pat_id', 'inner');
+        $this->db->join('pet_allergy_rel', 'pet_allergy_rel.pet_id = member_pet.pet_id', 'inner');
+        $this->db->join('pet_allergy', 'pet_allergy.pag_id = pet_allergy_rel.pag_id', 'inner');
+        $this->db->join('cmall_kind', 'cmall_kind.ckd_id = member_pet.ckd_id', 'inner');
+        $this->db->join('cmall_attr', 'cmall_kind.ckd_size = cmall_attr.cat_id', 'inner');
+
+        
+
+        
+        // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
+        if($cit_id)
+            $this->db->where('crawl_link_click_log.cit_id', $cit_id);
+        // $this->db->where('cit_status', 1);
+        // $this->db->where('cit_is_del', 0);
+        // $this->db->group_by('ckd_value_kr,pag_value,cat_value');
+        // $this->db->order_by('cnt', 'desc');
         if ($limit) {
             $this->db->limit($limit);
         }
