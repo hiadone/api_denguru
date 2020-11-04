@@ -93,11 +93,11 @@ class Member extends CI_Controller
 						'Member_pet_model',
 					)
 				);
-				$member['pet']['list'] = $this->CI->Member_pet_model->get('','',array('mem_id' => element('mem_id', $member)),'','','pet_main','desc');
+				$pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member)),'','','pet_main','desc');
 				
-				// if (is_array($pet)) {
-				// 	$member = array_merge($member, $pet);
-				// }
+				if (is_array($pet)) {
+					$member = array_merge($member, $pet);
+				}
 
 				$this->mb = $member;
 
@@ -124,7 +124,7 @@ class Member extends CI_Controller
 			return false;
 		}
 		$member = $this->mb;
-
+		
 		return isset($member[$column]) ? $member[$column] : false;
 	}
 

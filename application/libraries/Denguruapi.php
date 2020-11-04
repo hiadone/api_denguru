@@ -696,7 +696,7 @@ class Denguruapi extends CI_Controller
 
         $this->CI->load->model(
             array(
-                'Member_pet_model','Reviewer_model','Pet_attr_model','Pet_allergy_model','Cmall_kind_model'
+                'Member_pet_model','Reviewer_model'
             )
         );
 
@@ -724,16 +724,9 @@ class Denguruapi extends CI_Controller
 
         
         
-        $pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
+        $pet = $this->CI->Member_pet_model->get_one('','pet_id',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
         
-        if (is_array($pet)) {
-            $member = array_merge($member, $pet);
-        }
-
-        $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pat_id',$member));
-
-        $pet_kind = $this->CI->Cmall_kind_model->get_kind_info(element('ckd_id',$member));
-        
+        $pet_info = $this->get_pet_info(element('mem_id', $member),element('pet_id', $pet));
 
         $data['mem_id'] = element('mem_id',$member);
         $data['mem_userid'] = element('mem_userid',$member);
@@ -742,29 +735,45 @@ class Denguruapi extends CI_Controller
         $data['mem_nickname'] = element('mem_nickname',$member);
         $data['petwrite_url'] = base_url('mypage/petwrite');
 
-        $data['pet_id'] = element('pet_id',$member);
-        $data['pet_name'] = element('pet_name',$member);
-        $data['pet_birthday'] = element('pet_birthday',$member);
-        $data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
-        $data['pet_sex'] = element('pet_sex',$member);
-        $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
-        $data['pet_neutral'] = element('pet_neutral',$member);
-        $data['pet_weight'] = element('pet_weight',$member);
+        if (is_array($pet_info)) {
+            $data = array_merge($data, $pet_info);
+        }
 
-        $data['pat_id'] = element('pat_id',$member);
-        $data['pet_form_str'] = element('pat_value',$pet_form);
+        // $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pat_id',$member));
 
-        $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
+        // $pet_kind = $this->CI->Cmall_kind_model->get_kind_info(element('ckd_id',$member));
         
 
-        $data['ckd_id'] = element('ckd_id',$member);
         
-        $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$member));
-        
-        
-        $data['pet_is_allergy'] = element('pet_is_allergy',$member);
 
-        $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$member));
+        // $data['pet_id'] = element('pet_id',$member);
+        // $data['pet_name'] = element('pet_name',$member);
+        // $data['pet_birthday'] = element('pet_birthday',$member);
+        // $data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
+        // $data['pet_sex'] = element('pet_sex',$member);
+        // $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$member));
+        // $data['pet_neutral'] = element('pet_neutral',$member);
+        // $data['pet_weight'] = element('pet_weight',$member);
+
+        // $data['pat_id'] = element('pat_id',$member);
+        // $data['pet_form_str'] = element('pat_value',$pet_form);
+
+        // $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
+
+        // // $data['ckd_size'] = element('ckd_size',$pet_kind);
+        // $data['ckd_size_str'] = element('ckd_size',$pet_kind) == '4' ? '소형견' : element('ckd_size',$pet_kind) == '5' ? '중형견' : '대형견';
+
+
+        
+
+        // $data['ckd_id'] = element('ckd_id',$member);
+        
+        // $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$member));
+        
+        
+        // $data['pet_is_allergy'] = element('pet_is_allergy',$member);
+
+        // $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$member));
 
 
             
@@ -817,7 +826,7 @@ class Denguruapi extends CI_Controller
 
            $this->CI->load->model(
                array(
-                   'Pet_attr_model','Pet_allergy_model','Member_pet_model'
+                   'Member_pet_model'
                )
            );
 
@@ -828,33 +837,90 @@ class Denguruapi extends CI_Controller
             if($petlist)
                 foreach($petlist as $key => $value){
 
-                    $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pat_id',$value));
-
-                    $data['list'][$key]['pet_main'] = element('pet_main',$value);
-                    $data['list'][$key]['petmodify_url'] = base_url('mypage/petwrite/'.element('pet_id',$value));
-                    $data['list'][$key]['pet_id'] = element('pet_id',$value);
-                    $data['list'][$key]['pet_name'] = element('pet_name',$value);
-                    $data['list'][$key]['pet_birthday'] = element('pet_birthday',$value);
-                    $data['list'][$key]['pet_age'] = date('Y') - cdate('Y',strtotime(element('pet_birthday',$value)));
-                    $data['list'][$key]['pet_sex'] = element('pet_sex',$value);
-                    $data['list'][$key]['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$value));
-                    $data['list'][$key]['pet_neutral'] = element('pet_neutral',$value);
-                    $data['list'][$key]['pet_weight'] = element('pet_weight',$value);
-                    $data['list'][$key]['cat_id'] = element('cat_id',$value);
-                    $data['list'][$key]['pet_form_str'] = element('pat_value',$pet_form);
-                    $data['list'][$key]['ckd_id'] = element('ckd_id',$value);
-
-                    $data['list'][$key]['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$value));
-                            
-                            
-                            
-                    $data['list'][$key]['pet_is_allergy'] = element('pet_is_allergy',$value);
-
-                    $data['list'][$key]['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$value));
+                    $data['list'][$key] = $this->get_pet_info(element('mem_id', $value),element('pet_id', $value));
+                    
                 }
             
         
             
             return $data;
+    }
+
+    public function get_pet_info($mem_id = 0,$pet_id = 0)
+    {
+        
+        
+        
+        if (empty($mem_id) OR $mem_id < 1) {
+            return false;
+        }
+
+        if (empty($pet_id) OR $pet_id < 1) {
+            return false;
+        }
+
+
+
+
+        
+        
+
+        $this->CI->load->model(
+            array(
+                'Member_pet_model','Pet_attr_model','Pet_allergy_model','Cmall_kind_model'
+            )
+        );
+
+        $data = array();
+        
+        
+        $pet = $this->CI->Member_pet_model->get_one('','',array('mem_id' => $mem_id,'pet_id' => $pet_id));
+        
+        if (empty($pet)) {
+            return false;
+        }
+
+        $pet_form = $this->CI->Pet_attr_model->get_attr_info(element('pat_id',$pet));
+
+        $pet_kind = $this->CI->Cmall_kind_model->get_kind_info(element('ckd_id',$pet));
+        
+
+        
+
+        $data['pet_id'] = element('pet_id',$pet);
+        $data['pet_name'] = element('pet_name',$pet);
+        $data['pet_birthday'] = element('pet_birthday',$pet);
+        $data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
+        $data['pet_sex'] = element('pet_sex',$pet);
+        $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$pet));
+        $data['pet_neutral'] = element('pet_neutral',$pet);
+        $data['pet_weight'] = element('pet_weight',$pet);
+
+        $data['pat_id'] = element('pat_id',$pet);
+        $data['pet_form_str'] = element('pat_value',$pet_form);
+
+        $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
+
+        // $data['ckd_size'] = element('ckd_size',$pet_kind);
+        $data['ckd_size_str'] = element('ckd_size',$pet_kind) == '4' ? '소형견' : element('ckd_size',$pet_kind) == '5' ? '중형견' : '대형견';
+
+
+        
+
+        $data['ckd_id'] = element('ckd_id',$pet);
+        
+        $data['pet_attr'] = $this->CI->Pet_attr_model->get_attr(element('pet_id',$pet));
+        
+        
+        $data['pet_is_allergy'] = element('pet_is_allergy',$pet);
+
+        $data['pet_allergy_rel'] = $this->CI->Pet_allergy_model->get_allergy(element('pet_id',$pet));
+
+
+            
+
+        
+
+        return $data;
     }
 }

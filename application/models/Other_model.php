@@ -42,7 +42,7 @@ class Other_model extends CB_Model
         $cachename = 'other/other-' . $type . '-' . cdate('Y-m-d');
 
         if ( ! $result = $this->cache->get($cachename)) {
-            $this->db->select('oth_start_date,oth_end_date,oth_title,oth_url,oth_image');
+            $this->db->select('oth_start_date,oth_end_date,oth_title,oth_image');
             $this->db->from($this->_table);
             $this->db->where('oth_activated', 1);
             $this->db->group_start();

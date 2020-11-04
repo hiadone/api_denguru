@@ -64,7 +64,13 @@ class Cmall extends CB_Controller
 		$view['view']['type1_url'] = base_url('cmall/cit_type1_lists');
 		
 		// if ($this->member->is_member()) {
-		$view['view']['data']['ai_recom'] = $this->_itemairecomlists($mem_id);
+		
+		$config = array(
+            'mem_id' => $mem_id,
+            'pet_id' => $this->member->item('pet_id'),
+        );
+
+		$view['view']['data']['ai_recom'] = $this->_itemairecomlists($config);
 			// }
 		
 		// $field = array(
@@ -171,9 +177,12 @@ class Cmall extends CB_Controller
 			$view['view']['data']['type2']['middle']['list'] = $result_2;
 		}
 
-
+		$config = array(
+            'mem_id' => $mem_id,
+            'pet_id' => $this->member->item('pet_id'),
+        );
 		// if ($this->member->is_member()) {
-				$view['view']['data']['denguru_recom'] = $this->_itemdengururecomlists($mem_id);
+				$view['view']['data']['denguru_recom'] = $this->_itemdengururecomlists($config);
 			// }
 
 		// $param =& $this->querystring;
@@ -319,16 +328,58 @@ class Cmall extends CB_Controller
 	}
 
 
-	protected function _itemairecomlists($mem_id)
+	protected function itemairecomlists_get($pet_id=0)
 	{
 		
+		$view = array();
+		$view['view'] = array();
+
+		$mem_id = (int) $this->member->item('mem_id');
+		
+		if(empty($pet_id)) $pet_id = $this->member->item('pet_id');
+
+		$config = array(
+            'mem_id' => $mem_id,
+            'pet_id' => $pet_id,            
+            'sort' => $this->input->get('sort'),
+        );
+
+		$view['view'] = $this->_itemairecomlists($config);	
+		
+
+		$this->data = $view['view'];
+		
+		// print_r2($this->data);
+		return $this->response($this->data, parent::HTTP_OK);
+		
+	}
+
+	protected function _itemairecomlists($config)
+	{
+		
+
+		$mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
+        $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
+        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
 
 		$view = array();
 		$view['view'] = array();
 
 		if(empty($mem_id)) return false;
 
-		$this->load->model(array('Board_model'));
+		if(empty($pet_id)) return false;		
+
+
+
+		$this->load->model(array('Board_model','Member_pet_model'));
+
+
+		$pet = $this->Member_pet_model->get_one($pet_id);
+
+		if (empty(element('pet_id', $pet))) {
+			return false;
+		}
+
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
@@ -366,22 +417,33 @@ class Cmall extends CB_Controller
 				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
 				// $result['list'][$key]['num'] = $list_num--;
 			}
-		}
+		}	
+
+		
+		$result['pet_info'] = $this->denguruapi->get_pet_info($mem_id,$pet_id);
 		$view['view'] = $result;
 		
 		return $view['view'];
 		
 	}
 
-	protected function itemdengururecomlists_get()
+	protected function itemdengururecomlists_get($pet_id=0)
 	{
 		
 		$view = array();
 		$view['view'] = array();
 
 		$mem_id = (int) $this->member->item('mem_id');
-		
-		$view['view'] = $this->_itemdengururecomlists($mem_id);	
+		if(empty($pet_id)) $pet_id = $this->member->item('pet_id');
+
+		$config = array(
+            'mem_id' => $mem_id,
+            'pet_id' => $pet_id,            
+            'sort' => $this->input->get('sort'),
+            
+
+        );
+		$view['view'] = $this->_itemdengururecomlists($config);	
 		
 
 		$this->data = $view['view'];
@@ -391,15 +453,33 @@ class Cmall extends CB_Controller
 		
 	}
 
-	protected function _itemdengururecomlists($mem_id)
+	protected function _itemdengururecomlists($config)
 	{
 		
+
+		$mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
+        $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
+        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
 
 		$view = array();
 		$view['view'] = array();
 		if(empty($mem_id)) return false;
 
-		$this->load->model(array('Board_model'));
+		if(empty($pet_id)) return false;		
+
+
+
+		$this->load->model(array('Board_model','Member_pet_model'));
+
+
+		$pet = $this->Member_pet_model->get_one($pet_id);
+
+		if (empty(element('pet_id', $pet))) {
+			return false;
+		}
+
+
+		
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
@@ -430,7 +510,7 @@ class Cmall extends CB_Controller
 
 		
 		$result = $this->Board_model
-			->get_item_list(20,'' , $where);
+			->get_item_list(6,'' , $where);
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -440,7 +520,9 @@ class Cmall extends CB_Controller
 				// $result['list'][$key]['num'] = $list_num--;
 			}
 		}
-		$view['view']['data'] = $result;
+
+		$result['pet_info'] = $this->denguruapi->get_pet_info($mem_id,$pet_id);
+		$view['view'] = $result;
 		
 		
 		return $view['view'];
