@@ -408,7 +408,7 @@ class Cmall extends CB_Controller
 			
 		
 		$result = $this->Board_model
-			->get_item_list(20,'' , $where);
+			->get_item_list(20,'' , $where,'','rand()');
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -510,7 +510,7 @@ class Cmall extends CB_Controller
 
 		
 		$result = $this->Board_model
-			->get_item_list(6,'' , $where);
+			->get_item_list(6,'' , $where,'','rand()');
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
