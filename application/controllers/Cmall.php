@@ -371,7 +371,7 @@ class Cmall extends CB_Controller
 
 
 
-		$this->load->model(array('Board_model','Member_pet_model'));
+		$this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model'));
 
 
 		$pet = $this->Member_pet_model->get_one($pet_id);
@@ -380,6 +380,8 @@ class Cmall extends CB_Controller
 			return false;
 		}
 
+		$pet_info = $this->denguruapi->get_pet_info($mem_id,$pet_id);
+		
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
@@ -391,11 +393,102 @@ class Cmall extends CB_Controller
 		/**
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
-		$where = array();
-		$where['cit_status'] = 1;
-		$where['cit_is_del'] = 0;
-		$where['brd_blind'] = 0;
+		
 
+		$sattr =  array();
+		$skind = '';
+		if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
+		elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
+		elseif((int) element('pet_age',$pet_info) > 7) array_push($sattr,14);
+
+		$skind = element('ckd_id',$pet_info);
+
+		// if(element('pet_attr',$pet_info)){
+		// 	foreach(element('pet_attr',$pet_info) as $val){
+				
+		// 		if(element('pat_id',$val) === '4') array_push($sattr,79);
+		// 		if(element('pat_id',$val) === '5') array_push($sattr,80);
+		// 		if(element('pat_id',$val) === '6') array_push($sattr,81);
+
+		// 		if(element('pat_id',$val) === '7') array_push($sattr,82);
+		// 		if(element('pat_id',$val) === '8') array_push($sattr,83);
+		// 		if(element('pat_id',$val) === '9') array_push($sattr,84);
+
+		// 		if(element('pat_id',$val) === '10') array_push($sattr,85);
+		// 		if(element('pat_id',$val) === '11') array_push($sattr,86);
+		// 		if(element('pat_id',$val) === '12') array_push($sattr,87);
+
+		// 		if(element('pat_id',$val) === '13') array_push($sattr,88);
+		// 	}
+		// }
+
+		$all_kind = $this->Cmall_kind_model->get_all_kind();
+		$all_attr = $this->Cmall_attr_model->get_all_attr();
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array(
+				'brd_search' => 1,
+				'brd_blind' => 0,				
+				);
+
+		
+
+		
+		
+			$cmallwhere = 'where
+				cit_status = 1
+				AND cit_is_del = 0
+			';
+			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
+        	$this->Board_model->set_join(array("
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+		
+		if($sattr && is_array($sattr)){
+		    			
+			$sattr_id = array();
+			foreach($all_attr as $akey => $aval){
+				
+				foreach($aval as  $aaval){	
+					foreach($sattr as $cval){
+						if($cval == element('cat_id',$aaval)){
+							$sattr_id[$akey][] = $cval;
+						}
+					}	
+	        	}
+        	}
+
+        	
+        	$_join = '';
+        	foreach($sattr_id as $skey => $sval){
+        	
+        		if(empty($_join))
+        			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+        		else 
+        			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+        			
+        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+        		
+        	}
+        	
+
+        	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+
+
+        	
+        	
+        }
+
+        if($skind){
+
+            // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
+            // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
+            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+
+    //         if(empty($sattr))
+				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
+            
+        }
 		// $field = array(
 		// 	'board' => array('brd_name'),
 		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
@@ -405,10 +498,10 @@ class Cmall extends CB_Controller
 		// $select = get_selected($field);
 
 		// $this->Board_model->select = $select;
-			
+
 		
 		$result = $this->Board_model
-			->get_item_list(20,'' , $where,'','rand()');
+			->get_search_list(20,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -420,7 +513,7 @@ class Cmall extends CB_Controller
 		}	
 
 		
-		$result['pet_info'] = $this->denguruapi->get_pet_info($mem_id,$pet_id);
+		$result['pet_info'] = $pet_info;
 		$view['view'] = $result;
 		
 		return $view['view'];
@@ -469,7 +562,7 @@ class Cmall extends CB_Controller
 
 
 
-		$this->load->model(array('Board_model','Member_pet_model'));
+		$this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model'));
 
 
 		$pet = $this->Member_pet_model->get_one($pet_id);
@@ -478,7 +571,7 @@ class Cmall extends CB_Controller
 			return false;
 		}
 
-
+		$pet_info = $this->denguruapi->get_pet_info($mem_id,$pet_id);
 		
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
@@ -491,13 +584,102 @@ class Cmall extends CB_Controller
 		/**
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
-		$where = array();
-		$where['cit_status'] = 1;
-		$where['cit_is_del'] = 0;
-		$where['brd_blind'] = 0;
+		
+
+		$sattr =  array();
+		$skind = '';
+		if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
+		elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
+		elseif((int) element('pet_age',$pet_info) > 7) array_push($sattr,14);
+
+		$skind = element('ckd_id',$pet_info);
+
+		if(element('pet_attr',$pet_info)){
+			foreach(element('pet_attr',$pet_info) as $val){
+				
+				if(element('pat_id',$val) === '4') array_push($sattr,79);
+				if(element('pat_id',$val) === '5') array_push($sattr,80);
+				if(element('pat_id',$val) === '6') array_push($sattr,81);
+
+				if(element('pat_id',$val) === '7') array_push($sattr,82);
+				if(element('pat_id',$val) === '8') array_push($sattr,83);
+				if(element('pat_id',$val) === '9') array_push($sattr,84);
+
+				if(element('pat_id',$val) === '10') array_push($sattr,85);
+				if(element('pat_id',$val) === '11') array_push($sattr,86);
+				if(element('pat_id',$val) === '12') array_push($sattr,87);
+
+				if(element('pat_id',$val) === '13') array_push($sattr,88);
+			}
+		}
+
+		$all_kind = $this->Cmall_kind_model->get_all_kind();
+		$all_attr = $this->Cmall_attr_model->get_all_attr();
+		/**
+		 * 게시판 목록에 필요한 정보를 가져옵니다.
+		 */
+		$where = array(
+				'brd_search' => 1,
+				'brd_blind' => 0,				
+				);
 
 		
 
+		
+		
+			$cmallwhere = 'where
+				cit_status = 1
+				AND cit_is_del = 0
+			';
+			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
+        	$this->Board_model->set_join(array("
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+		
+		if($sattr && is_array($sattr)){
+		    			
+			$sattr_id = array();
+			foreach($all_attr as $akey => $aval){
+				
+				foreach($aval as  $aaval){	
+					foreach($sattr as $cval){
+						if($cval == element('cat_id',$aaval)){
+							$sattr_id[$akey][] = $cval;
+						}
+					}	
+	        	}
+        	}
+
+        	
+        	$_join = '';
+        	foreach($sattr_id as $skey => $sval){
+        	
+        		if(empty($_join))
+        			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+        		else 
+        			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+        			
+        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+        		
+        	}
+        	
+
+        	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+
+
+        	
+        	
+        }
+
+        if($skind){
+
+            // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
+            // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
+            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+
+    //         if(empty($sattr))
+				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
+            
+        }
 		// $field = array(
 		// 	'board' => array('brd_name'),
 		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
@@ -510,18 +692,23 @@ class Cmall extends CB_Controller
 
 		
 		$result = $this->Board_model
-			->get_item_list(6,'' , $where,'','rand()');
+			->get_search_list(6,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];
+		
+
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
-				
 				$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
 				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+
+				// $result['list'][$key]['category']=$this->Cmall_category_model->get_category(element('cit_id',$val));
+				// $result['list'][$key]['attr']=$this->Cmall_attr_model->get_attr(element('cit_id',$val));
+
 				// $result['list'][$key]['num'] = $list_num--;
 			}
 		}
 
-		$result['pet_info'] = $this->denguruapi->get_pet_info($mem_id,$pet_id);
+		$result['pet_info'] = $pet_info;
 		$view['view'] = $result;
 		
 		

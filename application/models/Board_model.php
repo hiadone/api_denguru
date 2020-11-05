@@ -25,7 +25,7 @@ class Board_model extends CB_Model
 	public $_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale,cmall_brand.cbr_id,cmall_brand.cbr_value_kr,cmall_brand.cbr_value_en';
 
 	public $allow_order = array('cit_order asc', 'cit_datetime desc', 'cit_datetime asc', 'cit_hit desc', 'cit_hit asc', 'cit_review_count desc',
-		'cit_review_count asc', 'cit_review_average desc', 'cit_review_average asc', 'cit_price desc', 'cit_price asc', 'cit_sell_count desc','brd_order asc');
+		'cit_review_count asc', 'cit_review_average desc', 'cit_review_average asc', 'cit_price desc', 'cit_price asc', 'cit_sell_count desc','brd_order asc','rand()');
 
 	public $cache_prefix = 'board/board-model-get-'; // 캐시 사용시 프리픽스
 
