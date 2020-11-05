@@ -175,8 +175,8 @@ class Search extends CB_Controller
 	        }
 
 	        $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
-        	$this->Board_model->set_join(array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+        	$set_join[] = array("
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 	       
 
 
@@ -186,11 +186,11 @@ class Search extends CB_Controller
 
 	        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 	            
-	            $this->Board_model->set_join(array("
+	            $set_join[] = array("
 					(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 					UNION
 					select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
-					) as AAA",'cmall_item.cit_id = AAA.cit_id','inner'));
+					) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 	           
 
 	            // $this->Board_model->set_join(array('cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner'));
@@ -233,7 +233,7 @@ class Search extends CB_Controller
             	}
             	
 
-            	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+            	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
             	
@@ -244,18 +244,18 @@ class Search extends CB_Controller
 
 	            // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
 	            // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-	            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).')) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+	            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).')) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
 	            if(empty($sattr))
-					$this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
-	            $this->Board_model->set_join(array('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner'));
+					$set_join[] = array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
+	            $set_join[] = array('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
 	        }
 	        
 
 	        if(!empty($category_child_id)){
 	        	
 	            $this->Board_model->set_where_in('cmall_category_rel.cca_id',$category_child_id);
-	            $this->Board_model->set_join(array('cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner'));
+	            $set_join[] = array('cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 
 	        }
 
@@ -266,6 +266,7 @@ class Search extends CB_Controller
 			
 			$like = '';
 		if($option ==='show_list'){
+			if(!empty($set_join)) $this->Board_model->set_join($set_join);
 			$result = $this->Board_model
 				->get_search_list($per_page, $offset, $where, $like, '', $findex);
 			$list_num = $result['total_rows'] - ($page - 1) * $per_page;
@@ -341,7 +342,7 @@ class Search extends CB_Controller
 				}
 			}
 		} else {
-			
+			if(!empty($set_join)) $this->Board_model->set_join($set_join);
 			$result = $this->Board_model
 				->get_search_count($per_page, $offset, $where, $like, '', $findex);
 			$view['view']['data']['total_rows'] = $result;

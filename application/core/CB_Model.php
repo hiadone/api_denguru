@@ -488,7 +488,7 @@ class CB_Model extends CI_Model
 
 		
 			
-		$this->_join[] = $join;
+		$this->_join = $join;
 			
 		
 	}

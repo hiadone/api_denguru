@@ -69,7 +69,6 @@ class Cmall extends CB_Controller
             'mem_id' => $mem_id,
             'pet_id' => $this->member->item('pet_id'),
         );
-
 		$view['view']['data']['ai_recom'] = $this->_itemairecomlists($config);
 			// }
 		
@@ -358,6 +357,7 @@ class Cmall extends CB_Controller
 	{
 		
 
+
 		$mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
         $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
         $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
@@ -441,8 +441,8 @@ class Cmall extends CB_Controller
 				AND cit_is_del = 0
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
-        	$this->Board_model->set_join(array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+        	$set_join[] = array("
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -472,7 +472,7 @@ class Cmall extends CB_Controller
         	}
         	
 
-        	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
         	
@@ -483,7 +483,7 @@ class Cmall extends CB_Controller
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
@@ -499,7 +499,7 @@ class Cmall extends CB_Controller
 
 		// $this->Board_model->select = $select;
 
-		
+		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
 			->get_search_list(20,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];
@@ -632,8 +632,8 @@ class Cmall extends CB_Controller
 				AND cit_is_del = 0
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
-        	$this->Board_model->set_join(array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+        	$set_join[] = array("
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -663,7 +663,7 @@ class Cmall extends CB_Controller
         	}
         	
 
-        	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
         	
@@ -674,7 +674,7 @@ class Cmall extends CB_Controller
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
@@ -690,7 +690,7 @@ class Cmall extends CB_Controller
 
 		// $this->Board_model->select = $select;
 
-		
+		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
 			->get_search_list(6,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];
@@ -3009,8 +3009,8 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.*';
 
-			$this->Board_model->set_join(array("
-				(select cit_id,brd_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner'));
+			$set_join[] = array("
+				(select cit_id,brd_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		}
 		if($sattr && is_array($sattr)){
 		    			
@@ -3040,7 +3040,7 @@ class Cmall extends CB_Controller
         	}
         	
 
-        	$this->Board_model->set_join(array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner'));
+        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
         	
@@ -3051,7 +3051,7 @@ class Cmall extends CB_Controller
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $this->Board_model->set_join(array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner'));
+            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
