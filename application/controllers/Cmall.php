@@ -440,6 +440,7 @@ class Cmall extends CB_Controller
 			$cmallwhere = 'where
 				cit_status = 1
 				AND cit_is_del = 0
+				AND cit_type3 = 1
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
@@ -502,7 +503,7 @@ class Cmall extends CB_Controller
 
 		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
-			->get_search_list(20,'' , $where,'','',$sort.'rand()');
+			->get_search_list(20,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -632,6 +633,7 @@ class Cmall extends CB_Controller
 			$cmallwhere = 'where
 				cit_status = 1
 				AND cit_is_del = 0
+				AND cit_type3 = 1
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
@@ -694,7 +696,7 @@ class Cmall extends CB_Controller
 
 		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
-			->get_search_list(6,'' , $where,'','',$sort.'rand()');
+			->get_search_list(6,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];
 		
 
