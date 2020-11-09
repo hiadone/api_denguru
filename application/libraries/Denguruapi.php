@@ -831,7 +831,7 @@ class Denguruapi extends CI_Controller
            );
 
            $data = array();
-           $petlist = $this->CI->Member_pet_model->get('','',array('mem_id' => $this->CI->member->item('mem_id')),'','','pet_main','desc');
+           $petlist = $this->CI->Member_pet_model->get('','',array('mem_id' => $mem_id),'','','pet_main','desc');
 
            
             if($petlist)

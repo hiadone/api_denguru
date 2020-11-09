@@ -360,7 +360,8 @@ class Cmall extends CB_Controller
 
 		$mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
         $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
-        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
+        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type3';
+        $sort = $sort.',';
 
 		$view = array();
 		$view['view'] = array();
@@ -442,7 +443,7 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -501,7 +502,7 @@ class Cmall extends CB_Controller
 
 		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
-			->get_search_list(20,'' , $where,'','','rand()');
+			->get_search_list(20,'' , $where,'','',$sort.'rand()');
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -552,8 +553,9 @@ class Cmall extends CB_Controller
 
 		$mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
         $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
-        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
+        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type3';
 
+        $sort=$sort.',';
 		$view = array();
 		$view['view'] = array();
 		if(empty($mem_id)) return false;
@@ -633,7 +635,7 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -692,7 +694,7 @@ class Cmall extends CB_Controller
 
 		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
-			->get_search_list(6,'' , $where,'','','rand()');
+			->get_search_list(6,'' , $where,'','',$sort.'rand()');
 		$list_num = $result['total_rows'];
 		
 

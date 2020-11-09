@@ -79,7 +79,7 @@ class Login extends CB_Controller
 			$config[] = array(
 				'field' => 'mem_userid',
 				'label' => '아이디',
-				'rules' => 'trim|required|alphanumunder|min_length[3]|max_length[20]',
+				'rules' => 'trim|required|alphanumunder|min_length[3]|max_length[50]',
 			);
 			// $view['view']['userid_label_text'] = '아이디';
 		}
