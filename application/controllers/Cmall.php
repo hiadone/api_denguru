@@ -444,7 +444,7 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." limit 3000) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -467,7 +467,7 @@ class Cmall extends CB_Controller
         		if(empty($_join))
         			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
         		else 
-        			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+        			$_join = 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
         			
         		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
         		
@@ -565,7 +565,7 @@ class Cmall extends CB_Controller
 
 
 
-		$this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model'));
+		$this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model','Kinditem_rel_model','Kinditem_group_model'));
 
 
 		$pet = $this->Member_pet_model->get_one($pet_id);
@@ -637,7 +637,7 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." limit 1000) as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -693,7 +693,7 @@ class Cmall extends CB_Controller
 		// $select = get_selected($field);
 
 		// $this->Board_model->select = $select;
-
+        
 		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
 			->get_search_list(6,'' , $where,'','','rand()');
@@ -719,6 +719,8 @@ class Cmall extends CB_Controller
 		return $view['view'];
 		
 	}
+
+	
 
 	protected function _itemlists($category_id = 0,$brd_id = 0,$swhere = array(),$config = array())
 	{

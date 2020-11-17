@@ -1600,3 +1600,26 @@ if ( ! function_exists('get_selected')) {
         return rtrim($select,',');
     }
 }
+
+if ( ! function_exists('get_listnum')) {
+    function get_listnum()
+    {
+        $CI = & get_instance();
+        if ($CI->input->get('listnum')
+            && is_numeric($CI->input->get('listnum'))
+            && $CI->input->get('listnum') > 0
+            && $CI->input->get('listnum') <= 1000) {
+
+            $listnum = (int) $CI->input->get('listnum');
+            // $cookie_name = 'admin_listnum';
+            // $cookie_value = $listnum;
+            // $cookie_expire = 8640000;
+            // set_cookie($cookie_name, $cookie_value, $cookie_expire);
+
+        } else {
+            
+            $listnum = $CI->cbconfig->item('list_count') > 0 ? $CI->cbconfig->item('list_count') : 20;
+        }
+        return $listnum;
+    }
+}
