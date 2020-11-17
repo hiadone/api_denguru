@@ -69,7 +69,7 @@ class Cmallitem extends CB_Controller
 		$view['view']['sort'] = array(
 			'cit_id' => $param->sort('cit_id', 'asc'),
 			'cit_key' => $param->sort('cit_key', 'asc'),
-			'cit_order' => $param->sort('cit_order', 'asc'),
+			'cit_order' => $param->sort('(0.1/cit_order)', 'asc'),
 			'cit_name' => $param->sort('cit_name', 'asc'),
 			'cit_datetime' => $param->sort('cit_datetime', 'asc'),
 			'cit_updated_datetime' => $param->sort('cit_updated_datetime', 'asc'),

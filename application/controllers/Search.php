@@ -60,7 +60,7 @@ class Search extends CB_Controller
 
 		$page = element('page', $config) ? element('page', $config) : 1;
 		$sop = element('sop', $config) ? element('sop', $config) : '';
-		$findex = element('findex', $config) ? element('findex', $config) : 'cit_order';
+		$findex = element('findex', $config) ? element('findex', $config) : '(0.1/cit_order)';
 		$forder = element('forder', $config) ? element('forder', $config) : 'DESC';
 		$limit = element('limit', $config) ? element('limit', $config) : '';
 		$period_second = element('period_second', $config);
@@ -1576,7 +1576,7 @@ class Search extends CB_Controller
 
 		$page = element('page', $config) ? element('page', $config) : 1;
 		$sop = element('sop', $config) ? element('sop', $config) : '';
-		$findex = element('findex', $config) ? element('findex', $config) : 'cit_order';
+		$findex = element('findex', $config) ? element('findex', $config) : '(0.1/cit_order)';
 		$forder = element('forder', $config) ? element('forder', $config) : 'DESC';
 		$limit = element('limit', $config) ? element('limit', $config) : '';
 		$period_second = element('period_second', $config);

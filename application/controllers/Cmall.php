@@ -135,7 +135,7 @@ class Cmall extends CB_Controller
 
 
 		$config = array(
-			'cit_type2' => '1',
+			'cit_type2' => '2',
 			'limit' => '20',
 			'cache_minute' => 86400,
 			// 'select' => $select,
@@ -732,7 +732,7 @@ class Cmall extends CB_Controller
             $result2 = $this->Kinditem_group_model
                 ->get_item_list('','', $where);
 
-            
+
             $list_num = $result2['total_rows'];
             if (element('list', $result2)) {
                 foreach (element('list', $result2) as $key => $val) {
