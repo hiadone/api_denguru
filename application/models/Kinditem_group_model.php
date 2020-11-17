@@ -182,6 +182,13 @@ class Kinditem_group_model extends CB_Model
             }
             
         }
+
+        if ($this->set_where) {         
+            foreach ($this->set_where as $skey => $sval) {
+                $this->db->where($skey, $sval,false);               
+            }
+        }
+        
         if ($search_where) {
             $this->db->where($search_where);
         }
@@ -326,6 +333,13 @@ class Kinditem_group_model extends CB_Model
             }
             
         }
+
+        if ($this->set_where) {         
+            foreach ($this->set_where as $skey => $sval) {
+                $this->db->where($skey, $sval,false);               
+            }
+        }
+
         if ($search_where) {
             $this->db->where($search_where);
         }

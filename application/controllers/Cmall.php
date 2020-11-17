@@ -727,9 +727,12 @@ class Cmall extends CB_Controller
         			);
             $where = array('kinditem_group.ckd_id' => $skind);
 
+            $this->Kinditem_group_model->set_where("(kir_start_date <='".cdate('Y-m-d')."' or kir_start_date IS NULL) and (kir_end_date >='".cdate('Y-m-d')."' or kir_end_date IS NULL)");
+
             $result2 = $this->Kinditem_group_model
                 ->get_item_list('','', $where);
 
+            
             $list_num = $result2['total_rows'];
             if (element('list', $result2)) {
                 foreach (element('list', $result2) as $key => $val) {
@@ -3365,7 +3368,7 @@ class Cmall extends CB_Controller
 		$skeyword = '';
 
 		$per_page = 5;
-		
+
 		$offset = ($page - 1) * $per_page;
 
 		$is_admin = $this->member->is_admin();
