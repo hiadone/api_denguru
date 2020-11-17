@@ -89,6 +89,7 @@ class Cmall extends CB_Controller
 		$result_1 = $this->denguruapi->cit_latest($config);
 		
 		// print_r2($result_1);
+		// exit;
 		if ($result_1) {
 			foreach ($result_1 as $key => $val) {
 				// $view['list'][$key]['cit_id'] = element('cit_id',$val);
@@ -388,7 +389,7 @@ class Cmall extends CB_Controller
 		 */
 		
 
-		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
+		$findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : '(0.1/cit_order)';
 		
 
 		/**
@@ -503,7 +504,7 @@ class Cmall extends CB_Controller
 
 		if(!empty($set_join)) $this->Board_model->set_join($set_join);
 		$result = $this->Board_model
-			->get_search_list(20,'' , $where,'','','rand()');
+			->get_search_list(20,'' , $where,'','','');
 		$list_num = $result['total_rows'];
 		if (element('list', $result)) {
 			foreach (element('list', $result) as $key => $val) {
@@ -713,6 +714,40 @@ class Cmall extends CB_Controller
 		}
 
 		$result['pet_info'] = $pet_info;
+
+        if ($skind) {
+        	
+
+        	$where = array(
+        			'brd_search' => 1,
+        			'brd_blind' => 0,
+        			'cit_status' => 1,
+        			'cit_is_del' => 0,
+        			'cit_type3' => 1,
+        			);
+            $where = array('kinditem_group.ckd_id' => $skind);
+
+            $result2 = $this->Kinditem_group_model
+                ->get_item_list('','', $where);
+
+            $list_num = $result2['total_rows'];
+            if (element('list', $result2)) {
+                foreach (element('list', $result2) as $key => $val) {
+                    
+                    $result2['list'][$key] = $this->denguruapi->convert_cit_info($result2['list'][$key]);
+                    $result2['list'][$key] = $this->denguruapi->convert_brd_info($result2['list'][$key]);                    
+                }
+            }
+
+            $result['list'] = array_merge($result2['list'],$result['list']);
+        }
+        $result['list']= array_slice($result['list'],0,6);
+
+
+        
+        
+
+		
 		$view['view'] = $result;
 		
 		
@@ -2554,7 +2589,7 @@ class Cmall extends CB_Controller
 		$findex = $this->Cmall_order_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -2647,7 +2682,9 @@ class Cmall extends CB_Controller
 		$findex = $this->Cmall_wishlist_model->primary_key;
 		$forder = 'asc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+
+		$per_page = get_listnum();
+
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -2841,7 +2878,8 @@ class Cmall extends CB_Controller
 		$findex = $this->Cmall_storewishlist_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -3327,6 +3365,7 @@ class Cmall extends CB_Controller
 		$skeyword = '';
 
 		$per_page = 5;
+		
 		$offset = ($page - 1) * $per_page;
 
 		$is_admin = $this->member->is_admin();

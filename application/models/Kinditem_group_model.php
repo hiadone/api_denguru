@@ -228,11 +228,11 @@ class Kinditem_group_model extends CB_Model
     public function get_item_list($limit = '', $offset = '', $where = '', $like = '', $findex = '', $forder = '', $sfield = '', $skeyword = '', $sop = 'OR')
     {
 
-        $select = 'kinditem_group.*,cmall_item.*,kinditem_rel.*';
+        $select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale,cmall_brand.cbr_id,cmall_brand.cbr_value_kr,cmall_brand.cbr_value_en';
         $join[] = array('table' => 'kinditem_rel', 'on' => 'kinditem_rel.kig_id = kinditem_group.kig_id', 'type' => 'inner');
         $join[] = array('table' => 'cmall_item', 'on' => 'cmall_item.cit_id = kinditem_rel.cit_id', 'type' => 'inner');
-        
-
+        $join[] = array('table' => 'cmall_brand', 'on' => 'cmall_item.cbr_id = cmall_brand.cbr_id', 'type' => 'inner');
+        $join[] = array('table' => 'board', 'on' => 'cmall_item.brd_id = board.brd_id', 'type' => 'inner');
         
 
         $forder = (strtoupper($forder) === 'ASC') ? 'ASC' : 'DESC';
@@ -354,7 +354,8 @@ class Kinditem_group_model extends CB_Model
 
         
 
-        $this->db->order_by($findex, $forder);
+        $this->db->order_by('(0.1/kir_order)', 'desc');
+        // $this->db->order_by('kir_id', 'desc');
         if ($limit) {
             $this->db->limit($limit, $offset);
         }

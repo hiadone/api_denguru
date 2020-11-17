@@ -71,7 +71,8 @@ class Notice extends CB_Controller
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
 
-        $per_page = 10;
+        // $per_page = 10;
+        $per_page = get_listnum(10);
         $offset = ($page - 1) * $per_page;
 
         /**

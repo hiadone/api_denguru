@@ -157,7 +157,8 @@ class Search extends CB_Controller
 		
 		
 
-			$per_page = 20;
+			// $per_page = 20;
+			$per_page = get_listnum();
 			$offset = ($page - 1) * $per_page;
 
 			if($sstart_price){            
@@ -1646,7 +1647,8 @@ class Search extends CB_Controller
 		$this->Board_model->allow_search_field = array('cit_id', 'cit_name', 'cta_tag', 'cca_value','cbr_value_kr','cbr_value_en'); // 검색이 가능한 필드
 		$this->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
 
-		$per_page = 15;
+		// $per_page = 15;
+		$per_page = get_listnum(15);
 		$offset = ($page - 1) * $per_page;
 
 		$where = array();

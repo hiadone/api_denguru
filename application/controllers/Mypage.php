@@ -200,7 +200,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Post_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -313,7 +314,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Comment_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -417,7 +419,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Point_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -521,7 +524,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Follow_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -628,7 +632,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Follow_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -735,7 +740,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Like_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -847,7 +853,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Like_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -998,7 +1005,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Scrap_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -1155,7 +1163,8 @@ class Mypage extends CB_Controller
 		$findex = $this->Member_login_log_model->primary_key;
 		$forder = 'desc';
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
@@ -1262,7 +1271,8 @@ class Mypage extends CB_Controller
         $sfield = '';
         $skeyword = '';
 
-        $per_page = 10;
+        // $per_page = 10;
+        $per_page = get_listnum(10);
         $offset = ($page - 1) * $per_page;
 
         $is_admin = $this->member->is_admin();
@@ -1453,7 +1463,8 @@ class Mypage extends CB_Controller
         $sfield = '';
         $skeyword = '';
 
-        $per_page = 10;
+        // $per_page = 10;
+        $per_page = get_listnum(10);
         $offset = ($page - 1) * $per_page;
 
         $is_admin = $this->member->is_admin();

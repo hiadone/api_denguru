@@ -1602,7 +1602,7 @@ if ( ! function_exists('get_selected')) {
 }
 
 if ( ! function_exists('get_listnum')) {
-    function get_listnum()
+    function get_listnum($default = 0)
     {
         $CI = & get_instance();
         if ($CI->input->get('listnum')
@@ -1616,6 +1616,9 @@ if ( ! function_exists('get_listnum')) {
             // $cookie_expire = 8640000;
             // set_cookie($cookie_name, $cookie_value, $cookie_expire);
 
+        } elseif($default) {
+            
+            $listnum = $default;
         } else {
             
             $listnum = $CI->cbconfig->item('list_count') > 0 ? $CI->cbconfig->item('list_count') : 20;

@@ -1791,6 +1791,7 @@ class Board_post extends CB_Controller
 			$per_page = element('list_count', $board)
 				? (int) element('list_count', $board) : 20;
 		}
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		$this->Post_model->allow_search_field = array('post_id', 'post_title', 'post_content', 'post_both', 'post_category', 'post_userid', 'post_nickname'); // 검색이 가능한 필드

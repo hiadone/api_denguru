@@ -69,7 +69,8 @@ class Faq extends CB_Controller
 		$sfield = array('faq_title', 'faq_content', 'faq_mobile_content');
 		$skeyword = $this->input->get('skeyword', null, '');
 
-		$per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		// $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
+		$per_page = get_listnum();
 		$offset = ($page - 1) * $per_page;
 
 		/**
