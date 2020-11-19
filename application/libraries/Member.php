@@ -99,6 +99,7 @@ class Member extends CI_Controller
 					$member = array_merge($member, $pet);
 				}
 
+
 				$this->mb = $member;
 
 			}
@@ -245,6 +246,8 @@ class Member extends CI_Controller
 	 */
 	public function delete_member($mem_id = 0)
 	{
+
+
 		$mem_id = (int) $mem_id;
 		if (empty($mem_id) OR $mem_id < 1) {
 			return false;
@@ -258,7 +261,7 @@ class Member extends CI_Controller
 				'Member_level_history_model', 'Member_login_log_model', 'Member_meta_model',
 				'Member_register_model', 'Notification_model', 'Point_model',
 				'Scrap_model', 'Social_meta_model',
-				'Tempsave_model', 'Member_userid_model','Member_pet_model','Cmall_review_model','Cmall_storewishlist_model','Cmall_wishlist_model','Reviewer_model'
+				'Tempsave_model', 'Member_userid_model','Member_pet_model','Cmall_review_model','Cmall_storewishlist_model','Cmall_wishlist_model','Reviewer_model','Memberleave_model'
 			)
 		);
 
@@ -288,6 +291,9 @@ class Member extends CI_Controller
 		$deletewhere = array(
 			'mem_id' => $mem_id,
 		);
+
+		$member_info = $this->CI->Member_model->get_one($mem_id);
+
 		$this->CI->Autologin_model->delete_where($deletewhere);
 		$this->CI->Board_admin_model->delete_where($deletewhere);
 		$this->CI->Board_group_admin_model->delete_where($deletewhere);
@@ -310,6 +316,47 @@ class Member extends CI_Controller
 		$this->CI->Cmall_storewishlist_model->delete_where($deletewhere);
 		$this->CI->Cmall_wishlist_model->delete_where($deletewhere);
 		$this->CI->Reviewer_model->delete_where($deletewhere);
+
+		$insertdata = array(
+            'mem_id' => $member_info['mem_id'],
+            'mem_userid' => $member_info['mem_userid'],
+            'mem_email' => $member_info['mem_email'],
+            'mem_password' => $member_info['mem_password'],
+            'mem_username' => $member_info['mem_username'],
+            'mem_nickname' => $member_info['mem_nickname'],
+            'mem_level' => $member_info['mem_level'],
+            'mem_point' => $member_info['mem_point'],
+            'mem_homepage' => $member_info['mem_homepage'],
+            'mem_phone' => $member_info['mem_phone'],
+            'mem_birthday' => $member_info['mem_birthday'],
+            'mem_sex' => $member_info['mem_sex'],
+            'mem_zipcode' => $member_info['mem_zipcode'],
+            'mem_address1' => $member_info['mem_address1'],
+            'mem_address2' => $member_info['mem_address2'],
+            'mem_address3' => $member_info['mem_address3'],
+            'mem_address4' => $member_info['mem_address4'],
+            'mem_receive_email' => $member_info['mem_receive_email'],
+            'mem_use_note' => $member_info['mem_use_note'],
+            'mem_receive_sms' => $member_info['mem_receive_sms'],
+            'mem_open_profile' => $member_info['mem_open_profile'],
+            'mem_denied' => $member_info['mem_denied'],
+            'mem_email_cert' => $member_info['mem_email_cert'],
+            'mem_register_datetime' => $member_info['mem_register_datetime'],
+            'mem_leave_datetime' => cdate('Y-m-d H:i:s'),
+            'mem_register_ip' => $member_info['mem_register_ip'],
+            'mem_lastlogin_datetime' => $member_info['mem_lastlogin_datetime'],
+            'mem_lastlogin_ip' => $member_info['mem_lastlogin_ip'],
+
+            'mem_is_admin' => $member_info['mem_is_admin'],
+            'mem_profile_content' => $member_info['mem_profile_content'],
+            'mem_adminmemo' => $member_info['mem_adminmemo'],
+            'mem_following' => $member_info['mem_following'],
+            'mem_followed' => $member_info['mem_followed'],
+            'mem_icon' => $member_info['mem_icon'],
+            'mem_photo' => $member_info['mem_photo'],
+
+        );
+        $new_mem_id = $this->CI->Memberleave_model->insert($insertdata);
 
 		$this->CI->Member_userid_model->update($mem_id, array('mem_status' => 1));
 
@@ -385,7 +432,7 @@ class Member extends CI_Controller
 
 		$this->CI->load->model(
 			array(
-				'Member_pet_model',
+				'Member_pet_model','Member_petleave_model'
 			)
 		);
 		$this->CI->load->library('aws_s3');
@@ -403,6 +450,24 @@ class Member extends CI_Controller
 			@unlink(config_item('uploads_dir') . '/member_icon/' . element('pet_backgroundimg', $getdata));
 			$deleted = $this->CI->aws_s3->delete_file(config_item('s3_folder_name') . '/member_icon/' . element('pet_backgroundimg', $getdata));
 		}
+
+		$insertdata = array(
+            'pet_id' => $getdata['pet_id'],
+            'mem_id' => $getdata['mem_id'],
+            'pet_name' => $getdata['pet_name'],
+            'pet_birthday' => $getdata['pet_birthday'],
+            'pet_sex' => $getdata['pet_sex'],
+            'pet_register_datetime' => $getdata['pet_register_datetime'],
+            'pet_leave_datetime' => cdate('Y-m-d H:i:s'),
+            'pet_profile_content' => $getdata['pet_profile_content'],
+            'pet_neutral' => $getdata['pet_neutral'],
+            'pet_weight' => $getdata['pet_weight'],
+            'pat_id' => $getdata['pat_id'],
+            'ckd_id' => $getdata['ckd_id'],
+            'pet_is_allergy' => $getdata['pet_is_allergy'],
+            'pet_var3' => $getdata['pet_var3'],
+        );
+        $this->CI->Member_petleave_model->insert($insertdata);
 
 		$deletewhere = array(
 			'pet_id' => $pet_id,

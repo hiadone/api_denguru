@@ -32,6 +32,7 @@ class Member_model extends CB_Model
 
 	public function get_by_memid($memid = 0, $select = '')
 	{
+		
 		$memid = (int) $memid;
 		if (empty($memid) OR $memid < 1) {
 			return false;

@@ -306,7 +306,7 @@ class Register extends CB_Controller
 		$configbasic['mem_email'] = array(
 			'field' => 'mem_email',
 			'label' => '이메일',
-			'rules' => 'trim|required|valid_email|max_length[50]|is_unique[member.mem_email]|callback__mem_email_check',
+			'rules' => 'trim|required|valid_email|max_length[100]|is_unique[member.mem_email]|callback__mem_email_check',
 			'description' => $email_description,
 		);
 		$configbasic['mem_homepage'] = array(

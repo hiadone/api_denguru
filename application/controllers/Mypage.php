@@ -2030,7 +2030,7 @@ class Mypage extends CB_Controller
 
 		$mem_id = (int) $this->member->item('mem_id');
 
-	    $this->load->model(array('Member_model','Member_pet_model','Pet_allergy_model','Pet_attr_model','Cmall_kind_model','Pet_allergy_rel_model','Pet_attr_rel_model'));
+	    $this->load->model(array('Member_model','Member_pet_model','Pet_allergy_model','Pet_attr_model','Cmall_kind_model','Pet_allergy_rel_model','Pet_attr_rel_model','Member_pethistory_model'));
 	    $primary_key = $this->Member_pet_model->primary_key;
 
 	    /**
@@ -2370,6 +2370,25 @@ class Mypage extends CB_Controller
 				$this->Pet_attr_rel_model->save_attr($pid, $pet_attr);
 
 
+				$historydata = array(
+                    'pet_id' => $getdata['pet_id'],
+                    'mem_id' => $getdata['mem_id'],
+                    'pet_name' => $getdata['pet_name'],
+                    'pet_birthday' => $getdata['pet_birthday'],
+                    'pet_sex' => $getdata['pet_sex'],
+                    'pet_register_datetime' => $getdata['pet_register_datetime'],                    
+                    'pet_profile_content' => $getdata['pet_profile_content'],
+                    'pet_neutral' => $getdata['pet_neutral'],
+                    'pet_weight' => $getdata['pet_weight'],
+                    'pat_id' => $getdata['pat_id'],
+                    'ckd_id' => $getdata['ckd_id'],
+                    'pet_main' => $getdata['pet_main'],
+                    'pet_is_allergy' => $getdata['pet_is_allergy'],
+                    'pet_var3' => $getdata['pet_var3'],
+                    'pet_modify_datetime' => cdate('Y-m-d H:i:s'),
+                );
+                $this->Member_pethistory_model->insert($historydata);
+                
 	            $view['msg'] = '정상적으로 수정되었습니다';
 	            
 	                

@@ -1598,7 +1598,7 @@ class Membermodify extends CB_Controller
 		required_user_login();
 
 		$mem_id = (int) $this->member->item('mem_id');
-
+		
 		$view = array();
 		$view['view'] = array();
 

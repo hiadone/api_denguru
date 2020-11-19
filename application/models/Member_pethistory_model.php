@@ -2,20 +2,20 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Member_pet model class
+ * Member_pethistory model class
  *
  * Copyright (c) CIBoard <www.ciboard.co.kr>
  *
  * @author CIBoard (develop@ciboard.co.kr)
  */
 
-class Member_pet_model extends CB_Model
+class Member_pethistory_model extends CB_Model
 {
 
     /**
      * 테이블명
      */
-    public $_table = 'member_pet';
+    public $_table = 'member_pethistory';
 
     /**
      * 사용되는 테이블의 프라이머리키
@@ -36,14 +36,11 @@ class Member_pet_model extends CB_Model
 
         $join = array();
         
-        $select = 'member_pet.*,member.mem_nickname,member.mem_userid';
-        $join[] = array('table' => 'member', 'on' => 'member_pet.mem_id = member.mem_id', 'type' => 'left');
+        $select = 'member_pethistory.*,member.mem_nickname,member.mem_userid';
+        $join[] = array('table' => 'member', 'on' => 'member_pethistory.mem_id = member.mem_id', 'type' => 'left');
         
         $result = $this->_get_list_common($select = '', $join, $limit, $offset, $where, $like, $findex, $forder, $sfield, $skeyword, $sop,$where_in);
 
         return $result;
     }
-
-    
-    
 }
