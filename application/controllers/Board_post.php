@@ -1938,7 +1938,7 @@ class Board_post extends CB_Controller
 			$category_id = '';
 		}
 
-		$this->Post_model->_select ='post_id,post_num,post_reply,brd_id,post_title,post_content,post.mem_id,post_datetime,post_updated_datetime,post_html,post_blame,post_userid,post_nickname,post_image';
+		$this->Post_model->_select ='post_id,post_num,post_reply,brd_id,post_title,post_content,post.mem_id,post_datetime,post_updated_datetime,post_html,post_blame,post_userid,post_nickname,post_file,post_image';
 
 		$result = $this->Post_model
 			->get_post_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
@@ -2047,13 +2047,13 @@ class Board_post extends CB_Controller
 							->get_one('', '', $filewhere, '', '', 'pfi_id', 'ASC');
 						$result['list'][$key]['thumb_url'] = thumb_url('post', element('pfi_filename', $file), $gallery_image_width, $gallery_image_height);
 						$result['list'][$key]['origin_image_url'] = thumb_url('post', element('pfi_filename', $file));
-					} else {
-						$thumb_url = get_post_image_url(element('post_content', $val), $gallery_image_width, $gallery_image_height);
-						$result['list'][$key]['thumb_url'] = $thumb_url
-							? $thumb_url
-							: thumb_url('', '', $gallery_image_width, $gallery_image_height);
-
-						$result['list'][$key]['origin_image_url'] = $thumb_url;
+					} elseif(element('post_image', $val)) {
+						$filewhere = array(
+							'post_id' => element('post_id', $val),
+						);
+						$file = $this->Post_file_model
+							->get_one('', '', $filewhere, '', '', 'pfi_id', 'ASC');
+						$result['list'][$key]['download_link'] = site_url('postact/download/' . element('pfi_id', $file));
 					}
 				}
 			}
