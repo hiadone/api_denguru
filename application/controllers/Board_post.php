@@ -1938,7 +1938,7 @@ class Board_post extends CB_Controller
 			$category_id = '';
 		}
 
-		$this->Post_model->_select ='post_id,post_num,post_reply,brd_id,post_title,post_content,post.mem_id,post_datetime,post_updated_datetime,post_html,post_blame,post_userid,post_nickname';
+		$this->Post_model->_select ='post_id,post_num,post_reply,brd_id,post_title,post_content,post.mem_id,post_datetime,post_updated_datetime,post_html,post_blame,post_userid,post_nickname,post_image';
 
 		$result = $this->Post_model
 			->get_post_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
