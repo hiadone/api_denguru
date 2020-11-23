@@ -1829,7 +1829,7 @@ class Board_post extends CB_Controller
 			? element('mobile_list_date_style_manual', $board)
 			: element('list_date_style_manual', $board);
 
-		if (element('use_gallery_list', $board)) {
+		if (element('use_gallery_list', $board) || $brd_key === 'b-a-9999') {
 			$this->load->model('Post_file_model');
 
 			$board['gallery_cols'] = $gallery_cols
@@ -2037,7 +2037,7 @@ class Board_post extends CB_Controller
 
 				$result['list'][$key]['thumb_url'] = '';
 				$result['list'][$key]['origin_image_url'] = '';
-				if (element('use_gallery_list', $board)) {
+				if (element('use_gallery_list', $board) || $brd_key === 'b-a-9999') {
 					if (element('post_image', $val)) {
 						$filewhere = array(
 							'post_id' => element('post_id', $val),
