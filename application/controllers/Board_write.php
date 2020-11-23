@@ -1070,9 +1070,11 @@ class Board_write extends CB_Controller
 				$updatedata['post_nickname'],
 				$updatedata['post_userid'],
 				cdate('Y-m-d H:i:s'),
-				post_url(element('brd_key', $board), $post_id),
+				//post_url(element('brd_key', $board), $post_id),
+				'http://adm.denguru.kr/post/'.$post_id,
 				element('brd_name', $board),
-				board_url(element('brd_key', $board)),
+				// board_url(element('brd_key', $board)),
+				'http://adm.denguru.kr/board/'.element('brd_key', $board),
 			);
 			$replaceconfig_escape = array(
 				html_escape($this->cbconfig->item('site_title')),
@@ -1083,9 +1085,11 @@ class Board_write extends CB_Controller
 				html_escape($updatedata['post_nickname']),
 				$updatedata['post_userid'],
 				cdate('Y-m-d H:i:s'),
-				post_url(element('brd_key', $board), $post_id),
+				// post_url(element('brd_key', $board), $post_id),
+				'http://adm.denguru.kr/post/'.$post_id,
 				html_escape(element('brd_name', $board)),
-				board_url(element('brd_key', $board)),
+				// board_url(element('brd_key', $board)),
+				'http://adm.denguru.kr/board/'.element('brd_key', $board),
 			);
 			if ($emailsendlistadmin) {
 				
