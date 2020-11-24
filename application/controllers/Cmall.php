@@ -548,7 +548,7 @@ class Cmall extends CB_Controller
         	
         	
 
-        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
+        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c ) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
         	
@@ -575,7 +575,10 @@ class Cmall extends CB_Controller
 
 		// $this->Board_model->select = $select;
 
-		if(!empty($set_join)) $this->Board_model->set_join($set_join);
+		if(!empty($set_join)) {
+			$this->Board_model->set_join($set_join);
+			$this->Board_model->set_group_by('cmall_item.cit_id');
+		}
 		$result = $this->Board_model
 			->get_search_list(20,'' , $where,'','','');
 		$list_num = $result['total_rows'];
@@ -858,7 +861,10 @@ class Cmall extends CB_Controller
 
 		// $this->Board_model->select = $select;
         
-		if(!empty($set_join)) $this->Board_model->set_join($set_join);
+		if(!empty($set_join)) {
+			$this->Board_model->set_join($set_join);
+			$this->Board_model->set_group_by('cmall_item.cit_id');
+		}
 		$result = $this->Board_model
 			->get_search_list(6,'' , $where,'','','rand()');
 		$list_num = $result['total_rows'];

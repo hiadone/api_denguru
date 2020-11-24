@@ -725,7 +725,8 @@ class Denguruapi extends CI_Controller
 
         
         
-        $pet = $this->CI->Member_pet_model->get_one('','pet_id',array('mem_id' => element('mem_id', $member),'pet_main' => 1));
+        $pet_arr = $this->CI->Member_pet_model->get('','',array('mem_id' => element('mem_id', $member)),'1','','pet_main','desc');
+        $pet = element(0,$pet_arr);
         
         $pet_info = $this->get_pet_info(element('mem_id', $member),element('pet_id', $pet));
 
