@@ -398,6 +398,7 @@ class Cmall extends CB_Controller
 		
 
 		$sattr =  array();
+		$usattr =  array();
 		$skind = '';
 		if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
 		elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
@@ -405,24 +406,64 @@ class Cmall extends CB_Controller
 
 		$skind = element('ckd_id',$pet_info);
 
-		// if(element('pet_attr',$pet_info)){
-		// 	foreach(element('pet_attr',$pet_info) as $val){
+		if(element('pet_attr',$pet_info)){
+
+			foreach(element('pet_attr',$pet_info) as $val){
 				
-		// 		if(element('pat_id',$val) === '4') array_push($sattr,79);
-		// 		if(element('pat_id',$val) === '5') array_push($sattr,80);
-		// 		if(element('pat_id',$val) === '6') array_push($sattr,81);
+				if(element('pat_id',$val) === '4') array_push($sattr,79);
+				if(element('pat_id',$val) === '5') array_push($sattr,80);
+				if(element('pat_id',$val) === '6') array_push($sattr,81);
 
-		// 		if(element('pat_id',$val) === '7') array_push($sattr,82);
-		// 		if(element('pat_id',$val) === '8') array_push($sattr,83);
-		// 		if(element('pat_id',$val) === '9') array_push($sattr,84);
+				if(element('pat_id',$val) === '7') array_push($sattr,82);
+				if(element('pat_id',$val) === '8') array_push($sattr,83);
+				if(element('pat_id',$val) === '9') array_push($sattr,84);
 
-		// 		if(element('pat_id',$val) === '10') array_push($sattr,85);
-		// 		if(element('pat_id',$val) === '11') array_push($sattr,86);
-		// 		if(element('pat_id',$val) === '12') array_push($sattr,87);
+				if(element('pat_id',$val) === '10') array_push($sattr,85);
+				if(element('pat_id',$val) === '11') array_push($sattr,86);
+				if(element('pat_id',$val) === '12') array_push($sattr,87);
 
-		// 		if(element('pat_id',$val) === '13') array_push($sattr,88);
-		// 	}
-		// }
+				if(element('pat_id',$val) === '13') array_push($sattr,88);
+			}
+		}
+
+		if(element('pet_allergy_rel',$pet_info)){
+			foreach(element('pet_allergy_rel',$pet_info) as $val){
+				
+				if(element('pag_id',$val) === '3') array_push($usattr,22);
+				if(element('pag_id',$val) === '4') array_push($usattr,53);
+				if(element('pag_id',$val) === '5') array_push($usattr,54);
+				
+				if(element('pag_id',$val) === '6') array_push($usattr,55);
+				if(element('pag_id',$val) === '7') array_push($usattr,56);
+				if(element('pag_id',$val) === '8') array_push($usattr,57);
+				
+				if(element('pag_id',$val) === '9') array_push($usattr,58);
+				if(element('pag_id',$val) === '10') array_push($usattr,59);
+				if(element('pag_id',$val) === '11') array_push($usattr,60);
+				
+				if(element('pag_id',$val) === '12') array_push($usattr,61);
+				if(element('pag_id',$val) === '13') array_push($usattr,62);
+				if(element('pag_id',$val) === '14') array_push($usattr,63);
+
+				if(element('pag_id',$val) === '15') array_push($usattr,64);
+				if(element('pag_id',$val) === '16') array_push($usattr,65);
+				if(element('pag_id',$val) === '17') array_push($usattr,66);
+
+				if(element('pag_id',$val) === '18') array_push($usattr,67);
+				if(element('pag_id',$val) === '19') array_push($usattr,68);
+				if(element('pag_id',$val) === '20') array_push($usattr,69);
+
+				if(element('pag_id',$val) === '21') array_push($usattr,70);
+				if(element('pag_id',$val) === '22') array_push($usattr,89);
+				if(element('pag_id',$val) === '23') array_push($usattr,90);
+
+				if(element('pag_id',$val) === '24') array_push($usattr,91);
+				if(element('pag_id',$val) === '25') array_push($usattr,92);
+				if(element('pag_id',$val) === '26') array_push($usattr,93);
+
+				if(element('pag_id',$val) === '27') array_push($usattr,94);
+			}
+		}
 
 		$all_kind = $this->Cmall_kind_model->get_all_kind();
 		$all_attr = $this->Cmall_attr_model->get_all_attr();
@@ -445,11 +486,12 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." limit 3000) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." order by rand()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
 			$sattr_id = array();
+			$usattr_id = array();
 			foreach($all_attr as $akey => $aval){
 				
 				foreach($aval as  $aaval){	
@@ -461,18 +503,49 @@ class Cmall extends CB_Controller
 	        	}
         	}
 
+	    	foreach($all_attr as $akey => $aval){
+				
+				foreach($aval as  $aaval){	
+					foreach($usattr as $cval){
+						if($cval == element('cat_id',$aaval)){
+
+							$usattr_id[$akey][] = $cval;
+						}
+					}	
+	        	}
+	    	}
+
+	    	
+	    	
+	    	$_join = '';
+	    	$sattr_val = array();
+	    	$usattr_val = array();
+	    	foreach($sattr_id as $skey => $sval){
+	    		foreach($sval as $sval_){
+	    			array_push($sattr_val,$sval_);
+	    		}
+	    			
+	    		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+	    		
+	    	}
+
+	    	foreach($usattr_id as $uskey => $usval){
+	    		foreach($usval as $usval_){
+	    			array_push($usattr_val,$usval_);
+	    		}
+	    			
+	    		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+	    		
+	    	}
+	    	
+	    	if(!empty($sattr_val) && !empty($usattr_val))
+	    		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).') and cat_id not in ('.implode(",",$usattr_val).')  ) AS A ';
+	    	elseif(!empty($sattr_val))
+	    		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).')  ) AS A ';
+	    	elseif(!empty($usattr_val))
+	    		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id not in ('.implode(",",$usattr_val).') ) AS A ';
+
         	
-        	$_join = '';
-        	foreach($sattr_id as $skey => $sval){
-        	
-        		if(empty($_join))
-        			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
-        		else 
-        			$_join = 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
-        			
-        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
-        		
-        	}
         	
 
         	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
@@ -486,7 +559,7 @@ class Cmall extends CB_Controller
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.' ) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
@@ -577,6 +650,7 @@ class Cmall extends CB_Controller
 
 		$pet_info = $this->denguruapi->get_pet_info($mem_id,$pet_id);
 		
+
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
 		 */
@@ -591,14 +665,20 @@ class Cmall extends CB_Controller
 		
 
 		$sattr =  array();
+		$usattr =  array();
 		$skind = '';
+
+
 		if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
 		elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
-		elseif((int) element('pet_age',$pet_info) > 7) array_push($sattr,14);
+		elseif((int) element('pet_age',$pet_info) > 6) array_push($sattr,14);
 
 		$skind = element('ckd_id',$pet_info);
 
+		
+		
 		if(element('pet_attr',$pet_info)){
+
 			foreach(element('pet_attr',$pet_info) as $val){
 				
 				if(element('pat_id',$val) === '4') array_push($sattr,79);
@@ -614,6 +694,45 @@ class Cmall extends CB_Controller
 				if(element('pat_id',$val) === '12') array_push($sattr,87);
 
 				if(element('pat_id',$val) === '13') array_push($sattr,88);
+			}
+		}
+
+		if(element('pet_allergy_rel',$pet_info)){
+			foreach(element('pet_allergy_rel',$pet_info) as $val){
+				
+				if(element('pag_id',$val) === '3') array_push($usattr,22);
+				if(element('pag_id',$val) === '4') array_push($usattr,53);
+				if(element('pag_id',$val) === '5') array_push($usattr,54);
+				
+				if(element('pag_id',$val) === '6') array_push($usattr,55);
+				if(element('pag_id',$val) === '7') array_push($usattr,56);
+				if(element('pag_id',$val) === '8') array_push($usattr,57);
+				
+				if(element('pag_id',$val) === '9') array_push($usattr,58);
+				if(element('pag_id',$val) === '10') array_push($usattr,59);
+				if(element('pag_id',$val) === '11') array_push($usattr,60);
+				
+				if(element('pag_id',$val) === '12') array_push($usattr,61);
+				if(element('pag_id',$val) === '13') array_push($usattr,62);
+				if(element('pag_id',$val) === '14') array_push($usattr,63);
+
+				if(element('pag_id',$val) === '15') array_push($usattr,64);
+				if(element('pag_id',$val) === '16') array_push($usattr,65);
+				if(element('pag_id',$val) === '17') array_push($usattr,66);
+
+				if(element('pag_id',$val) === '18') array_push($usattr,67);
+				if(element('pag_id',$val) === '19') array_push($usattr,68);
+				if(element('pag_id',$val) === '20') array_push($usattr,69);
+
+				if(element('pag_id',$val) === '21') array_push($usattr,70);
+				if(element('pag_id',$val) === '22') array_push($usattr,89);
+				if(element('pag_id',$val) === '23') array_push($usattr,90);
+
+				if(element('pag_id',$val) === '24') array_push($usattr,91);
+				if(element('pag_id',$val) === '25') array_push($usattr,92);
+				if(element('pag_id',$val) === '26') array_push($usattr,93);
+
+				if(element('pag_id',$val) === '27') array_push($usattr,94);
 			}
 		}
 
@@ -638,48 +757,92 @@ class Cmall extends CB_Controller
 			';
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." limit 1000) as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." order by rand()) as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 		
 		if($sattr && is_array($sattr)){
 		    			
 			$sattr_id = array();
+			$usattr_id = array();
 			foreach($all_attr as $akey => $aval){
 				
 				foreach($aval as  $aaval){	
 					foreach($sattr as $cval){
 						if($cval == element('cat_id',$aaval)){
+							
 							$sattr_id[$akey][] = $cval;
 						}
 					}	
 	        	}
         	}
 
+        	foreach($all_attr as $akey => $aval){
+				
+				foreach($aval as  $aaval){	
+					foreach($usattr as $cval){
+						if($cval == element('cat_id',$aaval)){
+
+							$usattr_id[$akey][] = $cval;
+						}
+					}	
+	        	}
+        	}
+
+        	
         	
         	$_join = '';
+        	$sattr_val = array();
+        	$usattr_val = array();
         	foreach($sattr_id as $skey => $sval){
-        	
-        		if(empty($_join))
-        			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
-        		else 
-        			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+        		foreach($sval as $sval_){
+        			array_push($sattr_val,$sval_);
+        		}
+        			
+        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+        		
+        	}
+
+        	foreach($usattr_id as $uskey => $usval){
+        		foreach($usval as $usval_){
+        			array_push($usattr_val,$usval_);
+        		}
         			
         		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
         		
         	}
         	
+        	if(!empty($sattr_val) && !empty($usattr_val))
+        		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).') and cat_id not in ('.implode(",",$usattr_val).') ) AS A ';
+        	elseif(!empty($sattr_val))
+        		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).') ) AS A ';
+        	elseif(!empty($usattr_val))
+        		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id not in ('.implode(",",$usattr_val).') ) AS A ';
+        	
+        	
+        	
+        	// foreach($usattr_id as $skey => $sval){
+        	
+        	// 	if(empty($_join))
+        	// 		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+        	// 	else 
+        	// 		$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+        			
+        	// 	// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+        		
+        	// }
 
         	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
+
 
 
         	
         	
         }
-
+        
         if($skind){
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.') AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.' ) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
