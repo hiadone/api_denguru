@@ -565,7 +565,7 @@ class Cmall extends CB_Controller
         
 
         $set_join[] = array("
-				(".$_join.") as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+				(".$_join." ORDER BY RAND()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
 
 
         
@@ -768,7 +768,7 @@ class Cmall extends CB_Controller
 				AND cit_type3 = 1
 			';
 
-			
+
 			$_join = '';
 
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
@@ -850,7 +850,7 @@ class Cmall extends CB_Controller
         
 
         $set_join[] = array("
-				(".$_join.") as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+				(".$_join." ORDER BY RAND()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
 		// $field = array(
 		// 	'board' => array('brd_name'),
 		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
