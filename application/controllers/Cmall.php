@@ -484,9 +484,13 @@ class Cmall extends CB_Controller
 				AND cit_is_del = 0
 				AND cit_type3 = 1
 			';
+			$_join = '';
+
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
-        	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." order by rand()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+        	
+
+			$_join = "
+				select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -517,7 +521,7 @@ class Cmall extends CB_Controller
 
 	    	
 	    	
-	    	$_join = '';
+	    	
 	    	$sattr_val = array();
 	    	$usattr_val = array();
 	    	foreach($sattr_id as $skey => $sval){
@@ -538,33 +542,35 @@ class Cmall extends CB_Controller
 	    		
 	    	}
 	    	
-	    	if(!empty($sattr_val) && !empty($usattr_val))
-	    		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).') and cat_id not in ('.implode(",",$usattr_val).')  ) AS A ';
-	    	elseif(!empty($sattr_val))
-	    		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).')  ) AS A ';
-	    	elseif(!empty($usattr_val))
-	    		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id not in ('.implode(",",$usattr_val).') ) AS A ';
-
-        	
-        	
-
-        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c ) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
-
-
-        	
-        	
+	    	
+	    	if(!empty($sattr_val))
+	    		$_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
+	    	if(!empty($usattr_val))
+	    		$_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
         }
+
+        
+
 
         if($skind){
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.' ) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id = ".$skind." )" ;
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
             
         }
+        
+
+        $set_join[] = array("
+				(".$_join.") as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+
+
+        
+
+        
 		// $field = array(
 		// 	'board' => array('brd_name'),
 		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
@@ -577,7 +583,7 @@ class Cmall extends CB_Controller
 
 		if(!empty($set_join)) {
 			$this->Board_model->set_join($set_join);
-			$this->Board_model->set_group_by('cmall_item.cit_id');
+			// $this->Board_model->set_group_by('cmall_item.cit_id');
 		}
 		$result = $this->Board_model
 			->get_search_list(20,'' , $where,'','','');
@@ -587,6 +593,9 @@ class Cmall extends CB_Controller
 
 				$result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
 				$result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+				$result['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
+
+				
 				// $result['list'][$key]['num'] = $list_num--;
 			}
 		}	
@@ -758,9 +767,15 @@ class Cmall extends CB_Controller
 				AND cit_is_del = 0
 				AND cit_type3 = 1
 			';
+
+			
+			$_join = '';
+
 			$this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
-        	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere." order by rand()) as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+        	
+
+			$_join = "
+				select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
 		
 		if($sattr && is_array($sattr)){
 		    			
@@ -771,14 +786,13 @@ class Cmall extends CB_Controller
 				foreach($aval as  $aaval){	
 					foreach($sattr as $cval){
 						if($cval == element('cat_id',$aaval)){
-							
 							$sattr_id[$akey][] = $cval;
 						}
 					}	
 	        	}
         	}
 
-        	foreach($all_attr as $akey => $aval){
+	    	foreach($all_attr as $akey => $aval){
 				
 				foreach($aval as  $aaval){	
 					foreach($usattr as $cval){
@@ -788,69 +802,55 @@ class Cmall extends CB_Controller
 						}
 					}	
 	        	}
-        	}
+	    	}
 
-        	
-        	
-        	$_join = '';
-        	$sattr_val = array();
-        	$usattr_val = array();
-        	foreach($sattr_id as $skey => $sval){
-        		foreach($sval as $sval_){
-        			array_push($sattr_val,$sval_);
-        		}
-        			
-        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
-        		
-        	}
+	    	
+	    	
+	    	
+	    	$sattr_val = array();
+	    	$usattr_val = array();
+	    	foreach($sattr_id as $skey => $sval){
+	    		foreach($sval as $sval_){
+	    			array_push($sattr_val,$sval_);
+	    		}
+	    			
+	    		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+	    		
+	    	}
 
-        	foreach($usattr_id as $uskey => $usval){
-        		foreach($usval as $usval_){
-        			array_push($usattr_val,$usval_);
-        		}
-        			
-        		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
-        		
-        	}
-        	
-        	if(!empty($sattr_val) && !empty($usattr_val))
-        		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).') and cat_id not in ('.implode(",",$usattr_val).') ) AS A ';
-        	elseif(!empty($sattr_val))
-        		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sattr_val).') ) AS A ';
-        	elseif(!empty($usattr_val))
-        		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id not in ('.implode(",",$usattr_val).') ) AS A ';
-        	
-        	
-        	
-        	// foreach($usattr_id as $skey => $sval){
-        	
-        	// 	if(empty($_join))
-        	// 		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
-        	// 	else 
-        	// 		$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
-        			
-        	// 	// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
-        		
-        	// }
-
-        	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
-
-
-
-        	
-        	
+	    	foreach($usattr_id as $uskey => $usval){
+	    		foreach($usval as $usval_){
+	    			array_push($usattr_val,$usval_);
+	    		}
+	    			
+	    		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+	    		
+	    	}
+	    	
+	    	
+	    	if(!empty($sattr_val))
+	    		$_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
+	    	if(!empty($usattr_val))
+	    		$_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
         }
+
         
+
+
         if($skind){
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $set_join[] = array('(select cit_id from cb_cmall_kind_rel where ckd_id = '.$skind.' ) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id = ".$skind." )" ;
 
     //         if(empty($sattr))
 				// $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner'));	
             
         }
+        
+
+        $set_join[] = array("
+				(".$_join.") as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
 		// $field = array(
 		// 	'board' => array('brd_name'),
 		// 	'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
@@ -863,7 +863,7 @@ class Cmall extends CB_Controller
         
 		if(!empty($set_join)) {
 			$this->Board_model->set_join($set_join);
-			$this->Board_model->set_group_by('cmall_item.cit_id');
+			// $this->Board_model->set_group_by('cmall_item.cit_id');
 		}
 		$result = $this->Board_model
 			->get_search_list(6,'' , $where,'','','rand()');
