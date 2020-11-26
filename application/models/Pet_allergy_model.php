@@ -74,6 +74,7 @@ class Pet_allergy_model extends CB_Model
         $this->db->select('pet_allergy.*');
         $this->db->join('pet_allergy_rel', 'pet_allergy.pag_id = pet_allergy_rel.pag_id', 'inner');
         $this->db->where(array('pet_allergy_rel.pet_id' => $pet_id));
+        $this->db->where(array('pet_allergy.pag_parent >' => 0 ));
         $this->db->order_by('pag_order', 'asc');
         $qry = $this->db->get($this->_table);
         $result = $qry->result_array();
