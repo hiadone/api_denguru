@@ -666,7 +666,7 @@ class Cmall extends CB_Controller
             
             
             if(!empty($sattr2_val))
-                $_join .= " and cit_id1 in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
             
         }
 
@@ -1066,7 +1066,7 @@ class Cmall extends CB_Controller
             
             
             if(!empty($sattr2_val))
-                $_join .= " and cit_id1 in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
             
         }
 
