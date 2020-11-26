@@ -398,8 +398,15 @@ class Cmall extends CB_Controller
         
 
         $sattr =  array();
+        $sattr2 =  array();
         $usattr =  array();
         $skind = '';
+
+
+        
+
+        if(element('ckd_size',$pet_info)) array_push($sattr2,element('ckd_size',$pet_info));
+
         if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
         elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
         elseif((int) element('pet_age',$pet_info) > 7) array_push($sattr,14);
@@ -549,7 +556,119 @@ class Cmall extends CB_Controller
                 $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
         }
 
-        
+        if($sattr && is_array($sattr)){
+                        
+            $sattr_id = array();
+            
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+
+            
+            
+            
+            $sattr_val = array();
+            
+            foreach($sattr_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            
+            
+            
+            if(!empty($sattr_val))
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
+            
+        }
+
+        if($usattr && is_array($usattr)){
+                        
+            
+            $usattr_id = array();
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($usattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+
+                            $usattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+            
+            
+            
+            $usattr_val = array();
+            
+
+            foreach($usattr_id as $uskey => $usval){
+                foreach($usval as $usval_){
+                    array_push($usattr_val,$usval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+            
+            if(!empty($usattr_val))
+                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
+        }
+
+        if($sattr2 && is_array($sattr2)){
+                        
+            $sattr2_id = array();
+            
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr2 as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr2_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+
+            
+            
+            
+            $sattr2_val = array();
+            
+            foreach($sattr2_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr2_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            
+            
+            
+            if(!empty($sattr2_val))
+                $_join .= " and cit_id1 in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
+            
+        }
 
 
         if($skind){
@@ -677,9 +796,12 @@ class Cmall extends CB_Controller
         
 
         $sattr =  array();
+        $sattr2 =  array();
         $usattr =  array();
         $skind = '';
 
+
+        if(element('ckd_size',$pet_info)) array_push($sattr2,element('ckd_size',$pet_info));
 
         if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
         elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
@@ -834,7 +956,119 @@ class Cmall extends CB_Controller
                 $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
         }
 
-        
+        if($sattr && is_array($sattr)){
+                        
+            $sattr_id = array();
+            
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+
+            
+            
+            
+            $sattr_val = array();
+            
+            foreach($sattr_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            
+            
+            
+            if(!empty($sattr_val))
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
+            
+        }
+
+        if($usattr && is_array($usattr)){
+                        
+            
+            $usattr_id = array();
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($usattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+
+                            $usattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+            
+            
+            
+            $usattr_val = array();
+            
+
+            foreach($usattr_id as $uskey => $usval){
+                foreach($usval as $usval_){
+                    array_push($usattr_val,$usval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+            
+            if(!empty($usattr_val))
+                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
+        }
+
+        if($sattr2 && is_array($sattr2)){
+                        
+            $sattr2_id = array();
+            
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr2 as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr2_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+
+            
+            
+            
+            $sattr2_val = array();
+            
+            foreach($sattr2_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr2_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            
+            
+            
+            if(!empty($sattr2_val))
+                $_join .= " and cit_id1 in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
+            
+        }
 
 
         if($skind){

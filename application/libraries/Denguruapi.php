@@ -903,6 +903,7 @@ class Denguruapi extends CI_Controller
 
         $data['pet_kind'] = element('ckd_value_kr',$pet_kind,element('ckd_value_en',$pet_kind));
 
+        $data['ckd_size'] = element('ckd_size',$pet_kind);
         // $data['ckd_size'] = element('ckd_size',$pet_kind);
         // 
         if(element('ckd_size',$pet_kind) == '4')
