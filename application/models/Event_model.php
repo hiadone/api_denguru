@@ -230,6 +230,18 @@ class Event_model extends CB_Model
         $this->db->select('event_rel.*');
         $this->db->join('event_rel', 'event.eve_id = event_rel.eve_id', 'inner');
         $this->db->where(array('event_rel.eve_id' => $eve_id));
+
+        $this->db->group_start();
+        $this->db->where(array('evr_start_date <=' => cdate('Y-m-d')));
+        $this->db->or_where(array('evr_start_date' => null));
+        $this->db->group_end();
+        $this->db->group_start();
+        $this->db->where('evr_end_date >=', cdate('Y-m-d'));
+        $this->db->or_where('evr_end_date', '0000-00-00');
+        $this->db->or_where(array('evr_end_date' => ''));
+        $this->db->or_where(array('evr_end_date' => null));
+        $this->db->group_end();
+
         $qry = $this->db->get($this->_table);
         $result = $qry->result_array();
 

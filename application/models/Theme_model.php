@@ -57,7 +57,7 @@ class Theme_model extends CB_Model
             $this->db->or_where(array('the_end_date' => ''));
             $this->db->or_where(array('the_end_date' => null));
             $this->db->group_end();
-            $this->db->order_by('the_order', 'DESC');
+            $this->db->order_by('(0.1/the_order)', 'DESC');
             $res = $this->db->get();
             $result = $res->result_array();
 

@@ -389,7 +389,7 @@ class Cmall extends CB_Controller
          */
         
 
-        $findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : '(0.1/cit_order)';
+        $findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : '(0.1/cit_order3)';
         
 
         /**
@@ -497,7 +497,7 @@ class Cmall extends CB_Controller
             
 
             $_join = "
-                select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
+                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
         
         if($sattr && is_array($sattr)){
                         
@@ -787,7 +787,7 @@ class Cmall extends CB_Controller
          */
         
 
-        $findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order asc';
+        $findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : 'cit_order3 asc';
         
 
         /**
@@ -897,7 +897,7 @@ class Cmall extends CB_Controller
             
 
             $_join = "
-                select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
+                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
         
         if($sattr && is_array($sattr)){
                         

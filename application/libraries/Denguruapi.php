@@ -183,17 +183,22 @@ class Denguruapi extends CI_Controller
         $cache_minute = element('cache_minute', $config);
         $where['cit_status'] = 1;
         $where['cit_is_del'] = 0;
+        $cit_order = '(0.1/cit_order)';
         if (element('cit_type1', $config)) {
             $where['cit_type1'] = 1;
+            $cit_order = '(0.1/cit_order1)';
         }
         if (element('cit_type2', $config)) {
             $where['cit_type2'] = 1;
+            $cit_order = '(0.1/cit_order2)';
         }
         if (element('cit_type3', $config)) {
             $where['cit_type3'] = 1;
+            $cit_order = '(0.1/cit_order3)';
         }
         if (element('cit_type4', $config)) {
             $where['cit_type4'] = 1;
+            $cit_order = '(0.1/cit_order4)';
         }
         $limit = element('limit', $config) ? element('limit', $config) : 4;
         
@@ -206,7 +211,7 @@ class Denguruapi extends CI_Controller
             $this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
             $this->CI->db->where($where);
             $this->CI->db->limit($limit);
-            $this->CI->db->order_by('(0.1/cit_order)', 'desc');
+            $this->CI->db->order_by($cit_order, 'desc');
             $this->CI->db->order_by('cit_id', 'desc');
             $qry = $this->CI->db->get('board');
             $result = $qry->result_array();
