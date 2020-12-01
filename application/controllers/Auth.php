@@ -23,7 +23,7 @@ class Auth extends CB_Controller
     public function token_get()
     {
         $tokenData = array();
-        $tokenData['mem_id'] = '2'; //TODO: Replace with data for token
+        $tokenData['mem_id'] = '0'; //TODO: Replace with data for token
         $output['token'] = AUTHORIZATION::generateToken($tokenData);
         $this->set_response($output, parent::HTTP_OK);
     }

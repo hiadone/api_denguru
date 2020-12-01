@@ -89,7 +89,7 @@ class Event extends CB_Controller
         $where['egr_activated'] = '1';
         
         $field = array(
-            'event_group' => array('egr_id','egr_start_date','egr_end_date','egr_title','egr_datetime','egr_image','egr_content'),
+            'event_group' => array('egr_id','egr_start_date','egr_end_date','egr_title','egr_datetime','egr_image','egr_content','egr_type'),
             
         );
         
