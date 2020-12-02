@@ -232,7 +232,7 @@ class Event extends CB_Controller
         // 이벤트 라이브러리를 로딩합니다
         // $eventname = 'event_event_post';
         // $this->load->event($eventname);
-
+        
         $view = array();
         $view['view'] = array();
 
@@ -257,7 +257,7 @@ class Event extends CB_Controller
         // if ($pid) {
             $getdata = $this->{$this->modelname}->get_one($pid);
 
-
+            
             $getdata['display_datetime'] = display_datetime(
                 element('egr_datetime', $getdata),'full'
             );
@@ -390,7 +390,7 @@ class Event extends CB_Controller
             }
 
             
-            $view['view']['data'] = $getdata;
+            $view['view']['data'] = $getdata;            
             $view['view']['data']['secionlist'] = $result['list'];
 
             
