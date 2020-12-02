@@ -332,6 +332,7 @@ class Event extends CB_Controller
 
             $result = $this->Event_model->get_today_list($pid);
 
+
             if (element('list', $result)) {
                 foreach (element('list', $result) as $key => $val) {
 
@@ -370,7 +371,9 @@ class Event extends CB_Controller
 
                     $event_rel = $this->Event_model->get_event(element('eve_id',$val));
                     
+
                     if($event_rel){
+
                         $eveval_id =array();
                         foreach($event_rel as $eveval){
                             array_push($eveval_id,element('cit_id',$eveval));
@@ -378,9 +381,11 @@ class Event extends CB_Controller
 
                         if(!empty($eveval_id)){
 
+                            
                             $this->load->library('cmalllib');
                             $_itemlists = $this->cmalllib->_itemlists('','',array('cit_id' =>$eveval_id));
                             $result['list'][$key]['itemlists'] = element('list',$_itemlists);
+                            
                         }
                     }
 
@@ -389,6 +394,7 @@ class Event extends CB_Controller
                 }
             }
 
+            
             
             $view['view']['data'] = $getdata;            
             $view['view']['data']['secionlist'] = $result['list'];

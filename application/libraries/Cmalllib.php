@@ -1595,15 +1595,18 @@ class Cmalllib extends CI_Controller
             foreach($swhere as $skey => $sval){
                 if(!empty($sval)){
                     if(is_array($sval) )
-                        $this->CI->Board_model->set_where_in($skey,$sval);
+                        $this->CI->Board_model->group_where_in($skey,$sval);
                     else
                         $where[$skey] = $sval;
                 }
             }
         }
 
+        
         $result = $this->CI->Board_model
             ->get_item_list($per_page, $offset, $where, $category_id, $findex);
+
+
         $list_num = $result['total_rows'] - ($page - 1) * $per_page;
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
