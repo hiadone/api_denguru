@@ -55,7 +55,7 @@ class Event_model extends CB_Model
     {
         $cachename = 'event/event-info-'.$egr_id.'-'. cdate('Y-m-d');
         $data = array();
-        if ( ! $data = $this->cache->get($cachename)) {
+        // if ( ! $data = $this->cache->get($cachename)) {
             $this->db->select($this->_select);
             $this->db->from($this->_table);
             $this->db->where('eve_activated', 1);
@@ -77,7 +77,7 @@ class Event_model extends CB_Model
             $data['cached'] = '1';
 
             $this->cache->save($cachename, $data, $this->cache_time);
-        }
+        // }
         return isset($data['result']) ? $data['result'] : false;
     }
 
