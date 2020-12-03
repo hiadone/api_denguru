@@ -172,7 +172,7 @@ class Search extends CB_Controller
 
 	        
 	        if($skeyword){
-	        	$cmallwhere .=' AND cit_name like "%'.$skeyword.'%"';
+	        	// $cmallwhere .=' AND cit_name like "%'.$skeyword.'%"';
 	        }
 
 	        $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
@@ -188,7 +188,9 @@ class Search extends CB_Controller
 	        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 	            
 	            $set_join[] = array("
-					(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
+					(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+					UNION
+					select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 					UNION
 					select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 					) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
@@ -423,7 +425,9 @@ class Search extends CB_Controller
 		        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 		            
 		            $this->db->join("
-						(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
@@ -554,7 +558,9 @@ class Search extends CB_Controller
 		        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 		            
 		            $this->db->join("
-						(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
@@ -706,7 +712,9 @@ class Search extends CB_Controller
 				        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 				            
 				            $this->db->join("
-								(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+								(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+								UNION
+								select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
 								UNION
 								select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 								) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
@@ -885,7 +893,9 @@ class Search extends CB_Controller
 					        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 					            
 					            $this->db->join("
-									(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+									(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+									UNION
+									select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
 									UNION
 									select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 									) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
@@ -1112,7 +1122,9 @@ class Search extends CB_Controller
 		        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 		            
 		            $this->db->join("
-						(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
@@ -1278,7 +1290,9 @@ class Search extends CB_Controller
 		        	// $this->Board_model->set_where("(  cbr_value_kr = '".$skeyword."' )",'',false);
 		            
 		            $this->db->join("
-						(select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
