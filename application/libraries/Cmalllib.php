@@ -254,7 +254,7 @@ class Cmalllib extends CI_Controller
 		$where = array(
 			'cmall_wishlist.mem_id' => $mem_id,
 			'cit_status' => 1,
-			'cit_is_del' => 0,
+			'cit_is_del' => 0,			
 		);
 		$result = $this->CI->Cmall_wishlist_model
 			->get_list($limit, $offset = '', $where, $like = '', $findex = 'cwi_id', $forder = 'desc');
@@ -1563,6 +1563,9 @@ class Cmalllib extends CI_Controller
         $where = array();
         $where['cit_status'] = 1;
         $where['cit_is_del'] = 0;
+        $where['cit_is_soldout'] = 0;
+
+        
         $where['brd_blind'] = 0;
         // $field = array(
         //  'board' => array('brd_name'),

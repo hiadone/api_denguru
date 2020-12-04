@@ -183,6 +183,7 @@ class Denguruapi extends CI_Controller
         $cache_minute = element('cache_minute', $config);
         $where['cit_status'] = 1;
         $where['cit_is_del'] = 0;
+        $where['cit_is_soldout'] = 0;
         $cit_order = '(0.1/cit_order)';
         if (element('cit_type1', $config)) {
             $where['cit_type1'] = 1;

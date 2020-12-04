@@ -153,6 +153,7 @@ class Search extends CB_Controller
 		$cmallwhere = 'where
 				cit_status = 1
 				AND cit_is_del = 0
+				AND cit_is_soldout = 0
 			';
 		
 		

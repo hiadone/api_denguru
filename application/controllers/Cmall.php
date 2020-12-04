@@ -489,6 +489,7 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
+                AND cit_is_soldout = 0
                 AND cit_type3 = 1
             ';
             $_join = '';
@@ -887,6 +888,7 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
+                AND cit_is_soldout = 0
                 AND cit_type3 = 1
             ';
 
@@ -1126,6 +1128,7 @@ class Cmall extends CB_Controller
                     'brd_blind' => 0,
                     'cit_status' => 1,
                     'cit_is_del' => 0,
+                    'cit_is_soldout' => 0,
                     'cit_type3' => 1,
                     );
             $where = array('kinditem_group.ckd_id' => $skind);
@@ -3456,6 +3459,7 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
+                AND cit_is_soldout = 0
             ';
             $_join = '';
             $this->Board_model->_select = 'board.*';
