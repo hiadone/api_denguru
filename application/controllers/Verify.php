@@ -114,7 +114,7 @@ class Verify extends CB_Controller
 				$view['view']['message'] = '이메일 인증이 완료되었습니다.<br />감사합니다';
 				$this->Member_auth_email_model->update(element('mae_id', $result), $updateemail);
 
-				$this->member->update_login_log(element('mem_id', $dbmember), element('mem_userid', $dbmember), 1, '이메일 인증 후 로그인 성공');
+				$this->member->update_login_log(element('mem_id', $dbmember), element('mem_userid', $dbmember,''), 1, '이메일 인증 후 로그인 성공');
 				$this->session->set_userdata('mem_id', element('mem_id', $dbmember));
 			}
 		}

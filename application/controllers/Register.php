@@ -391,7 +391,7 @@ class Register extends CB_Controller
 		$configbasic['mem_recommend'] = array(
 			'field' => 'mem_recommend',
 			'label' => '추천인아이디',
-			'rules' => 'trim|alphanumunder|min_length[3]|max_length[50]|callback__mem_recommend_check',
+			'rules' => 'trim|min_length[3]|max_length[50]|callback__mem_recommend_check',
 		);
 
 		// if ($this->member->is_admin() === false && ! $this->session->userdata('registeragree')) {
