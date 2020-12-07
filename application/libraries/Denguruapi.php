@@ -213,6 +213,7 @@ class Denguruapi extends CI_Controller
             $this->CI->db->where($where);
             $this->CI->db->limit($limit);
             $this->CI->db->order_by($cit_order, 'desc');
+            $this->CI->db->order_by('(0.1/cit_order)', 'desc');
             $this->CI->db->order_by('cit_id', 'desc');
             $qry = $this->CI->db->get('board');
             $result = $qry->result_array();

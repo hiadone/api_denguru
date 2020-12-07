@@ -78,8 +78,8 @@ class Verify extends CB_Controller
 			$view['view']['message'] = '잘못된 접근입니다';
 		} elseif ( ! empty($result['mae_use_datetime']) && element('mae_use_datetime', $result) !== '0000-00-00 00:00:00') {
 			$view['view']['message'] = '회원님은 이미 인증을 받으셨습니다';
-		} elseif (strtotime(element('mae_generate_datetime', $result)) < ctimestamp()- 86400) {
-			$view['view']['message'] = '24 시간 이내에 인증을 받으셔야 합니다';
+		} elseif (strtotime(element('mae_generate_datetime', $result)) < ctimestamp()- 1800) {
+			$view['view']['message'] = '30분 이내에 인증을 받으셔야 합니다';
 		} elseif (element('mae_expired', $result)) {
 			$view['view']['message'] = '잘못된 접근입니다';
 		} else {
@@ -186,8 +186,8 @@ class Verify extends CB_Controller
 			$view['view']['error_message'] = '잘못된 접근입니다';
 		} elseif ( ! empty($result['mae_use_datetime']) && element('mae_use_datetime', $result) !== '0000-00-00 00:00:00') {
 			$view['view']['error_message'] = '회원님은 이미 패스워드 변경을 하셨습니다';
-		} elseif (strtotime(element('mae_generate_datetime', $result)) < ctimestamp()- 86400) {
-			$view['view']['message'] = '24 시간 이내에 인증을 받으셔야 합니다';
+		} elseif (strtotime(element('mae_generate_datetime', $result)) < ctimestamp()- 1800) {
+			$view['view']['message'] = '30분 이내에 변경 하셔야 합니다';
 		} elseif (element('mae_type', $result) !== '3') {
 			$view['view']['error_message'] = '잘못된 접근입니다';
 		} else {
