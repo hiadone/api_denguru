@@ -83,6 +83,7 @@ class Event_group_model extends CB_Model
             $this->db->or_where(array('egr_end_date' => ''));
             $this->db->or_where(array('egr_end_date' => null));
             $this->db->group_end();
+            $this->db->order_by('(0.1/egr_order)', 'desc');            
             $res = $this->db->get();
             $result['list'] = $res->result_array();
 

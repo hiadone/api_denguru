@@ -1681,7 +1681,7 @@ class Register extends CB_Controller
 		);
 		$receiver = array();
 		
-		$content= "인증번호 (".$ssc_key.") 입력하시면 정상처리 됩니다.";
+		$content= "안녕하세요 댕구루 입니다.. 인증번호 (".$ssc_key.") 입력하시면 정상처리 됩니다.";
 
 		$receiver['phone'] = $mem_phone;
 		$receiver['mem_id'] = 1;
@@ -1779,14 +1779,31 @@ class Register extends CB_Controller
        $cnt = $this->Sms_send_history_model->count_by($sendwhere);
        
        if($cnt < 1){
-           $result = array('result'=>'error','msg' => '인증 번호가 맞지 앖습니다. 다시 확인해 주세요 ');
-           return $this->response($result, 200);
+            $result = array('result'=>'error','msg' => '인증 번호가 맞지 앖습니다. 다시 확인해 주세요 ');
+            return $this->response($result, 200);
            
        }
-
+       
        if($cnt > 0){
-           $result = array('result'=>'success','msg' => '확인 되었습니다.');
-           return $this->response($result, 200);
+       		$msg = "확인 되었습니다.";
+       		$where = array(
+				'mem_phone' => $mem_phone,
+			);
+			$mem_info = $this->Member_model->get_one('','mem_email',$where);
+
+			if(element('mem_email',$mem_info)){
+
+
+				$mem_email = explode('@',element('mem_email',$mem_info));
+
+				if(element(1,$mem_email))
+					$msg= "이미 ".$this->mytory_asterisk(element(0,$mem_email)).'@'.element(1,$mem_email)." 으로 가입 하셨습니다.\n가입은 그대로 진행 합니다.";
+				else
+					$msg= "이미 ".$this->mytory_asterisk(element(0,$mem_email))." 으로 가입 하셨습니다.\n가입은 그대로 진행 합니다.";
+	       			
+	       	}
+            $result = array('result'=>'success','msg' => $msg);
+            return $this->response($result, 200);
            
        }
 
@@ -1856,6 +1873,26 @@ class Register extends CB_Controller
        
        
      	return true;  
+	}
+
+	function mytory_asterisk($string) {
+	    $string = trim($string);
+	    $length = mb_strlen($string, 'utf-8');
+	    $string_changed = $string;
+	    if ($length <= 2) {
+	        // 한두 글자면 그냥 뒤에 별표 붙여서 내보낸다.
+	        $string_changed = mb_substr($string, 0, 1, 'utf-8') . '*';
+	    }
+	    if ($length >= 3) {
+	        // 3으로 나눠서 앞뒤.
+	        $leave_length = floor($length/3); // 남겨 둘 길이. 반올림하니 너무 많이 남기게 돼, 내림으로 해서 남기는 걸 줄였다.
+	        $asterisk_length = $length - ($leave_length * 2);
+	        $offset = $leave_length + $asterisk_length;
+	        $head = mb_substr($string, 0, $leave_length, 'utf-8');
+	        $tail = mb_substr($string, $offset, $leave_length, 'utf-8');
+	        $string_changed = $head . implode('', array_fill(0, $asterisk_length, '*')) . $tail;
+	    }
+	    return $string_changed;
 	}
 
 	
