@@ -42,7 +42,7 @@ class Theme_model extends CB_Model
         $cachename = 'theme/theme-' . $type . '-' . cdate('Y-m-d');
 
         // if ( ! $result = $this->cache->get($cachename)) {
-            $this->db->select('theme.the_id,the_title,brd_id');
+            $this->db->select('theme.the_id,the_title,brd_id,thr_id');
             $this->db->from($this->_table);
             $this->db->join('theme_rel', 'theme.the_id = theme_rel.the_id', 'inner');
             // $this->db->where(array('theme_rel.the_id' => $the_id));
@@ -57,7 +57,7 @@ class Theme_model extends CB_Model
             $this->db->or_where(array('the_end_date' => ''));
             $this->db->or_where(array('the_end_date' => null));
             $this->db->group_end();
-            $this->db->order_by('(0.1/the_order)', 'DESC');
+            $this->db->order_by('(0.1/thr_order)', 'DESC');
             $res = $this->db->get();
             $result = $res->result_array();
 
@@ -83,6 +83,7 @@ class Theme_model extends CB_Model
         $this->db->select('theme_rel.*');
         $this->db->join('theme_rel', 'theme.the_id = theme_rel.the_id', 'inner');
         $this->db->where(array('theme_rel.the_id' => $the_id));
+        $this->db->order_by('(0.1/thr_order)', 'DESC');
         $qry = $this->db->get($this->_table);
         $result = $qry->result_array();
 
