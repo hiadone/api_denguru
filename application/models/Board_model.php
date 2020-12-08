@@ -170,6 +170,13 @@ class Board_model extends CB_Model
 		$this->db->from($this->_table);
 		$this->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
 		$this->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
+
+		if ($this->_join) {
+
+			foreach($this->_join as $jval){
+				$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
+			}
+		}
 		if ($where) {
 			$this->db->where($where);
 		}
@@ -215,6 +222,14 @@ class Board_model extends CB_Model
 		$this->db->from($this->_table);
 		$this->db->join('cmall_item', 'board.brd_id = cmall_item.brd_id', 'inner');
 		$this->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
+
+		if ($this->_join) {
+
+			foreach($this->_join as $jval){
+				$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
+			}
+		}
+
 		if ($where) {
 			$this->db->where($where);
 		}

@@ -369,24 +369,28 @@ class Event extends CB_Controller
                         $result['list'][$key]['eve_end_date'] = '0000-00-00';
                     }
 
-                    $event_rel = $this->Event_model->get_event(element('eve_id',$val));
+                    // $event_rel = $this->Event_model->get_event(element('eve_id',$val));
                     
 
-                    if($event_rel){
+                    if(element('eve_id',$val)){
 
-                        $eveval_id =array();
-                        foreach($event_rel as $eveval){
-                            array_push($eveval_id,element('cit_id',$eveval));
-                        }
+                        // $eveval_id =array();
+                        // foreach($event_rel as $eveval){
+                        //     array_push($eveval_id,element('cit_id',$eveval));
+                        // }
 
-                        if(!empty($eveval_id)){
+                        // if(!empty($eveval_id)){
 
+                            $config = array(
+                                'findex' => '(0.1/evr_order) DESC',
+                                'set_join' => array('event_rel','cmall_item.cit_id = event_rel.cit_id','inner'),
+                                );
                             
                             $this->load->library('cmalllib');
-                            $_itemlists = $this->cmalllib->_itemlists('','',array('cit_id' =>$eveval_id));
+                            $_itemlists = $this->cmalllib->_itemlists('','',array('eve_id' =>element('eve_id',$val)),$config);
                             $result['list'][$key]['itemlists'] = element('list',$_itemlists);
                             
-                        }
+                        // }
                     }
 
 

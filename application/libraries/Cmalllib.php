@@ -1593,6 +1593,17 @@ class Cmalllib extends CI_Controller
             $per_page = element('per_page', $cfg);
             $offset = ($page - 1) * $per_page;  
         }
+
+        if(element('findex', $cfg)){
+            $findex = element('findex', $cfg);
+            
+        }
+
+        if(element('set_join', $cfg)){
+            $set_join[] = element('set_join', $cfg);            
+            $this->CI->Board_model->set_join($set_join);
+            
+        }
         
         if($swhere && is_array($swhere)){
             foreach($swhere as $skey => $sval){
