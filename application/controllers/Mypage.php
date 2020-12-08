@@ -2042,7 +2042,7 @@ class Mypage extends CB_Controller
 	        if(empty(element('pet_id',$getdata)))
 	        	alert('이 펫은 현재 존재하지 않습니다',"",406);
 
-	        $getdata['pet_photo_url'] = thumb_url('member_photo',element('pet_photo',$getdata));
+	        $getdata['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$getdata));
 
 	        $getdata['pet_attr'] = $this->Pet_attr_model->get_attr(element('pet_id',$getdata));
 	        
@@ -2096,7 +2096,7 @@ class Mypage extends CB_Controller
 	            'rules' => 'trim|numeric|required',
 	        ),
 	        array(
-	            'field' => 'ckd_Id',
+	            'field' => 'ckd_id',
 	            'label' => '품종',
 	            'rules' => 'trim|numeric|required',
 	        ),
