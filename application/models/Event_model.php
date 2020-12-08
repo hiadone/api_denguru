@@ -242,7 +242,7 @@ class Event_model extends CB_Model
         $this->db->or_where(array('evr_end_date' => ''));
         $this->db->or_where(array('evr_end_date' => null));
         $this->db->group_end();
-
+        $this->db->order_by('(0.1/evr_order)', 'desc');            
         $qry = $this->db->get($this->_table);
         $result = $qry->result_array();
 
