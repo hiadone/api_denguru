@@ -148,7 +148,7 @@ class Findaccount extends CB_Controller
 				);
 				$this->Member_auth_email_model->insert($authdata);
 
-				$verify_url = 'http://adm.denguru.kr/verify/resetpassword?user=' . element('mem_userid', $mb) . '&code=' . $verificationcode;
+				$verify_url = 'http://denguru.kr/verify/resetpassword?user=' . element('mem_userid', $mb) . '&code=' . $verificationcode;
 
 				$searchconfig = array(
 					'{홈페이지명}',
