@@ -1551,7 +1551,9 @@ class Cmalllib extends CI_Controller
         $skeyword = $this->CI->input->get('skeyword', null, '');
 
 
-        $per_page = $this->CI->cbconfig->item('list_count') ? (int) $this->CI->cbconfig->item('list_count') : 20;        
+        // $per_page = $this->CI->cbconfig->item('list_count') ? (int) $this->CI->cbconfig->item('list_count') : 20;  
+        $per_page = get_listnum(20);      
+        
         $offset = ($page - 1) * $per_page;
 
         $this->CI->Board_model->allow_search_field = array('brd_name','cit_id', 'cit_name', 'cit_content', 'cit_both', 'cit_price'); // 검색이 가능한 필드
