@@ -23,7 +23,7 @@ class Membermodify extends CB_Controller
 	/**
 	 * 헬퍼를 로딩합니다
 	 */
-	protected $helpers = array('form', 'array', 'string');
+	protected $helpers = array('form', 'array', 'string','cmall');
 
 	function __construct()
 	{
@@ -32,7 +32,7 @@ class Membermodify extends CB_Controller
 		/**
 		 * 라이브러리를 로딩합니다
 		 */
-		$this->load->library(array('querystring', 'form_validation', 'email', 'notelib'));
+		$this->load->library(array('querystring', 'form_validation', 'email', 'notelib','denguruapi'));
 	}
 
 
@@ -1586,6 +1586,148 @@ class Membermodify extends CB_Controller
 	/**
 	 * 회원탈퇴 페이지입니다
 	 */
+	
+	public function memberleave_get()
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		// $eventname = 'event_membermodify_memberleave';
+		// $this->load->event($eventname);
+
+		/**
+		 * 로그인이 필요한 페이지입니다
+		 */
+		required_user_login();
+		$this->load->model(array('Cmall_wishlist_model','Cmall_storewishlist_model','Cmall_review_model'));
+		$mem_id = (int) $this->member->item('mem_id');
+		
+		$view = array();
+		$view['view'] = array();
+		
+		$page = 1;
+		$per_page = 999; 
+		
+        $offset = ($page - 1) * $per_page;
+        
+        
+        if(empty($pet_id)) $pet_id = $this->member->item('pet_id');
+
+        $config = array(
+            'mem_id' => $mem_id,
+            'pet_id' => $pet_id,            
+            'sort' => $this->input->get('sort'),
+        );
+
+        $view['view']['data']['ai_recom'] = $this->_itemairecomlists($config);  
+        
+        
+		$where = array();
+		$where['cmall_wishlist.mem_id'] = $this->member->item('mem_id');
+		// $where['cit_status'] = 1;
+		$result = $this->Cmall_wishlist_model
+		    ->get_list($per_page, $offset, $where);
+		$list_num = $result['total_rows'] - ($page - 1) * $per_page;
+		if (element('list', $result)) {
+		    foreach (element('list', $result) as $key => $val) {
+		        $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id',$val),$result['list'][$key]);
+
+		        $board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$result['list'][$key]));
+
+		        // $result['list'][$key]['brd_register_url'] = element('brd_register_url',$board_crawl);    
+		        // $result['list'][$key]['brd_order_url'] = element('brd_order_url',$board_crawl);
+
+		        
+		        $result['list'][$key]['num'] = $list_num--;
+		    }
+		}
+
+		$view['view']['data']['cit_wish'] = $result;
+
+		$where = array();
+		$where['cmall_storewishlist.mem_id'] = $this->member->item('mem_id');
+        
+
+        $field = array(
+            'cmall_storewishlist' => array('csi_id','csi_datetime','brd_id'),
+        );
+        
+        $select = get_selected($field);
+        
+        $this->Cmall_storewishlist_model->_select = $select;
+
+        // $result = $this->Cmall_storewishlist_model
+        //  ->get_list($per_page, $offset, $where, '', $findex, $forder);
+        // $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+        $result = $this->Cmall_storewishlist_model
+            ->get_list('','', $where);
+        
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+                $result['list'][$key] = $this->denguruapi->get_brd_info(element('brd_id', $val),$result['list'][$key]);
+                // $result['list'][$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val));
+                
+                
+                
+                
+                // $result['list'][$key]['num'] = $list_num--;
+            }
+        }
+        $view['view']['data']['brd_wish'] = $result;
+
+        $where = array();
+        // $where['cre_status'] = 1;
+        // if($cit_id) $where['cit_id'] = $cit_id;
+
+        $where = array(
+			'cmall_review.mem_id' => $mem_id,
+			'cre_status' => 1,
+		);
+
+        
+
+        // $field = array(
+        //     'cmall_review' => array('cre_id','cit_id','cre_title','cre_content','cre_content_html_type','mem_id','cre_score','cre_datetime','cre_like','cre_update_datetime'),
+        // );
+        
+        // $select = get_selected($field);
+        
+        // $this->Cmall_review_model->_select = $select;
+
+
+        $result = $this->Cmall_review_model
+            ->get_list($per_page, $offset, $where);
+        $list_num = $result['total_rows'] - ($page - 1) * $per_page;
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+                
+                
+
+                
+
+                
+                
+
+                $result['list'][$key] = $this->denguruapi->get_cit_info(element('cit_id', $val),$result['list'][$key]);                   
+                // $result['list'][$key] = $this->board->get_default_info($result['list'][$key]['brd_id'],$result['list'][$key]);                   
+                $result['list'][$key] = $this->denguruapi->convert_review_info($result['list'][$key]);                   
+
+
+
+                $result['list'][$key]['num'] = $list_num--;
+                
+            }
+        }
+        $view['view']['data']['review'] = $result;
+		
+		
+
+		
+		
+		
+		return $this->response($view['view'], parent::HTTP_OK);
+	
+	}
+
 	public function memberleave_put()
 	{
 		// 이벤트 라이브러리를 로딩합니다
@@ -2163,7 +2305,7 @@ class Membermodify extends CB_Controller
            
 			$this->form_validation->set_message(
 				'_mem_smsmap_check',
-				'잘못된 인증 번호 입니다.'
+				'인증 번호를 입력해 주세요.'
 			);
 			return false;
        }
@@ -2211,4 +2353,378 @@ class Membermodify extends CB_Controller
        
      	return true;  
 	}
+
+	protected function _itemairecomlists($config)
+    {
+        
+
+
+        $mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
+        $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
+        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type3';
+        $sort = $sort.',';
+
+        $view = array();
+        $view['view'] = array();
+
+        if(empty($mem_id)) return false;
+
+        if(empty($pet_id)) return false;        
+
+
+
+        $this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model'));
+
+
+        $pet = $this->Member_pet_model->get_one($pet_id);
+
+        if (empty(element('pet_id', $pet))) {
+            return false;
+        }
+
+        $pet_info = $this->denguruapi->get_pet_info($mem_id,$pet_id);
+        
+        /**
+         * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
+         */
+        
+
+        $findex = ($this->input->get('findex') && in_array($this->input->get('findex'), $allow_order_field)) ? $this->input->get('findex') : '(0.1/cit_order3)';
+        
+
+        /**
+         * 게시판 목록에 필요한 정보를 가져옵니다.
+         */
+        
+
+        $sattr =  array();
+        $sattr2 =  array();
+        $usattr =  array();
+        $skind = '';
+
+
+        
+
+        if(element('ckd_size',$pet_info)) array_push($sattr2,element('ckd_size',$pet_info));
+
+        if((int) element('pet_age',$pet_info) < 1) array_push($sattr,12);
+        elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
+        elseif((int) element('pet_age',$pet_info) > 7) array_push($sattr,14);
+
+        $skind = element('ckd_id',$pet_info);
+
+        if(element('pet_attr',$pet_info)){
+
+            foreach(element('pet_attr',$pet_info) as $val){
+                
+                if(element('pat_id',$val) === '4') array_push($sattr,79);
+                if(element('pat_id',$val) === '5') array_push($sattr,80);
+                if(element('pat_id',$val) === '6') array_push($sattr,81);
+
+                if(element('pat_id',$val) === '7') array_push($sattr,82);
+                if(element('pat_id',$val) === '8') array_push($sattr,83);
+                if(element('pat_id',$val) === '9') array_push($sattr,84);
+
+                if(element('pat_id',$val) === '10') array_push($sattr,85);
+                if(element('pat_id',$val) === '11') array_push($sattr,86);
+                if(element('pat_id',$val) === '12') array_push($sattr,87);
+
+                if(element('pat_id',$val) === '13') array_push($sattr,88);
+            }
+        }
+
+        if(element('pet_allergy_rel',$pet_info)){
+            foreach(element('pet_allergy_rel',$pet_info) as $val){
+                
+                if(element('pag_id',$val) === '3') array_push($usattr,22);
+                if(element('pag_id',$val) === '4') array_push($usattr,53);
+                if(element('pag_id',$val) === '5') array_push($usattr,54);
+                
+                if(element('pag_id',$val) === '6') array_push($usattr,55);
+                if(element('pag_id',$val) === '7') array_push($usattr,56);
+                if(element('pag_id',$val) === '8') array_push($usattr,57);
+                
+                if(element('pag_id',$val) === '9') array_push($usattr,58);
+                if(element('pag_id',$val) === '10') array_push($usattr,59);
+                if(element('pag_id',$val) === '11') array_push($usattr,60);
+                
+                if(element('pag_id',$val) === '12') array_push($usattr,61);
+                if(element('pag_id',$val) === '13') array_push($usattr,62);
+                if(element('pag_id',$val) === '14') array_push($usattr,63);
+
+                if(element('pag_id',$val) === '15') array_push($usattr,64);
+                if(element('pag_id',$val) === '16') array_push($usattr,65);
+                if(element('pag_id',$val) === '17') array_push($usattr,66);
+
+                if(element('pag_id',$val) === '18') array_push($usattr,67);
+                if(element('pag_id',$val) === '19') array_push($usattr,68);
+                if(element('pag_id',$val) === '20') array_push($usattr,69);
+
+                if(element('pag_id',$val) === '21') array_push($usattr,70);
+                if(element('pag_id',$val) === '22') array_push($usattr,89);
+                if(element('pag_id',$val) === '23') array_push($usattr,90);
+
+                if(element('pag_id',$val) === '24') array_push($usattr,91);
+                if(element('pag_id',$val) === '25') array_push($usattr,92);
+                if(element('pag_id',$val) === '26') array_push($usattr,93);
+
+                if(element('pag_id',$val) === '27') array_push($usattr,94);
+            }
+        }
+
+        $all_kind = $this->Cmall_kind_model->get_all_kind();
+        $all_attr = $this->Cmall_attr_model->get_all_attr();
+        /**
+         * 게시판 목록에 필요한 정보를 가져옵니다.
+         */
+        $where = array(
+                'brd_search' => 1,
+                'brd_blind' => 0,               
+                );
+
+        
+
+        
+        
+            $cmallwhere = 'where
+                cit_status = 1
+                AND cit_is_del = 0
+                AND cit_is_soldout = 0
+                AND cit_type3 = 1
+            ';
+            $_join = '';
+
+            $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
+            
+
+            $_join = "
+                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id from cb_cmall_item ".$cmallwhere;
+        
+        if($sattr && is_array($sattr)){
+                        
+            $sattr_id = array();
+            $usattr_id = array();
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($usattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+
+                            $usattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+            
+            
+            $sattr_val = array();
+            $usattr_val = array();
+            foreach($sattr_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            foreach($usattr_id as $uskey => $usval){
+                foreach($usval as $usval_){
+                    array_push($usattr_val,$usval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+            
+            
+            if(!empty($sattr_val))
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
+            if(!empty($usattr_val))
+                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
+        }
+
+        if($sattr && is_array($sattr)){
+                        
+            $sattr_id = array();
+            
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+
+            
+            
+            
+            $sattr_val = array();
+            
+            foreach($sattr_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            
+            
+            
+            if(!empty($sattr_val))
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
+            
+        }
+
+        if($usattr && is_array($usattr)){
+                        
+            
+            $usattr_id = array();
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($usattr as $cval){
+                        if($cval == element('cat_id',$aaval)){
+
+                            $usattr_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+            
+            
+            
+            $usattr_val = array();
+            
+
+            foreach($usattr_id as $uskey => $usval){
+                foreach($usval as $usval_){
+                    array_push($usattr_val,$usval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+            
+            if(!empty($usattr_val))
+                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
+        }
+
+        if($sattr2 && is_array($sattr2)){
+                        
+            $sattr2_id = array();
+            
+            foreach($all_attr as $akey => $aval){
+                
+                foreach($aval as  $aaval){  
+                    foreach($sattr2 as $cval){
+                        if($cval == element('cat_id',$aaval)){
+                            $sattr2_id[$akey][] = $cval;
+                        }
+                    }   
+                }
+            }
+
+            
+
+            
+            
+            
+            $sattr2_val = array();
+            
+            foreach($sattr2_id as $skey => $sval){
+                foreach($sval as $sval_){
+                    array_push($sattr2_val,$sval_);
+                }
+                    
+                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+                
+            }
+
+            
+            
+            
+            if(!empty($sattr2_val))
+                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr2_val)."))";
+            
+        }
+
+
+        if($skind){
+
+            // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
+            // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
+            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id = ".$skind." )" ;
+
+    //         if(empty($sattr))
+                // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
+            
+        }
+        
+        if(!empty($_join))
+            $set_join[] = array("
+                (".$_join." ORDER BY RAND()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+
+
+        
+
+        
+        // $field = array(
+        //  'board' => array('brd_name'),
+        //  'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
+        //  'cmall_brand' => array('cbr_value_kr','cbr_value_en'),
+        // );
+        
+        // $select = get_selected($field);
+
+        // $this->Board_model->select = $select;
+
+        if(!empty($set_join)) {
+            $this->Board_model->set_join($set_join);
+            // $this->Board_model->set_group_by('cmall_item.cit_id');
+        }
+        $result = $this->Board_model
+            ->get_search_list(20,'' , $where,'','','');
+        $list_num = $result['total_rows'];
+        if (element('list', $result)) {
+            foreach (element('list', $result) as $key => $val) {
+
+                $result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+                $result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+                $result['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
+
+                
+                // $result['list'][$key]['num'] = $list_num--;
+            }
+        }   
+
+        
+        // $result['pet_info'] = $pet_info;
+        $view['view'] = $result;
+        
+        return $view['view'];
+        
+    }
 }

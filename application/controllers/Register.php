@@ -1826,7 +1826,7 @@ class Register extends CB_Controller
            
 			$this->form_validation->set_message(
 				'_mem_smsmap_check',
-				'잘못된 인증 번호 입니다.'
+				'인증 번호를 입력해 주세요.'
 			);
 			return false;
        }
