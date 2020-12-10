@@ -236,8 +236,8 @@ class Search extends CB_Controller
             		
             	}
             	
-
-            	$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
+            	if($_join)
+            		$set_join[] = array('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
             	
@@ -484,8 +484,8 @@ class Search extends CB_Controller
                 	}
   	
 
-                	
-                	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
+                	if($_join)
+                		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
                 }
 		        if($skind){
 
@@ -621,7 +621,8 @@ class Search extends CB_Controller
                 	
                 	
                 }
-		        $this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
+                if($_join)
+		        	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
 		        if($skind){
@@ -773,7 +774,8 @@ class Search extends CB_Controller
 	                    	
 	                    	
 	                    }
-	                    $this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
+	                    if($_join)
+	                    	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
 						if($skind){
 
 							// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
@@ -960,7 +962,7 @@ class Search extends CB_Controller
 		                    	}
 		      	
 
-		                    	
+		                    	if($_join)
 		                    	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
 		                    	
 		                    }
@@ -1189,7 +1191,8 @@ class Search extends CB_Controller
                 	
                 	
                 }
-	            $this->db->join('(select cit_id,cat_id from ('.$_join.')  AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
+                if($_join)
+	            	$this->db->join('(select cit_id,cat_id from ('.$_join.')  AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 		        if($skind){
 
@@ -1346,8 +1349,8 @@ class Search extends CB_Controller
                 	}
   	
 
-                	
-                	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
+                	if($_join)
+                		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
                 }
                 
 
