@@ -4269,7 +4269,7 @@ class Cmall extends CB_Controller
                 $key++;
                 $data['list'][$key]['cca_id'] = html_escape(element('cca_id', $value));
                 $data['list'][$key]['cca_value'] = html_escape(element('cca_value', $value));
-                $data['list'][$key]['category_url'] = base_url('search/show_list?sscategory[]=' . element('cca_id', $value));
+                $data['list'][$key]['category_url'] = base_url('search/show_list?scategory[]=' . element('cca_id', $value));
                 $data['list'][$key]['category_image_url'] = cdn_url('category','icon-cate-'.element('cca_id', $value).'.svg');
 
                 // if (element(element('cca_id', $value), $category)) {
