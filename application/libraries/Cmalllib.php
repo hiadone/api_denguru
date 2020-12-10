@@ -1588,8 +1588,8 @@ class Cmalllib extends CI_Controller
 
         if($brd_id){
             $where['board.brd_id'] = $brd_id;
-            $per_page = 18;
-            $offset = '';
+            // $per_page = 18;
+            // $offset = '';
         }
         if(element('per_page', $cfg)){
             $per_page = element('per_page', $cfg);

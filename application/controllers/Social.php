@@ -1061,6 +1061,7 @@ class Social extends CB_Controller
 				$insertdata = array();
 				$insertdata['mem_userid'] = $user_id;
 				$insertdata['mem_email'] = $user_email;
+				$insertdata['mem_username'] = $nickname;
 				$insertdata['mem_nickname'] = $nickname;
 				$insertdata['mem_level'] = $mem_level;
 
