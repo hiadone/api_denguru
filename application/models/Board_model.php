@@ -583,7 +583,7 @@ class Board_model extends CB_Model
 
 		// $this->db->select('cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale, board.brd_key, board.brd_name, board.brd_order, board.brd_search, cmall_attr.cat_id, cmall_attr.cat_value, cmall_attr.cat_parent, cmall_category.cca_id, cmall_category.cca_value, cmall_category.cca_parent ');		
 
-		$this->db->select('count(DISTINCT cb_cmall_item.cit_id ) rownum');
+		$this->db->select('count(cb_cmall_item.cit_id ) rownum');
 		$this->db->from('board');
 		// $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
 

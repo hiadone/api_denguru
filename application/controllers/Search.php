@@ -50,11 +50,17 @@ class Search extends CB_Controller
 		$stype = element('stype', $config) ? element('stype', $config) : '0';
 		$ssort = element('ssort', $config) ? element('ssort', $config) : 'cit_type2';
 		$option = element('option', $config) ? element('option', $config) : 'show_list';
-		$scategory = element('scategory', $config) ? element('scategory', $config) : '0';
 		$skeyword = element('skeyword', $config) ? element('skeyword', $config) : '';
+
+		$scategory = element('scategory', $config) ? element('scategory', $config) : false;
+		if(is_array($scategory)) $scategory = array_filter($scategory);		
 		$sage = element('sage', $config) ? element('sage', $config) : false;
+		if(is_array($sage)) $sage = array_filter($sage);
 		$sattr = element('sattr', $config) ? element('sattr', $config) : false;
+		if(is_array($sattr)) $sattr = array_filter($sattr);
 		$skind = element('skind', $config) ? element('skind', $config) : false;
+		if(is_array($skind)) $skind = array_filter($skind);
+
 		$sstart_price = element('sstart_price', $config) ? element('sstart_price', $config) : '0';
 		$send_price = element('send_price', $config) ? element('send_price', $config) : '0';
 
@@ -130,7 +136,7 @@ class Search extends CB_Controller
 		$category_child_id=array();
 		if($scategory && is_array($scategory)){
 			
-			foreach($scategory as $val){
+			foreach($scategory as $val){				
 				array_push($category_child_id,$val);
 				
 				$category_child = $this->Cmall_category_model->get_category_child($val);	
@@ -142,6 +148,7 @@ class Search extends CB_Controller
 						
 					}
 				}
+				
 			}
 		}
 
@@ -156,7 +163,14 @@ class Search extends CB_Controller
 				AND cit_is_soldout = 0
 			';
 		
-		
+		$is_color=false;
+
+		if($scategory && is_array($scategory)){
+			foreach($scategory as $val){
+				if(in_array($val,array(6,14,15,16,17,18,21,22,23)))
+					$is_color = true;
+			}
+		}
 
 			// $per_page = 20;
 			$per_page = get_listnum();
@@ -248,7 +262,7 @@ class Search extends CB_Controller
             	
             }
 
-	        if($skind){
+	        if($skind && is_array($skind)){
 
 	            // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
 	            // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -260,7 +274,7 @@ class Search extends CB_Controller
 	        }
 	        
 
-	        if(!empty($category_child_id)){
+	        if(!empty($category_child_id) && is_array($category_child_id)){
 	        	
 	            // $this->Board_model->set_where_in('cmall_category_rel.cca_id',$category_child_id);
 	            $set_join[] = array('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel ','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
@@ -362,14 +376,7 @@ class Search extends CB_Controller
 			$total_rows =0;
 			
 
-			$is_color=false;
-
-			if($scategory && is_array($scategory)){
-				foreach($scategory as $val){
-					if(in_array($val,array(6,14,15,16,17,18,21,22,23)))
-						$is_color = true;
-				}
-			}
+			
 
 			if($option === 'price'){
 
@@ -454,7 +461,7 @@ class Search extends CB_Controller
 				            // $this->Board_model->set_join(array('cmall_brand','cmall_brand.cbr_id = cmall_item.cbr_id','inner'));
 
 				        }
-				if(!empty($category_child_id)){
+				if(!empty($category_child_id) && is_array($category_child_id)){
 					
 
 		            // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
@@ -495,7 +502,7 @@ class Search extends CB_Controller
                 	if($_join)
                 		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
                 }
-		        if($skind){
+		        if($skind && is_array($skind)){
 
 	        		// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 	        		// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -592,7 +599,7 @@ class Search extends CB_Controller
 				            // $this->Board_model->set_join(array('cmall_brand','cmall_brand.cbr_id = cmall_item.cbr_id','inner'));
 
 				        }
-				if(!empty($category_child_id)){
+				if(!empty($category_child_id) && is_array($category_child_id)){
 					
 
 		            // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
@@ -637,7 +644,7 @@ class Search extends CB_Controller
 		        	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
 
-		        if($skind){
+		        if($skind && is_array($skind)){
 
 	        		// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 	        		// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -751,7 +758,7 @@ class Search extends CB_Controller
 						            // $this->Board_model->set_join(array('cmall_brand','cmall_brand.cbr_id = cmall_item.cbr_id','inner'));
 
 						}
-						if(!empty($category_child_id)){
+						if(!empty($category_child_id) && is_array($category_child_id)){
 						    
 
 						    $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
@@ -792,7 +799,7 @@ class Search extends CB_Controller
 	                    }
 	                    if($_join)
 	                    	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
-						if($skind){
+						if($skind && is_array($skind)){
 
 							// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 							// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -936,7 +943,7 @@ class Search extends CB_Controller
 							            // $this->Board_model->set_join(array('cmall_brand','cmall_brand.cbr_id = cmall_item.cbr_id','inner'));
 
 							        }
-							if(!empty($category_child_id)){
+							if(!empty($category_child_id) && is_array($category_child_id)){
 								
 
 							    // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
@@ -987,7 +994,7 @@ class Search extends CB_Controller
 		                    	
 		                    }
 		                    
-					        if($skind){
+					        if($skind && is_array($skind)){
 
 				        		// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 				        		$this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -1174,7 +1181,7 @@ class Search extends CB_Controller
 
 		        }
 
-		        if(!empty($category_child_id)){
+		        if(!empty($category_child_id) && is_array($category_child_id)){
 		        	
 
 		            
@@ -1218,7 +1225,7 @@ class Search extends CB_Controller
                 if($_join)
 	            	$this->db->join('(select cit_id,cat_id from ('.$_join.')  AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');
 
-		        if($skind){
+		        if($skind && is_array($skind)){
 
 		        			// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 		        			// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -1382,7 +1389,7 @@ class Search extends CB_Controller
                 }
                 
 
-		        if($skind){
+		        if($skind && is_array($skind)){
 
 		        			// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 		        			// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
@@ -1398,7 +1405,7 @@ class Search extends CB_Controller
 				// $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');		
 				// $this->db->join('crawl_tag', 'crawl_tag.cit_id = cmall_item.cit_id', 'inner');
 				
-				if(!empty($category_child_id)){
+				if(!empty($category_child_id) && is_array($category_child_id)){
 		        	
 
 		            // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
@@ -1525,12 +1532,13 @@ class Search extends CB_Controller
 	        }
 
 	        
-			
+		
 	        $view['view']['config']['cmall_size'] = $cmall_size;        
 	        $view['view']['config']['cmall_color'] = $cmall_color;
 	        $view['view']['config']['cmall_age'] = $cmall_age;        
 			$view['view']['config']['cmall_category'] = $cmall_category;
 	        // $view['view']['config']['cmall_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
+	    }	
 	        $view['view']['search_url'] = site_url('search/show_list?' . $param->output());
 	        $view['view']['search_price_url'] = site_url('search/price?' . $param->output());
 	        $view['view']['search_size_url'] = site_url('search/size?' . $param->output());
@@ -1539,7 +1547,7 @@ class Search extends CB_Controller
 	        	$view['view']['search_color_url'] = site_url('search/color?' . $param->output());
 	        $view['view']['search_age_url'] = site_url('search/age?' . $param->output());
 	        $view['view']['search_category_url'] = site_url('search/category/?' . $param->output());
-	    }
+	    
 
 		return $view['view'];
 	}
