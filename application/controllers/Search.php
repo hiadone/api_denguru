@@ -77,6 +77,13 @@ class Search extends CB_Controller
 			$findex = $ssort;
 		}
 		
+		if($ssort === 'high_price'){
+			$findex = 'cit_price_sale desc,cit_price desc';
+		}
+
+		if($ssort === 'low_price'){
+			$findex = 'cit_price_sale asc,cit_price asc';
+		}
 
 		/**
 		 * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
@@ -177,12 +184,12 @@ class Search extends CB_Controller
 			$offset = ($page - 1) * $per_page;
 
 			if($sstart_price){            
-	            $cmallwhere .=' AND cit_price >='.$sstart_price;
+	            $cmallwhere .=' AND ( cit_price >='.$sstart_price.' or cit_price_sale >='.$sstart_price.')';
 	                
 	        }
 
 	        if($send_price){            
-	        	$cmallwhere .=' AND cit_price <='.$send_price;
+	        	$cmallwhere .=' AND ( cit_price <='.$send_price.' or cit_price_sale <='.$sstart_price.')';
 	        }
 
 	        
