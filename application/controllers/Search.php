@@ -194,6 +194,10 @@ class Search extends CB_Controller
 					select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 					UNION
 					select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+					UNION
+					select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+					UNION
+					select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 					) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 	           
 
@@ -429,9 +433,13 @@ class Search extends CB_Controller
 		            $this->db->join("
 						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
 						UNION
-						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+						UNION
+						select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 				           
 
@@ -563,9 +571,13 @@ class Search extends CB_Controller
 		            $this->db->join("
 						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
 						UNION
-						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+						UNION
+						select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 				           
 
@@ -718,9 +730,13 @@ class Search extends CB_Controller
 				            $this->db->join("
 								(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
 								UNION
-								select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+								select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 								UNION
 								select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+								UNION
+								select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+								UNION
+								select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 								) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 						           
 
@@ -899,9 +915,13 @@ class Search extends CB_Controller
 					            $this->db->join("
 									(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
 									UNION
-									select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+									select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 									UNION
 									select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+									UNION
+									select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+									UNION
+									select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 									) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 							           
 
@@ -1132,9 +1152,13 @@ class Search extends CB_Controller
 		            $this->db->join("
 						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
 						UNION
-						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+						UNION
+						select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 		           
 
@@ -1295,9 +1319,13 @@ class Search extends CB_Controller
 		            $this->db->join("
 						(select cit_id from cb_cmall_item where cit_name like '%".$skeyword."%'
 						UNION
-						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."'  
+						select cit_id from cb_crawl_tag where cta_tag = '".$skeyword."' 
 						UNION
 						select cit_id from cb_cmall_attr_rel INNER JOIN cb_cmall_attr ON cb_cmall_attr_rel.cat_id = cb_cmall_attr.cat_id  where cat_value = '".$skeyword."'
+						UNION
+						select cit_id from cb_board INNER JOIN cb_cmall_item ON cb_board.brd_id = cb_cmall_item.brd_id  where brd_name like '%".$skeyword."%'
+						UNION
+						select cit_id from cb_cmall_brand INNER JOIN cb_cmall_item ON cb_cmall_brand.cbr_id = cb_cmall_item.cbr_id  where cbr_value_kr like '%".$skeyword."%' or cbr_value_en like '%".$skeyword."%'
 						) as AAA",'cmall_item.cit_id = AAA.cit_id','inner');
 				           
 
