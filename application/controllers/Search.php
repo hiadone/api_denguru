@@ -134,7 +134,7 @@ class Search extends CB_Controller
 		 * 게시판 목록에 필요한 정보를 가져옵니다.
 		 */
 		
-		$cmall_kind = $cmall_color = $cmall_age = $cmall_size =  $cmall_category = array();
+		$cmall_price = $cmall_kind = $cmall_color = $cmall_age = $cmall_size =  $cmall_category = array();
 		$all_kind = $this->Cmall_kind_model->get_all_kind();
 		$all_attr = $this->Cmall_attr_model->get_all_attr();
 		$all_category = $this->Cmall_category_model->get_all_category();
@@ -189,7 +189,7 @@ class Search extends CB_Controller
 	        }
 
 	        if($send_price){            
-	        	$cmallwhere .=' AND ( cit_price <='.$send_price.' or cit_price_sale <='.$sstart_price.')';
+	        	$cmallwhere .=' AND ( cit_price <='.$send_price.' or cit_price_sale <='.$send_price.')';
 	        }
 
 	        
@@ -372,6 +372,7 @@ class Search extends CB_Controller
 				}
 			}
 		} else {
+			// $this->Board_model->get_today_price_count()
 			if(!empty($set_join)) $this->Board_model->set_join($set_join);
 			$result = $this->Board_model
 				->get_search_count($per_page, $offset, $where, $like, '', $findex);
@@ -423,7 +424,7 @@ class Search extends CB_Controller
 		       
 
 				// $this->db->group_by($group_by);
-				$this->db->select($group_by.',count( cb_cmall_item.cit_id) as rownum');
+				$this->db->select('sum(case when cit_price_sale > 0 then (case when cit_price_sale > 0 and cit_price_sale <= 10000 then 1 else 0 end) else (case when cit_price > 0 and cit_price <= 10000 then 1 else 0 end) end) 10000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 10000 and cit_price_sale <= 20000 then 1 else 0 end) else (case when cit_price > 10000 and cit_price <= 20000 then 1 else 0 end) end) 20000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 20000 and cit_price_sale <= 30000 then 1 else 0 end) else (case when cit_price > 20000 and cit_price <= 30000 then 1 else 0 end) end) 30000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 30000 and cit_price_sale <= 40000 then 1 else 0 end) else (case when cit_price > 30000 and cit_price <= 40000 then 1 else 0 end) end) 40000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 40000 and cit_price_sale <= 50000 then 1 else 0 end) else (case when cit_price > 40000 and cit_price <= 50000 then 1 else 0 end) end) 50000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 50000 and cit_price_sale <= 60000 then 1 else 0 end) else (case when cit_price > 50000 and cit_price <= 60000 then 1 else 0 end) end) 60000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 60000 and cit_price_sale <= 70000 then 1 else 0 end) else (case when cit_price > 60000 and cit_price <= 70000 then 1 else 0 end) end) 70000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 70000 and cit_price_sale <= 80000 then 1 else 0 end) else (case when cit_price > 70000 and cit_price <= 80000 then 1 else 0 end) end) 80000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 80000 and cit_price_sale <= 90000 then 1 else 0 end) else (case when cit_price > 80000 and cit_price <= 90000 then 1 else 0 end) end) 90000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 90000 and cit_price_sale <= 100000 then 1 else 0 end) else (case when cit_price > 90000 and cit_price <= 100000 then 1 else 0 end) end) 100000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 100000 and cit_price_sale <= 110000 then 1 else 0 end) else (case when cit_price > 100000 and cit_price <= 110000 then 1 else 0 end) end) 110000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 110000 and cit_price_sale <= 120000 then 1 else 0 end) else (case when cit_price > 110000 and cit_price <= 120000 then 1 else 0 end) end) 120000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 120000 and cit_price_sale <= 130000 then 1 else 0 end) else (case when cit_price > 120000 and cit_price <= 130000 then 1 else 0 end) end) 130000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 130000 and cit_price_sale <= 140000 then 1 else 0 end) else (case when cit_price > 130000 and cit_price <= 140000 then 1 else 0 end) end) 140000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 140000 and cit_price_sale <= 150000 then 1 else 0 end) else (case when cit_price > 140000 and cit_price <= 150000 then 1 else 0 end) end) 150000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 150000 and cit_price_sale <= 160000 then 1 else 0 end) else (case when cit_price > 150000 and cit_price <= 160000 then 1 else 0 end) end) 160000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 160000 and cit_price_sale <= 170000 then 1 else 0 end) else (case when cit_price > 160000 and cit_price <= 170000 then 1 else 0 end) end) 170000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 170000 and cit_price_sale <= 180000 then 1 else 0 end) else (case when cit_price > 170000 and cit_price <= 180000 then 1 else 0 end) end) 180000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 180000 and cit_price_sale <= 190000 then 1 else 0 end) else (case when cit_price > 180000 and cit_price <= 190000 then 1 else 0 end) end) 190000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 190000 and cit_price_sale <= 200000 then 1 else 0 end) else (case when cit_price > 190000 and cit_price <= 200000 then 1 else 0 end) end) 200000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 200000 and cit_price_sale <= 210000 then 1 else 0 end) else (case when cit_price > 200000 and cit_price <= 210000 then 1 else 0 end) end) 210000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 210000 and cit_price_sale <= 220000 then 1 else 0 end) else (case when cit_price > 210000 and cit_price <= 220000 then 1 else 0 end) end) 220000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 220000 and cit_price_sale <= 230000 then 1 else 0 end) else (case when cit_price > 220000 and cit_price <= 230000 then 1 else 0 end) end) 230000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 230000 and cit_price_sale <= 240000 then 1 else 0 end) else (case when cit_price > 230000 and cit_price <= 240000 then 1 else 0 end) end) 240000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 240000 and cit_price_sale <= 250000 then 1 else 0 end) else (case when cit_price > 240000 and cit_price <= 250000 then 1 else 0 end) end) 250000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 250000 and cit_price_sale <= 260000 then 1 else 0 end) else (case when cit_price > 250000 and cit_price <= 260000 then 1 else 0 end) end) 260000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 260000 and cit_price_sale <= 270000 then 1 else 0 end) else (case when cit_price > 260000 and cit_price <= 270000 then 1 else 0 end) end) 270000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 270000 and cit_price_sale <= 280000 then 1 else 0 end) else (case when cit_price > 270000 and cit_price <= 280000 then 1 else 0 end) end) 280000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 280000 and cit_price_sale <= 290000 then 1 else 0 end) else (case when cit_price > 280000 and cit_price <= 290000 then 1 else 0 end) end) 290000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 290000 and cit_price_sale <= 300000 then 1 else 0 end) else (case when cit_price > 290000 and cit_price <= 300000 then 1 else 0 end) end) 300000under,sum(case when cit_price_sale > 0 then (case when cit_price_sale > 300000 then 1 else 0 end) else (case when cit_price > 300000 then 1 else 0 end) end) 300000over');
 				// $this->db->where(array('cmall_item.brd_id' =>2));				
 				// $this->db->where(array('cmall_category_rel.cca_id' =>7));
 				// $this->db->where(' (`cb_cmall_attr`.`cat_parent` = 9
@@ -435,7 +436,8 @@ class Search extends CB_Controller
 				
 				$this->db->from('board');
 				$this->db->join("
-					(select cit_id,brd_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+					(select cit_id,brd_id,cit_price,cit_price_sale from cb_cmall_item where
+				cit_status = 1 AND cit_is_del = 0 AND cit_is_soldout = 0) as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 				// $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
 
 				if($skeyword){
@@ -530,9 +532,17 @@ class Search extends CB_Controller
 				$qry = $this->db->get();
 				$result = $qry->result_array();
 				
+				foreach($result as $val){
+					foreach($val as $key_ => $val_){
+		        		$cmall_price[] = array(		        			
+		        			'pri_value' => $key_,
+		        			'rownum' => $val_,
+		        			);
 
-				$total_rows = $result[0]['rownum'];
-				// echo $total_rows;
+
+		        	}
+				}
+				
 			}
 
 			if($is_color && $option ==='color'){
@@ -1549,7 +1559,7 @@ class Search extends CB_Controller
 	        }
 
 	        
-		
+			$view['view']['config']['cmall_price'] = $cmall_price;        
 	        $view['view']['config']['cmall_size'] = $cmall_size;        
 	        $view['view']['config']['cmall_color'] = $cmall_color;
 	        $view['view']['config']['cmall_age'] = $cmall_age;        
