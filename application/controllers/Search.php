@@ -199,7 +199,7 @@ class Search extends CB_Controller
 
 	        $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
         	$set_join[] = array("
-				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
+				(select cit_id,brd_id,cit_order,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,cbr_id,cit_version from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
 	       
 
 

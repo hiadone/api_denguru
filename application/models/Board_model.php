@@ -211,6 +211,7 @@ class Board_model extends CB_Model
 			$this->db->group_end();
 		}
 
+		$this->db->order_by('cit_version');
 		$this->db->order_by($orderby);
 		if ($limit) {
 			$this->db->limit($limit, $offset);
@@ -447,6 +448,7 @@ class Board_model extends CB_Model
 
 		$this->db->group_by($this->_group_by);
 
+		$this->db->order_by('cit_version');
 		$this->db->order_by($orderby);
 		if ($limit) {
 			$this->db->limit($limit, $offset);
@@ -839,6 +841,37 @@ class Board_model extends CB_Model
 
 		return $result;
 	}
+
+	// public function get_today_price_count()
+ //    {
+ //        $cachename = 'event/event-info-'.$egr_id.'-'. cdate('Y-m-d');
+ //        $data = array();
+ //        // if ( ! $data = $this->cache->get($cachename)) {
+ //            $this->db->select($this->_select);
+ //            $this->db->from($this->_table);
+ //            $this->db->where('eve_activated', 1);
+ //            $this->db->where('egr_id',$egr_id);
+ //            $this->db->group_start();
+ //            $this->db->where(array('eve_start_date <=' => cdate('Y-m-d')));
+ //            $this->db->or_where(array('eve_start_date' => null));
+ //            $this->db->group_end();
+ //            $this->db->group_start();
+ //            $this->db->where('eve_end_date >=', cdate('Y-m-d'));
+ //            $this->db->or_where('eve_end_date', '0000-00-00');
+ //            $this->db->or_where(array('eve_end_date' => ''));
+ //            $this->db->or_where(array('eve_end_date' => null));
+ //            $this->db->group_end();
+ //            $this->db->order_by('(0.1/eve_order)', 'desc');            
+ //            $res = $this->db->get();
+ //            $result['list'] = $res->result_array();
+
+ //            $data['result'] = $result;
+ //            $data['cached'] = '1';
+
+ //            $this->cache->save($cachename, $data, $this->cache_time);
+ //        // }
+ //        return isset($data['result']) ? $data['result'] : false;
+ //    }
 }
 
 

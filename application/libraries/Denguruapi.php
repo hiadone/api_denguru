@@ -212,6 +212,7 @@ class Denguruapi extends CI_Controller
             $this->CI->db->join('cmall_brand', 'cmall_item.cbr_id = cmall_brand.cbr_id', 'inner');
             $this->CI->db->where($where);
             $this->CI->db->limit($limit);
+            $this->CI->db->order_by('cit_version', 'desc');
             $this->CI->db->order_by($cit_order, 'desc');
             $this->CI->db->order_by('(0.1/cit_order)', 'desc');
             $this->CI->db->order_by('cit_id', 'desc');

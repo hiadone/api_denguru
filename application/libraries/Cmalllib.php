@@ -1542,7 +1542,7 @@ class Cmalllib extends CI_Controller
 
         
 
-        $findex =  'cit_order asc,cit_id desc';
+        $findex =  '(0.1/cit_order) desc,cit_id desc';
         
         $sfield = $this->CI->input->get('sfield', null, '');
         if ($sfield === 'cit_both') {

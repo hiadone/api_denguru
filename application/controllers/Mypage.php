@@ -2366,6 +2366,11 @@ class Mypage extends CB_Controller
 	            $pet_attr = $this->input->post('pet_attr', null, '');
 	            $pet_allergy_rel = $this->input->post('pet_allergy_rel', null, '');
 
+	            if($pet_allergy_rel){
+	            	array_push($pet_allergy_rel,1);
+	            	array_push($pet_allergy_rel,2);
+	            }
+	            
 	            $this->Pet_allergy_rel_model->save_attr($pid, $pet_allergy_rel);
 				$this->Pet_attr_rel_model->save_attr($pid, $pet_attr);
 
@@ -2406,7 +2411,11 @@ class Mypage extends CB_Controller
 	            
 	            $pet_attr = $this->input->post('pet_attr', null, '');
 	            $pet_allergy_rel = $this->input->post('pet_allergy_rel', null, '');
-
+	            
+	            if($pet_allergy_rel){
+	            	array_push($pet_allergy_rel,1);
+	            	array_push($pet_allergy_rel,2);
+	            }
 	            $this->Pet_allergy_rel_model->save_attr($pid, $pet_allergy_rel);
 				$this->Pet_attr_rel_model->save_attr($pid, $pet_attr);
 
