@@ -547,8 +547,8 @@ class Denguruapi extends CI_Controller
             $review['reviewblamestatus'] = $this->CI->Like_model->count_by($where);  
         }
 
-        if (element('cre_image', $review) || element('cre_image', $review))
-            $this->CI->load->model('Review_file_model');
+        
+        $this->CI->load->model('Review_file_model');
 
         $review['review_image'] = array();
         if (element('cre_image', $review)) {
