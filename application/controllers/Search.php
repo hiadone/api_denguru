@@ -168,6 +168,7 @@ class Search extends CB_Controller
 				cit_status = 1
 				AND cit_is_del = 0
 				AND cit_is_soldout = 0
+				AND (cit_price > 0 or cit_price_sale > 0)
 			';
 		
 		$is_color=false;
