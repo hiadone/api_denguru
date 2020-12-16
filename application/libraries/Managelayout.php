@@ -321,6 +321,8 @@ class Managelayout extends CI_Controller
 			// $view['view']['max_value'] = $max;
 			// $view['view']['sum_count'] = $sum_count;
 		}
+		$view['search']['list'] = array_slice($view['search']['list'],0,20,true);
+
 
 		$data['search_keyword_rank'] = $view['search'];
 
