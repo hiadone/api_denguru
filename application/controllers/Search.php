@@ -332,11 +332,11 @@ class Search extends CB_Controller
 			if($mem_id)
 				$view['view']['data']['member'] = $this->denguruapi->get_mem_info($this->member->item('mem_id'));					
 
-			if ( ! $this->cb_jwt->userdata('skeyword_'.$oth_id.'_'. urlencode($skeyword))) {
+			if ( ! $this->cb_jwt->userdata('skeyword_'. urlencode($skeyword))) {
 				$sfieldarray = array('post_title', 'post_content', 'post_both');
 				// if (in_array($sfield2, $sfieldarray)) {
 				if ($skeyword) {
-					if ($mem_id) {
+					if (empty($oth_id)) {
 						$searchinsert = array(
 							'sek_keyword' => $skeyword,
 							'sek_datetime' => cdate('Y-m-d H:i:s'),
@@ -346,12 +346,14 @@ class Search extends CB_Controller
 						);
 						$this->Search_keyword_model->insert($searchinsert);
 						$this->cb_jwt->set_userdata(
-							'skeyword_'.$oth_id.'_'. urlencode($skeyword),
+							'skeyword_'. urlencode($skeyword),
 							1
 						);
 					}
 				}
-				if ($oth_id) {
+			}
+			if ( ! $this->cb_jwt->userdata('skeyword_'.$oth_id.'_'. urlencode($skeyword))) {
+				if ($oth_id && $mem_id) {
 					$this->load->model(array('Other_model','Other_keyword_model'));
 
 					if ($mem_id) {
