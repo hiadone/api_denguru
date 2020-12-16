@@ -264,7 +264,7 @@ class Managelayout extends CI_Controller
 			}
 		}
 		
-		$data['search_url'] = base_url('search');
+
 
 		$start_date = cdate("Y-m-d", strtotime("-1 month", time()));
 		$end_date = cdate('Y-m-d');
@@ -311,6 +311,7 @@ class Managelayout extends CI_Controller
 				$view['search']['list'][$k]['no'] = $no;
 
 				$view['search']['list'][$k]['key'] = $key;
+				$view['search']['list'][$k]['search_url'] = base_url('search/show_list/'.element('oth_id',$val).'?skeyword='.$key;
 				
 				
 
