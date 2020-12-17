@@ -1509,12 +1509,13 @@ class Cmall extends CB_Controller
         // $data['reviewscore'] = $this->Cmall_review_model->get_review_count(element('cit_id',$data));
         $data['popularreview'] = $this->denguruapi->get_popular_item_review(element('cit_id',$data));
 
+        $data['ai_keyword'] = array();
         $ai_keyword = $this->denguruapi->get_popular_cit_tags(element('cit_id',$data));
 
         if($ai_keyword && is_array($ai_keyword))
-        foreach($ai_keyword as $val){
-            $data['ai_keyword'][] = array($val,base_url('search/show_list/0?skeyword='.$val)); 
-        }
+            foreach($ai_keyword as $val){
+                $data['ai_keyword'][] = array($val,base_url('search/show_list/0?skeyword='.$val)); 
+            }
         $get_category = $this->Cmall_category_model->get_category(element('cit_id', $data));
         $cca_id_arr =array();
         if($get_category){
