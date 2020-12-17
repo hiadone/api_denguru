@@ -1511,6 +1511,7 @@ class Cmall extends CB_Controller
 
         $ai_keyword = $this->denguruapi->get_popular_cit_tags(element('cit_id',$data));
 
+        if($ai_keyword && is_array($ai_keyword))
         foreach($ai_keyword as $val){
             $data['ai_keyword'][] = array($val,base_url('search/show_list/0?skeyword='.$val)); 
         }

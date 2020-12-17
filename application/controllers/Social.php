@@ -947,7 +947,7 @@ class Social extends CB_Controller
 				$user_id = '';
 				$user_email = '';
 				if ($social_type === 'facebook') {
-					$nickname = element('name', $socialinfo);
+					$nickname = element('familyName', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					if (element('email', $socialinfo)) {
@@ -958,7 +958,7 @@ class Social extends CB_Controller
 						$user_email = $user_id .'@facebook.com';
 					}
 				} elseif ($social_type === 'twitter') {
-					$nickname = element('name', $socialinfo);
+					$nickname = element('familyName', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					if (element('screen_name', $socialinfo)) {
@@ -967,7 +967,7 @@ class Social extends CB_Controller
 						$user_id = '-social_' . $social_id;
 					}
 				} elseif ($social_type === 'google') {
-					$nickname = element('name', $socialinfo);
+					$nickname = element('familyName', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					if (element('email', $socialinfo)) {
@@ -978,7 +978,7 @@ class Social extends CB_Controller
 						$user_email = $user_id .'@google.com';
 					}
 				} elseif ($social_type === 'naver') {
-					$nickname = element('nickname', $socialinfo) ? element('nickname', $socialinfo) : element('name', $socialinfo);
+					$nickname = element('nickname', $socialinfo) ? element('nickname', $socialinfo) : element('familyName', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					if (element('email', $socialinfo)) {
@@ -989,7 +989,7 @@ class Social extends CB_Controller
 						$user_email = $user_id .'@naver.com';
 					}
 				} elseif ($social_type === 'kakao') {
-					$nickname = element('nickname', $socialinfo);
+					$nickname = element('familyName', $socialinfo);
 					$nickname = preg_replace('/\s+/', '', $nickname);
 
 					$user_id = '-social_' . $social_id;
@@ -1007,25 +1007,25 @@ class Social extends CB_Controller
 					if (preg_match("/[\,]?{$nickname}/i", $this->cbconfig->item('denied_nickname_list'))) {
 						$good = false;
 					}
-					if ($good) {
-						$countwhere = array(
-							'mem_nickname' => $nickname,
-						);
-						$row = $this->Member_model->count_by($countwhere);
+					// if ($good) {
+					// 	$countwhere = array(
+					// 		'mem_nickname' => $nickname,
+					// 	);
+					// 	$row = $this->Member_model->count_by($countwhere);
 
-						if ($row > 0) {
-							$good = false;
-						}
-					}
-					if ($good) {
-						$countwhere = array(
-							'mni_nickname' => $nickname,
-						);
-						$row = $this->Member_nickname_model->count_by($countwhere);
-						if ($row > 0) {
-							$good = false;
-						}
-					}
+					// 	if ($row > 0) {
+					// 		$good = false;
+					// 	}
+					// }
+					// if ($good) {
+					// 	$countwhere = array(
+					// 		'mni_nickname' => $nickname,
+					// 	);
+					// 	$row = $this->Member_nickname_model->count_by($countwhere);
+					// 	if ($row > 0) {
+					// 		$good = false;
+					// 	}
+					// }
 					if ($good) {
 						break;
 					}

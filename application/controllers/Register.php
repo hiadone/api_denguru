@@ -1376,22 +1376,23 @@ class Register extends CB_Controller
 			return $this->response($result, 200);
 		}
 
-		$where = array(
-			'mem_nickname' => $nickname,
-		);
-		$count = $this->Member_model->count_by($where);
-		if ($count > 0) {
-			$result = array(
-				'result' => 'error',
-				'msg' => '이미 사용중인 닉네임입니다',
-			);
-			return $this->response($result, 200);
-		}
+		// $where = array(
+		// 	'mem_nickname' => $nickname,
+		// );
+		// $count = $this->Member_model->count_by($where);
+		// if ($count > 0) {
+		// 	$result = array(
+		// 		'result' => 'error',
+		// 		'msg' => '이미 사용중인 닉네임입니다',
+		// 	);
+		// 	return $this->response($result, 200);
+		// }
 
 		if ($this->_mem_nickname_check($nickname) === false) {
 			$result = array(
 				'result' => 'error',
-				'msg' => '이미 사용중인 닉네임입니다',
+				// 		'msg' => '이미 사용중인 닉네임입니다',
+				'msg' => '닉네임은 공백없이 한글, 영문, 숫자만 입력 가능합니다',
 			);
 			return $this->response($result, 200);
 		}
@@ -1442,31 +1443,31 @@ class Register extends CB_Controller
 			);
 			return false;
 		}
-		$countwhere = array(
-			'mem_nickname' => $str,
-		);
-		$row = $this->Member_model->count_by($countwhere);
+		// $countwhere = array(
+		// 	'mem_nickname' => $str,
+		// );
+		// $row = $this->Member_model->count_by($countwhere);
 
-		if ($row > 0) {
-			$this->form_validation->set_message(
-				'_mem_nickname_check',
-				$str . ' 는 이미 다른 회원이 사용하고 있는 닉네임입니다'
-			);
-			return false;
-		}
+		// if ($row > 0) {
+		// 	$this->form_validation->set_message(
+		// 		'_mem_nickname_check',
+		// 		$str . ' 는 이미 다른 회원이 사용하고 있는 닉네임입니다'
+		// 	);
+		// 	return false;
+		// }
 
-		$countwhere = array(
-			'mni_nickname' => $str,
-		);
-		$row = $this->Member_nickname_model->count_by($countwhere);
+		// $countwhere = array(
+		// 	'mni_nickname' => $str,
+		// );
+		// $row = $this->Member_nickname_model->count_by($countwhere);
 
-		if ($row > 0) {
-			$this->form_validation->set_message(
-				'_mem_nickname_check',
-				$str . ' 는 이미 다른 회원이 사용하고 있는 닉네임입니다'
-			);
-			return false;
-		}
+		// if ($row > 0) {
+		// 	$this->form_validation->set_message(
+		// 		'_mem_nickname_check',
+		// 		$str . ' 는 이미 다른 회원이 사용하고 있는 닉네임입니다'
+		// 	);
+		// 	return false;
+		// }
 
 		return true;
 	}

@@ -85,7 +85,7 @@ class Mypage extends CB_Controller
 			);
 			$order_crawl = $this->Cmall_order_model->get('', 'cor_id,brd_id,cor_key,cor_pay_type', $owhere);
 			
-
+			$data['orderstatus'] = array();
 			if ($order_crawl) {
 				foreach ($order_crawl as $okey => $oval) {
 					$board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$oval));	
