@@ -2404,7 +2404,7 @@ class Cmall extends CB_Controller
     }
 
 
-    public function orderresult($cor_id = 0)
+    public function orderresult_get($cor_id = 0)
     {
         // 이벤트 라이브러리를 로딩합니다
         $eventname = 'event_cmall_orderresult';
@@ -2438,144 +2438,41 @@ class Cmall extends CB_Controller
             && (int) element('mem_id', $order) !== $mem_id) {
             alert('잘못된 접근입니다',"",400);
         }
-        $orderdetail = $this->Cmall_order_detail_model->get_by_item($cor_id);
+
+        $board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$order));
+
+        $result['cor_id'] = element('cor_id',$order);
+        $result['brd_info']  = $this->denguruapi->get_brd_info(element('brd_id', $order));
+        $result['brd_info']['brd_phone']  = element('brd_phone',$board_crawl);
+        $result['cor_memo'] = element('cor_memo',$order);
+        $result['cor_total_money'] = element('cor_total_money',$order);
+        $result['cor_content'] = element('cor_content',$order);
+        $result['cor_pay_type'] = element('cor_pay_type',$order);
+        $result['cor_order_history'] = element('cor_order_history',$order);
+        $result['cor_order_delete_url'] = base_url('cmall/orderresult/'.element('cor_id',$order));
+
+
+        
+        $result_=array();
+        $orderdetail = $this->Cmall_order_detail_model->get_by_item(element('cor_id',$order));
         if ($orderdetail) {
-            foreach ($orderdetail as $key => $value) {
-                $orderdetail[$key]['item'] = $item
-                    = $this->Cmall_item_model->get_one(element('cit_id', $value));
-                $orderdetail[$key]['itemdetail'] = $itemdetail
-                    = $this->Cmall_order_detail_model
-                    ->get_detail_by_item($cor_id, element('cit_id', $value));
-
-                $orderdetail[$key]['item']['possible_download'] = 1;
-                if (element('cod_download_days', element(0, $itemdetail)) && element('cor_approve_datetime', $order)) {
-                    $endtimestamp = strtotime(element('cor_approve_datetime', $order))
-                        + 86400 * element('cod_download_days', element(0, $itemdetail));
-                    $orderdetail[$key]['item']['download_end_date'] = $enddate
-                        = cdate('Y-m-d', $endtimestamp);
-
-                    $orderdetail[$key]['item']['possible_download'] = ($enddate >= date('Y-m-d')) ? 1 : 0;
-                }
-            }
-        }
-        if (element('cor_status', $order) === '1') {
-            $this->cb_jwt->set_userdata(
-                'cmall_item_download_' . element('cor_id', $order),
-                '1'
-            );
-        }
-
-        //핸드폰의 영수증 정보
-        if( element('cor_pay_type', $order) === 'phone' ){
-            switch( element('cor_pg', $order) ){
-                case 'lg' :
-                    $init           = $this->paymentlib->lg_init();
-                    $LGD_MID        = element('LGD_MID', $init);
-                    $LGD_TID        = element('cor_tno', $order);
-                    $LGD_MERTKEY    = element('pg_lg_key', $init);
-                    $LGD_HASHDATA   = md5($LGD_MID.$LGD_TID.$LGD_MERTKEY);
-
-                    if ( element('is_test', $order) ) {
-                        $order['card_receipt_js'] = 'http://pgweb.uplus.co.kr:7085/WEB_SERVER/js/receipt_link.js';
-                    } else {
-                        $order['card_receipt_js'] = 'http://pgweb.uplus.co.kr/WEB_SERVER/js/receipt_link.js';
-                    }
-                    $order['card_receipt_script'] = 'showReceiptByTID(\''.$LGD_MID.'\', \''.$LGD_TID.'\', \''.$LGD_HASHDATA.'\');';
-                    break;
-                case 'inicis' :
-                    $order['card_receipt_script'] = 'window.open(\'https://iniweb.inicis.com/DefaultWebApp/mall/cr/cm/mCmReceipt_head.jsp?noTid='.element('cor_tno', $order).'&noMethod=1\',\'receipt\',\'width=430,height=700\');';
-                    break;
-                case 'kcp' :
-                    if ( element('is_test', $order) ) {
-                        $receipturl = 'https://testadmin8.kcp.co.kr/assist/bill.BillActionNew.do?cmd=';
-                    } else {
-                        $receipturl = 'https://admin8.kcp.co.kr/assist/bill.BillActionNew.do?cmd=';
-                    }
-                    $order['card_receipt_script'] = 'window.open(\''.$receipturl.'mcash_bill&tno='.element('cor_tno', $order).'&order_no='.element('cor_id', $order).'&trade_mony='.element('cor_cash', $order).'\', \'winreceipt\', \'width=470,height=815,scrollbars=yes,resizable=yes\');';
-                    break;
+            foreach ($orderdetail as $value) {
+                $result_['item'][] 
+                    = $this->denguruapi->get_cit_info(element('cit_id', $value));
+                
             }
         }
 
-        //카드의 영수증 정보
-        if( element('cor_pay_type', $order) === 'card' ){
-            switch( element('cor_pg', $order) ){
-                case 'lg' :
-                    $init = $this->paymentlib->lg_init();
-                    $LGD_MID        = element('LGD_MID', $init);
-                    $LGD_TID        = element('cor_tno', $order);
-                    $LGD_MERTKEY    = element('pg_lg_key', $init);
-                    $LGD_HASHDATA   = md5($LGD_MID.$LGD_TID.$LGD_MERTKEY);
+       
+        
 
-                    if ( element('is_test', $order) ) {
-                        $order['card_receipt_js'] = 'http://pgweb.uplus.co.kr:7085/WEB_SERVER/js/receipt_link.js';
-                    } else {
-                        $order['card_receipt_js'] = 'http://pgweb.uplus.co.kr/WEB_SERVER/js/receipt_link.js';
-                    }
-                    $order['card_receipt_script'] = 'showReceiptByTID(\''.$LGD_MID.'\', \''.$LGD_TID.'\', \''.$LGD_HASHDATA.'\');';
-                    break;
-                case 'inicis' :
-                    $order['card_receipt_script'] = 'window.open(\'https://iniweb.inicis.com/DefaultWebApp/mall/cr/cm/mCmReceipt_head.jsp?noTid='.element('cor_tno', $order).'&noMethod=1\',\'receipt\',\'width=430,height=700\');';
-                    break;
-                case 'kcp' :
-                    if ( element('is_test', $order) ) {
-                        $receipturl = 'https://testadmin8.kcp.co.kr/assist/bill.BillActionNew.do?cmd=';
-                    } else {
-                        $receipturl = 'https://admin8.kcp.co.kr/assist/bill.BillActionNew.do?cmd=';
-                    }
-                    $order['card_receipt_script'] = 'window.open(\''.$receipturl.'card_bill&tno='.element('cor_tno', $order).'&order_no='.element('cor_id', $order).'&trade_mony='.element('cor_cash', $order).'\', \'winreceipt\', \'width=470,height=815,scrollbars=yes,resizable=yes\');';
-                    break;
-            }
-        }
-
-        $view['view']['data'] = $order;
-        $view['view']['orderdetail'] = $orderdetail;
+        $view['view']['data']['orderresult'] = $result;
+        $view['view']['data']['orderdetail'] = $result_;
 
 
-        // 이벤트가 존재하면 실행합니다
-        // $view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
-
-        /**
-         * 레이아웃을 정의합니다
-         */
-        $page_title = $this->cbconfig->item('site_meta_title_cmall_orderresult');
-        $meta_description = $this->cbconfig->item('site_meta_description_cmall_orderresult');
-        $meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall_orderresult');
-        $meta_author = $this->cbconfig->item('site_meta_author_cmall_orderresult');
-        $page_name = $this->cbconfig->item('site_page_name_cmall_orderresult');
-
-        $searchconfig = array(
-            '{컨텐츠몰명}',
-        );
-        $replaceconfig = array(
-            $this->cbconfig->item('cmall_name'),
-        );
-
-        $page_title = str_replace($searchconfig, $replaceconfig, $page_title);
-        $meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
-        $meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
-        $meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
-        $page_name = str_replace($searchconfig, $replaceconfig, $page_name);
-
-        $layoutconfig = array(
-            'path' => 'cmall',
-            'layout' => 'layout',
-            'skin' => 'order_result',
-            'layout_dir' => $this->cbconfig->item('layout_cmall'),
-            'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
-            'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
-            'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
-            'skin_dir' => $this->cbconfig->item('skin_cmall'),
-            'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
-            'page_title' => $page_title,
-            'meta_description' => $meta_description,
-            'meta_keywords' => $meta_keywords,
-            'meta_author' => $meta_author,
-            'page_name' => $page_name,
-        );
-        $view['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
-        $this->data = $view;
-        $this->layout = element('layout_skin_file', element('layout', $view));
-        $this->view = element('view_skin_file', element('layout', $view));
+        $this->data = $view['view'];
+        
+        return $this->response($this->data, parent::HTTP_OK);
     }
 
 
@@ -3011,6 +2908,7 @@ class Cmall extends CB_Controller
          */
         $where = array();
         $where['mem_id'] = $this->member->item('mem_id');
+        $where['is_del'] = 0;
 
         $result_= array();
         $result = $this->Cmall_order_model
@@ -3020,7 +2918,7 @@ class Cmall extends CB_Controller
             foreach (element('list', $result) as $key => $val) {
 
                 
-
+                $result_['list'][$key]['cor_id'] = element('cor_id',$val);
                 $result_['list'][$key]['brd_info']  = $this->denguruapi->get_brd_info(element('brd_id', $val));
 
                 $orderdetail = $this->Cmall_order_detail_model->get_by_item(element('cor_id',$val));
@@ -3043,7 +2941,7 @@ class Cmall extends CB_Controller
 
                 
                 
-
+                $result_['list'][$key]['orderresult_url'] = base_url('cmall/orderresult/'.element('cor_id',$val));                
                 
                 // $result['list'][$key]['num'] = $list_num--;
             }
@@ -4731,5 +4629,58 @@ class Cmall extends CB_Controller
 
     //  return $data;
     // }
+    // 
+    
+
+    public function orderresult_delete($cor_id)
+    {
+        required_user_login();
+
+        $this->load->library(array('paymentlib'));
+        $mem_id = (int) $this->member->item('mem_id');
+
+        $view = array();
+        $view['view'] = array();
+
+        // 이벤트가 존재하면 실행합니다
+        // $view['view']['event']['before'] = Events::trigger('before', $eventname);
+
+        if (empty($cor_id) OR $cor_id < 1) {
+            show_404();
+        }
+
+        $this->load->model(array( 'Cmall_order_model'));
+
+        $order = $this->Cmall_order_model->get_one($cor_id);
+        if ( ! element('cor_id', $order)) {
+            show_404();
+        }
+        if ($this->member->is_admin() === false
+            && (int) element('mem_id', $order) !== $mem_id) {
+            alert('잘못된 접근입니다',"",400);
+        }
+
+        $this->Cmall_order_model->update(element('cor_id', $order),array('is_del' => 1));
+        $result = array('msg' => 'success');
+        $view['view']= $result;
+        
+        return $this->response($view['view'], 201);
+    }
+
+
+    function getconfig_get()
+    {
+
+
+        $this->load->model(array('Cmall_attr_model','Pet_attr_model','Cmall_kind_model'));
+        $pet_attr = $this->Pet_attr_model->get_all_attr();
+
+        $view['view']['config']['pet_age'] = element(3,$pet_attr);;
+        $view['view']['config']['pet_form'] = element(2,$pet_attr);
+        $view['view']['config']['pet_kind'] = element(0,$this->Cmall_kind_model->get_all_kind());
+        $view['view']['config']['pet_attr'] = element(1,$pet_attr);
+
+        return $this->response($view['view'], 200);
+    }
 }
 
