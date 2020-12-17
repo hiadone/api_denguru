@@ -37,7 +37,7 @@ class Notification_model extends CB_Model
 
 		$this->db->select('notification.*, member.mem_id, member.mem_userid, member.mem_nickname, member.mem_is_admin, member.mem_icon');
 		$this->db->from($this->_table);
-		$this->db->join('member', 'notification.target_mem_id = member.mem_id', 'left');
+		$this->db->join('member', 'notification.mem_id = member.mem_id', 'left');
 
 		$this->db->where(array('notification.mem_id' => $mem_id));
 		if ($nottype === 'Y') {
@@ -59,7 +59,7 @@ class Notification_model extends CB_Model
 
 		$this->db->select('count(*) as rownum');
 		$this->db->from($this->_table);
-		$this->db->join('member', 'notification.target_mem_id = member.mem_id', 'left');
+		$this->db->join('member', 'notification.mem_id = member.mem_id', 'left');
 		$this->db->where(array('notification.mem_id' => $mem_id));
 		if ($nottype === 'Y') {
 			$this->db->where(array('not_read_datetime >' => '0000-00-00 00:00:00'));
