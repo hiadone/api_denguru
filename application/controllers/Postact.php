@@ -42,12 +42,7 @@ class Postact extends CB_Controller
 	public function post_delete($post_id = 0)
 	{
 
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_delete';
-		$this->load->event($eventname);
-
-		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		
 
 		$post_id = (int) $post_id;
 		if (empty($post_id) OR $post_id < 1) {
@@ -90,8 +85,7 @@ class Postact extends CB_Controller
 			}
 		}
 
-		// 이벤트가 존재하면 실행합니다
-		Events::trigger('step1', $eventname);
+
 
 		if (element('mem_id', $post)) {
 			if ($is_admin === false
@@ -104,8 +98,7 @@ class Postact extends CB_Controller
 			$view= array();
 			$view['view'] = array();
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['step2'] = Events::trigger('step2', $eventname);
+
 
 			if ($is_admin !== false) {
 				$this->session->set_userdata(
@@ -132,7 +125,7 @@ class Postact extends CB_Controller
 			if ( ! $this->session->userdata('can_delete_' . element('post_id', $post))) {
 
 				// 이벤트가 존재하면 실행합니다
-				$view['view']['event']['before_layout'] = Events::trigger('before_layout', $eventname);
+				
 
 				/**
 				 * 레이아웃을 정의합니다
@@ -167,7 +160,7 @@ class Postact extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('step3', $eventname);
+		
 
 		if (element('use_post_delete_log', $board)) {
 			$updata = array(
@@ -188,7 +181,8 @@ class Postact extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		
+
 
 		redirect(board_url(element('brd_key', $board)));
 
@@ -201,15 +195,13 @@ class Postact extends CB_Controller
 	public function multi_delete($flag = '')
 	{
 
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_multi_delete';
-		$this->load->event($eventname);
+		
 
 		$result = array();
 		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		
 
 		$post_ids = $this->input->post('chk_post_id');
 		if (empty($post_ids)) {
@@ -243,7 +235,7 @@ class Postact extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		
 
 		$result = array('success' => '선택된 게시글이 삭제되었습니다');
 		exit(json_encode($result));
@@ -284,15 +276,13 @@ class Postact extends CB_Controller
 	public function comment_multi_delete()
 	{
 
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_comment_multi_delete';
-		$this->load->event($eventname);
+		
 
 		$result = array();
 		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		
 
 		$cmt_ids = $this->input->post('chk_comment_id');
 		if (empty($cmt_ids)) {
@@ -315,7 +305,7 @@ class Postact extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$result = array('success' => '선택된 댓글이 삭제되었습니다');
 		exit(json_encode($result));
@@ -3304,11 +3294,11 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_post_like';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_post_like';
+		// $this->load->event($eventname);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$target_type = 3; //리뷰
 
@@ -3432,7 +3422,7 @@ class Postact extends CB_Controller
 		$success = '이 글을 ' . $status . ' 하셨습니다';
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$result = array('msg' => $success, 'count' => $count);
 		
@@ -3443,11 +3433,11 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_post_like';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_post_like';
+		// $this->load->event($eventname);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$target_type = 3; //리뷰
 
@@ -3557,7 +3547,7 @@ class Postact extends CB_Controller
 		$success = '이 글의 ' . $status . '삭제 하셨습니다';
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		$result = array('msg' => $success, 'count' => $count);
 		
@@ -3568,11 +3558,11 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_link';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_link';
+		// $this->load->event($eventname);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$cit_id = (int) $cit_id;
 		$mem_id = (int) $this->member->item('mem_id');
@@ -3630,7 +3620,7 @@ class Postact extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		redirect(prep_url(strip_tags(element('cit_post_url', $link))));
 
@@ -3640,11 +3630,11 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_link';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_link';
+		// $this->load->event($eventname);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$brd_id = (int) $brd_id;
 		$mem_id = (int) $this->member->item('mem_id');
@@ -3699,7 +3689,7 @@ class Postact extends CB_Controller
 		}
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('after', $eventname);
+		// Events::trigger('after', $eventname);
 
 		
 		
@@ -3716,11 +3706,11 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_comment_blame';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_comment_blame';
+		// $this->load->event($eventname);
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$result = array();
 		$target_type = 3; // 리뷰
@@ -4052,7 +4042,7 @@ class Postact extends CB_Controller
         // }
 
         // 이벤트가 존재하면 실행합니다
-        Events::trigger('after', $eventname);
+        // Events::trigger('after', $eventname);
 
 
         if ( $review && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_review_blame')) {
@@ -4088,8 +4078,8 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_multi_delete';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_multi_delete';
+		// $this->load->event($eventname);
 
 		required_user_login();	
 
@@ -4103,7 +4093,7 @@ class Postact extends CB_Controller
 		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 		$cwi_ids = $this->input->post('chk_cwi_id');
 		if (empty($cwi_ids)) {
@@ -4146,8 +4136,8 @@ class Postact extends CB_Controller
 	{
 
 		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_postact_multi_delete';
-		$this->load->event($eventname);
+		// $eventname = 'event_postact_multi_delete';
+		// $this->load->event($eventname);
 
 		required_user_login();	
 
@@ -4161,7 +4151,7 @@ class Postact extends CB_Controller
 		$this->output->set_content_type('application/json');
 
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		// Events::trigger('before', $eventname);
 
 
 		$cit_ids = $this->input->post('chk_cit_id');
@@ -4286,6 +4276,68 @@ class Postact extends CB_Controller
 
 
 		redirect(base_url('event/post/'. element('egr_id', $getdata)));
+
+	}
+
+	public function device_id_update_get($dev_token,$mem_id = 0)
+	{
+
+		
+
+		$result = array();
+		
+		if (empty($dev_token)) {
+			show_404();
+		}
+
+		
+		
+		
+        
+		if(!empty($mem_id)){
+			$member_info = $this->Member_model->get_one($mem_id);
+			if ( ! element('mem_id', $member_info)) {
+				show_404();
+			}
+		}
+		
+
+        $this->load->model('Device_model');
+
+        $where = array(            
+            'dev_token' => $dev_token
+        );
+
+
+        $dev_info = $this->Device_model
+            ->get_one('','dev_id',$where);
+
+        if(element('dev_id',$dev_info)){
+
+        	$updatedata = array(
+            'mem_id' => $mem_id,
+            'dev_token' => $dev_token,
+            'dev_update_datetime' => cdate('Y-m-d H:i:s'),
+            
+        	);
+        
+        	$dev_id = $this->Device_model->update(element('dev_id',$dev_info),$updatedata);	
+        	
+        } else {
+        	$insertdata = array(
+            'mem_id' => $mem_id,
+            'dev_token' => $dev_token,
+            'dev_register_datetime' => cdate('Y-m-d H:i:s'),
+            
+        	);
+        
+        	$dev_id = $this->Device_model->insert($insertdata);	
+        }
+        
+        
+        return $this->response($result, 201);
+
+        
 
 	}
 }

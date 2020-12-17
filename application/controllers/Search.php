@@ -142,21 +142,22 @@ class Search extends CB_Controller
 		// $this->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
 		$category_child_id=array();
 
-		foreach($all_category as $key => $val){
 
-			if($key === 0 ) continue;
-			foreach($val as $key_ => $val_){
-				
-				if(in_array(element('cca_id',$val_),$scategory)) {
-					$b = array_search($key,$scategory); 
-					if($b!==FALSE) unset($scategory[$b]); 
-				}
-				
-			}
-		}
 		
+
 		if($scategory && is_array($scategory)){
-			
+			foreach($all_category as $key => $val){
+
+				if($key === 0 ) continue;
+				foreach($val as $key_ => $val_){
+					
+					if(in_array(element('cca_id',$val_),$scategory)) {
+						$b = array_search($key,$scategory); 
+						if($b!==FALSE) unset($scategory[$b]); 
+					}
+					
+				}
+			}	
 			foreach($scategory as $val){				
 				array_push($category_child_id,$val);
 				
