@@ -111,7 +111,7 @@ class Cmall_item_model extends CB_Model
 	
 	public function get_popular_attr($brd_id = 0, $limit = '')
     {
-        $this->db->select('count(*) as cnt, cat_value ', false);
+        $this->db->select('count(*) as cnt, cat_value,cmall_attr.cat_id ', false);
         $this->db->from('cmall_item');
         $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
         $this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');        
@@ -123,6 +123,7 @@ class Cmall_item_model extends CB_Model
         $this->db->where('cit_is_del', 0);
         $this->db->where('cat_parent >', 0);
         $this->db->group_by('cat_value');
+        $this->db->order_by('cat_parent = 1', 'desc',false);        
         $this->db->order_by('cnt', 'desc');
         if ($limit) {
             $this->db->limit($limit);

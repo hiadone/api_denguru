@@ -519,7 +519,13 @@ class Board_model extends CB_Model
 
 		$qry = $this->db->get();
 		$rows = $qry->row_array();
-		$result['total_rows'] = $rows['rownum'];
+
+		if($this->_group_by){			
+			$result['total_rows'] = count($qry->result_array());
+		} else {
+			$rows = $qry->row_array();
+			$result['total_rows'] = $rows['rownum'];
+		}
 
 		return $result;
 	}
@@ -643,10 +649,17 @@ class Board_model extends CB_Model
 			}
 			$this->db->group_end();
 		}		
-
+		$this->db->group_by($this->_group_by);
 		$qry = $this->db->get();
 		$rows = $qry->row_array();
-		$result['total_rows'] = $rows['rownum'];
+		
+		if($this->_group_by){			
+			$result['total_rows'] = count($qry->result_array());
+		} else {
+			$rows = $qry->row_array();
+			$result['total_rows'] = $rows['rownum'];
+		}
+		
 
 		return $result['total_rows'];
 	}

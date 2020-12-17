@@ -296,6 +296,7 @@ class Search extends CB_Controller
 			
 			$like = '';
 		if($option ==='show_list'){
+			$this->Board_model->set_group_by('cmall_item.cit_id');
 			if(!empty($set_join)) $this->Board_model->set_join($set_join);
 			$result = $this->Board_model
 				->get_search_list($per_page, $offset, $where, $like, '', $findex);
@@ -375,6 +376,8 @@ class Search extends CB_Controller
 				}
 			}
 		} else {
+
+			$this->Board_model->set_group_by('cmall_item.cit_id');
 			// $this->Board_model->get_today_price_count()
 			if(!empty($set_join)) $this->Board_model->set_join($set_join);
 			$result = $this->Board_model
@@ -477,7 +480,7 @@ class Search extends CB_Controller
 					
 
 		            // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
-		            $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') ) as cb_cmall_category_rel ','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
+		            $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel ','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 
 		            
 		        }
@@ -512,17 +515,17 @@ class Search extends CB_Controller
   	
 
                 	if($_join)
-                		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
+                		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c group by cit_id) AS cb_cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
                 }
 		        if($skind && is_array($skind)){
 
 	        		// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 	        		// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
 	        	 //    $this->db->join('cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
-	        	    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).')) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+	        	    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') group by cit_id) AS cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
-	        	    if(empty($sattr))
-				        $this->db->join('cmall_attr_rel ', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
+	        	    if(empty($_join))
+				        $this->db->join('(select cit_id,cat_id from cb_cmall_attr_rel group by cit_id) as cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
 	        		
 					$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
 		            
@@ -623,7 +626,7 @@ class Search extends CB_Controller
 					
 
 		            // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
-		            $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') ) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
+		            $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 
 		        }
 
@@ -642,14 +645,18 @@ class Search extends CB_Controller
         	        	}
                 	}
 
-
+                	 if(empty(element(9,$sattr_id)))
+                        $_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in (17,18,19,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42) ) AS A ';
+                    else
+                        $_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",element(9,$sattr_id)).') ) AS A ';
 
                 	
                 	foreach($sattr_id as $skey => $sval){
                 	
-                		if(empty($_join))
-                			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
-                		else 
+                		// if(empty($_join))
+                		// 	$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+                		// else 
+                		if($skey != '9')
                 			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') ) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
                 			
                 		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
@@ -670,9 +677,10 @@ class Search extends CB_Controller
 	        		// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
 	        	 //    $this->db->join('cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
-	        	    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') ) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+	        	    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') group by cit_id) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 		        	
-		            
+		            if(empty($_join))
+				        $this->db->join('(select cit_id,cat_id from cb_cmall_attr_rel ) as cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
 		        }
 				// $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');		
 				$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
@@ -781,7 +789,7 @@ class Search extends CB_Controller
 						if(!empty($category_child_id) && is_array($category_child_id)){
 						    
 
-						    $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') ) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
+						    $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 
 						}
 						$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in (4,5,6) ) AS A ';
@@ -799,14 +807,18 @@ class Search extends CB_Controller
 	            	        	}
 	                    	}
 
-
+	                    	if(empty(element(1,$sattr_id)))
+	                    	    $_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in (4,5,6) ) AS A ';
+	                    	else
+	                    	    $_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",element(1,$sattr_id)).') ) AS A ';
 
 	                    	
 	                    	foreach($sattr_id as $skey => $sval){
 	                    	
-	                    		if(empty($_join))
-	                    			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
-	                    		else 
+	                    		// if(empty($_join))
+	                    		// 	$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+	                    		// else 
+	                    		if($skey != '1')
 	                    			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
 	                    			
 	                    		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
@@ -824,8 +836,10 @@ class Search extends CB_Controller
 							// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 							// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
 						 //    $this->db->join('cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
-						    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') ) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+						    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') group by cit_id) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 						    
+						    if(empty($_join))
+				        		$this->db->join('(select cit_id,cat_id from cb_cmall_attr_rel ) as cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
 						}
 						// $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');		
 						$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');	
@@ -979,7 +993,7 @@ class Search extends CB_Controller
 							    // $this->db->where_in('cmall_category_rel.cca_id',$category_child_id);
 							    // $this->db->join('cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 
-							    $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') ) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
+							    $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 							}
 
 							// if($sattr){
@@ -1020,7 +1034,7 @@ class Search extends CB_Controller
 		      	
 
 		                    	if($_join)
-		                    	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
+		                    	$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c group by cit_id) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
 		                    	
 		                    }
 		                    
@@ -1029,8 +1043,9 @@ class Search extends CB_Controller
 				        		// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 				        		$this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
 
-				        		if(empty($sattr))
-					        		$this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');		
+				        		if(empty($_join))
+				        			$this->db->join('(select cit_id,cat_id from cb_cmall_attr_rel group by cit_id) as cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
+				        		
 					        	$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
 					            
 					        	$this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') ) as cb_cmall_kind_rel', 'cmall_kind_rel.cit_id = cmall_item.cit_id', 'inner');		    
@@ -1129,6 +1144,7 @@ class Search extends CB_Controller
 			
 	 		if($option ==='age'){
 				$group_by='cmall_attr.cat_id';
+
 				// if($sstart_price){            
 		  //               $where['cit_price >= '] = $sstart_price;
 		  //       }
@@ -1216,7 +1232,7 @@ class Search extends CB_Controller
 
 		            
 
-		            $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') ) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
+		            $this->db->join('(select cit_id,cca_id from cb_cmall_category_rel where cca_id in ('.implode(",",$category_child_id).') group by cit_id) as cb_cmall_category_rel','cmall_item.cit_id = cmall_category_rel.cit_id','inner');
 		        }
 
 		        $_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in (12,13,14) ) AS A ';
@@ -1235,13 +1251,17 @@ class Search extends CB_Controller
                 	}
 
 
+                	if(empty(element(8,$sattr_id)))
+                		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in (12,13,14) ) AS A ';
+                	else
+                		$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",element(8,$sattr_id)).') ) AS A ';
 
-                	
                 	foreach($sattr_id as $skey => $sval){
-                	
-                		if(empty($_join))
-                			$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
-                		else 
+                		
+                		// if(empty($_join))
+                		// 	$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
+                		// else 
+                		if($skey != '8')
                 			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') ) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
                 			
                 		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
@@ -1260,8 +1280,8 @@ class Search extends CB_Controller
 		        			// $this->db->where_in('cmall_kind_rel.ckd_id',$skind);
 		        			// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
 		        		 //    $this->db->join('cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
-		        		    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') ) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
-			        	
+		        		    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') group by cit_id) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+			        		
 			            
 			        }
 				// $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');		
@@ -1415,7 +1435,7 @@ class Search extends CB_Controller
   	
 
                 	if($_join)
-                		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
+                		$this->db->join('(select cit_id,cat_id from ('.$_join.') AS c group by cit_id) AS cmall_attr_rel','cmall_item.cit_id = cmall_attr_rel'.'.cit_id','inner');	
                 }
                 
 
@@ -1425,9 +1445,11 @@ class Search extends CB_Controller
 		        			// $this->db->where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
 		        		 //    $this->db->join('cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
 
-		        		    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') ) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
-			        	if(empty($sattr))
-					        $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
+		        		    $this->db->join('(select cit_id,ckd_id from cb_cmall_kind_rel where ckd_id in ('.implode(",",$skind).') group by cit_id) AS cb_cmall_kind_rel','cmall_item.cit_id = cmall_kind_rel.cit_id','inner');
+
+		        		if(empty($_join))
+				        	$this->db->join('(select cit_id,cat_id from cb_cmall_attr_rel group by cit_id) as cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');	
+			        	
 		        		
 						$this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
 			            

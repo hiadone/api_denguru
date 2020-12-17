@@ -308,17 +308,30 @@ class Denguruapi extends CI_Controller
         $cachename = 'latest/get_popular_brd_attr' . $brd_id . '_' . $limit;
         $data = array();
 
-        if ( ! $data = $this->CI->cache->get($cachename)) {
+        // if ( ! $data = $this->CI->cache->get($cachename)) {
 
             $this->CI->load->model( array('Cmall_item_model'));
             $result = $this->CI->Cmall_item_model->get_popular_attr($brd_id, $limit);
+
+            $flag=true;
+            foreach($result as $val){
+
+                if(element('cat_id',$val) == '4' || element('cat_id',$val) == '5' || element('cat_id',$val) == '6'){
+                    $flag= false;
+                    break;
+                }
+            }
+            
+            if($flag){
+                 array_unshift($result,array('cnt' => 9999, 'cat_value' => '전견종' , 'cat_id' => '2'));
+            }
 
             $data['result'] = $result;
             $data['cached'] = '1';
             check_cache_dir('latest');
             $this->CI->cache->save($cachename, $data, 86400);
 
-        }
+        // }
         return isset($data['result']) ? $data['result'] : array();
     }
 
