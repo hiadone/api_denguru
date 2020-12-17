@@ -2448,7 +2448,33 @@ class Cmall extends CB_Controller
         $result['cor_total_money'] = element('cor_total_money',$order);
         $result['cor_content'] = element('cor_content',$order);
         $result['cor_pay_type'] = element('cor_pay_type',$order);
-        $result['cor_order_history'] = element('cor_order_history',$order);
+
+        $result['cor_order_history'] = array();
+        if(element('cor_order_history',$order)){
+            $cor_order_history = explode("\n",element('cor_order_history',$order));
+            
+            
+            print_r2($cor_order_history);
+            foreach($cor_order_history as  $val){
+                
+                $new_names ='';
+                $new_names = trim(preg_replace('/[^\x{1100}-\x{11FF}\x{3130}-\x{318F}\x{AC00}-\x{D7AF}a-zA-Z\s]/u', "", $val));
+                echo $val;
+                echo "<br>";
+
+                $result['cor_order_history'][$new_names] = $val;
+            }
+            
+
+            // print_r2($result['cor_order_history']);
+            exit;
+            
+
+
+
+            
+        }
+
         $result['cor_order_delete_url'] = base_url('cmall/orderresult/'.element('cor_id',$order));
 
 
