@@ -2287,7 +2287,7 @@ class Membermodify extends CB_Controller
 	public function _mem_smsmap_check($str)
 	{
 
-		
+		$this->load->library('form_validation');
 
 		$mem_phone = $this->form_validation->valid_mobile($str);
 		
@@ -2295,23 +2295,15 @@ class Membermodify extends CB_Controller
 			return true;
 		}
 
-	   $this->load->library('form_validation');
+	   
 
        $cfc_num = $this->input->post('cfc_num');
 
        
        
-       if(empty($cfc_num)) {
-           
-			$this->form_validation->set_message(
-				'_mem_smsmap_check',
-				'인증 번호를 입력해 주세요.'
-			);
-			return false;
-       }
        
-       $this->load->library('form_validation');
-
+       
+       
        
        
        if(empty($mem_phone)) {
@@ -2321,6 +2313,15 @@ class Membermodify extends CB_Controller
 				'잘못된 핸드폰 번호입니다.'
 			);
            return false;
+       }
+
+       if(empty($cfc_num)) {
+           
+			$this->form_validation->set_message(
+				'_mem_smsmap_check',
+				'인증 번호를 입력해 주세요.'
+			);
+			return false;
        }
 
        $this->load->model( 'Sms_send_history_model');
