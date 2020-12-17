@@ -141,6 +141,20 @@ class Search extends CB_Controller
 		// $this->Board_model->allow_search_field = array('cit_id', 'cit_name', 'cta_tag', 'cca_value','cbr_value_kr','cbr_value_en'); // 검색이 가능한 필드
 		// $this->Board_model->search_field_equal = array('cit_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
 		$category_child_id=array();
+
+		foreach($all_category as $key => $val){
+
+			if($key === 0 ) continue;
+			foreach($val as $key_ => $val_){
+				
+				if(in_array(element('cca_id',$val_),$scategory)) {
+					$b = array_search($key,$scategory); 
+					if($b!==FALSE) unset($scategory[$b]); 
+				}
+				
+			}
+		}
+		
 		if($scategory && is_array($scategory)){
 			
 			foreach($scategory as $val){				
@@ -149,6 +163,7 @@ class Search extends CB_Controller
 				$category_child = $this->Cmall_category_model->get_category_child($val);	
 
 				if(!empty($category_child)){
+
 					foreach($category_child as $cval){
 
 						array_push($category_child_id,element('cca_id',$cval));
@@ -158,6 +173,7 @@ class Search extends CB_Controller
 				
 			}
 		}
+
 
 		$where = array(
 				'brd_search' => 1,
