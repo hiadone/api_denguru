@@ -116,6 +116,7 @@ class Membermodify extends CB_Controller
 			if(validation_errors()){
             	$view['http_status_codes'] = 400;
             	$view['msg'] = validation_errors();
+            	log_message('error', 'msg:' .validation_errors() .' pointer:'.current_url());
 			}
             else 
             	$view['http_status_codes'] = 200;
@@ -629,7 +630,7 @@ class Membermodify extends CB_Controller
 			$view['msg'] = $file_error . $file_error2.validation_errors();
             
             
-
+			log_message('error', 'msg:'.$file_error . $file_error2.validation_errors() .' pointer:'.current_url());
 			
 			$k = 0;
 			if ($form && is_array($form)) {
@@ -1348,7 +1349,7 @@ class Membermodify extends CB_Controller
 			// $password_description .= '합니다';
 
 			$view['msg'] = validation_errors();
-
+			log_message('error', 'msg:'. validation_errors() .' pointer:'.current_url());
 			return $this->response(array('msg' => $view['msg']), 400);
 
 		} else {
@@ -1783,7 +1784,7 @@ class Membermodify extends CB_Controller
             
             
 
-			
+			log_message('error', 'msg:'.validation_errors() .' pointer:'.current_url());
 			
 
             $view['http_status_codes'] = 400;

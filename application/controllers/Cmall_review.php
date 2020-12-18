@@ -1004,7 +1004,7 @@ class Cmall_review extends CB_Controller
                         $uploadconfig = array();
                         $uploadconfig['upload_path'] = $upload_path;
                         $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|acc|flv|f4a|f4v|mov|mp3|mp4|m4a|m4v|oga|ogg|rss|webm';
-                        $uploadconfig['max_size'] = 100 * 1024;
+                        $uploadconfig['max_size'] = 200 * 1024;
                         $uploadconfig['encrypt_name'] = true;
 
                         $this->upload->initialize($uploadconfig);
@@ -1072,7 +1072,7 @@ class Cmall_review extends CB_Controller
                         $uploadconfig = array();
                         $uploadconfig['upload_path'] = $upload_path;
                         $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif|acc|flv|f4a|f4v|mov|mp3|mp4|m4a|m4v|oga|ogg|rss|webm';
-                        $uploadconfig['max_size'] = 100 * 1024;
+                        $uploadconfig['max_size'] = 200 * 1024;
                         $uploadconfig['encrypt_name'] = true;
                         $this->upload->initialize($uploadconfig);
                         $_FILES['userfile']['name'] = $_FILES['cre_file_update']['name'][$i];
@@ -1129,7 +1129,7 @@ class Cmall_review extends CB_Controller
 
             if(validation_errors().$file_error){
                 $view['msg'] = validation_errors().$file_error;
-
+                log_message('error', 'msg:'.$file_error .validation_errors() .' pointer:'.current_url());
                 // $view['view']['wishlist_url'] = base_url('cmall/wishlist');
                 // $view['view']['itemlists_url'] = base_url('cmall/itemlists');
                 // $view['view']['data']['review'] = $getdata;

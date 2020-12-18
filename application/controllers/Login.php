@@ -98,8 +98,10 @@ class Login extends CB_Controller
 
 			$view['msg'] = validation_errors();
 
-			if(validation_errors())
+			if(validation_errors()){
+				log_message('error', 'msg:'. validation_errors() .' pointer:'.current_url());
             	$view['http_status_codes'] = 400;
+			}
            	else
            		$view['http_status_codes'] = 200;
             

@@ -633,7 +633,7 @@ class Board_write extends CB_Controller
 
 			if ($file_error.validation_errors()) {
 				$view['view']['msg'] = $file_error.validation_errors();
-
+				log_message('error', 'msg:'.$file_error .validation_errors() .' pointer:'.current_url());
 				return $this->response(array('msg' =>$view['view']['msg']),400);
 			} else {
 				return $this->response($view['view'],200);

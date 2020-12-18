@@ -2176,7 +2176,7 @@ class Mypage extends CB_Controller
 	            $uploadconfig = array();
 	            $uploadconfig['upload_path'] = $upload_path;
 	            $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif';
-	            $uploadconfig['max_size'] = '10000';
+	            $uploadconfig['max_size'] = 100 * 1024;
 	            // $uploadconfig['max_width'] = '2000';
 	            // $uploadconfig['max_height'] = '1000';
 	            $uploadconfig['encrypt_name'] = true;
@@ -2228,7 +2228,7 @@ class Mypage extends CB_Controller
 	            $uploadconfig = array();
 	            $uploadconfig['upload_path'] = $upload_path;
 	            $uploadconfig['allowed_types'] = 'jpg|jpeg|png|gif';
-	            $uploadconfig['max_size'] = '10000';
+	            $uploadconfig['max_size'] = 100 * 1024;
 	            // $uploadconfig['max_width'] = '2000';
 	            // $uploadconfig['max_height'] = '1000';
 	            $uploadconfig['encrypt_name'] = true;
@@ -2279,7 +2279,14 @@ class Mypage extends CB_Controller
 
             // $view['view']['primary_key'] = $primary_key;
 
-            $view['http_status_codes'] = parent::HTTP_OK;
+            if ($file_error . $file_error2.validation_errors()) {
+            	log_message('error', 'msg:'.$file_error . $file_error2.validation_errors() .' pointer:'.current_url());
+
+            	$view['http_status_codes'] = 400;
+            } else {
+            	$view['http_status_codes'] = parent::HTTP_OK;
+            }
+            
 
             
             return $view;
