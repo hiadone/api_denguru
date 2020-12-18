@@ -106,7 +106,7 @@ class Cmall_review extends CB_Controller
          */
         $where = array();
         $where['cre_status'] = 1;
-        if($cit_id) $where['cit_id'] = $cit_id;
+        if($cit_id) $where['cb_cmall_review.cit_id'] = $cit_id;
 
         $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
             ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
