@@ -760,7 +760,7 @@ class Cmall extends CB_Controller
 
         $mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
         $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
-        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type3';
+        $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
 
         $sort=$sort.',';
         $view = array();
@@ -3262,7 +3262,9 @@ class Cmall extends CB_Controller
                 // $result['list'][$key]['brd_tag'] = $this->denguruapi->get_popular_brd_tags(element('brd_id', $val));
                 $result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
                 
-                $result['list'][$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
+
+                
+                $result['list'][$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'cit_status' => 1,'cit_is_del' => 0,'cit_is_soldout' => 0,'brd_id' => element('brd_id', $val)));
                 $result['list'][$key]['delete_url'] = site_url('cmallact/storewishlist/' . element('csi_id', $val) . '?' . $param->output());
                 // $result['list'][$key]['num'] = $list_num--;
             }
