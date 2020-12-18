@@ -266,66 +266,7 @@ class Managelayout extends CI_Controller
 		
 
 
-		$start_date = cdate("Y-m-d", strtotime("-1 month", time()));
-		$end_date = cdate('Y-m-d');
-
-		$CI->load->model('Search_keyword_model');
-		$result = $CI->Search_keyword_model->get_rank($start_date, $end_date);
-
-		$sum_count = 0;
-		$arr = array();
-		$max = 0;
-
-		if ($result && is_array($result)) {
-			foreach ($result as $key => $value) {
-				$s = element('sek_keyword', $value);
-				if ( ! isset($arr[$s])) {
-					$arr[$s] = 0;
-				}
-				$arr[$s]++;
-
-				if ($arr[$s] > $max) {
-					$max = $arr[$s];
-				}
-				$sum_count++;
-
-			}
-		}
-
-		$view['search']['list'] = array();
-		$i = 0;
-		$k = 0;
-		$save_count = -1;
-		$tot_count = 0;
-
-		if (count($arr)) {
-			arsort($arr);
-			foreach ($arr as $key => $value) {
-				$count = (int) $arr[$key];
-				$view['search']['list'][$k]['count'] = $count;
-				$i++;
-				if ($save_count !== $count) {
-					$no = $i;
-					$save_count = $count;
-				}
-				$view['search']['list'][$k]['no'] = $no;
-
-				$view['search']['list'][$k]['key'] = $key;
-				$view['search']['list'][$k]['search_url'] = base_url('search/show_list?skeyword='.$key);
-				
-				
-
-				
-				$k++;
-			}
-
-			// $view['view']['max_value'] = $max;
-			// $view['view']['sum_count'] = $sum_count;
-		}
-		$view['search']['list'] = array_slice($view['search']['list'],0,20,true);
-
-
-		$data['search_keyword_rank'] = $view['search'];
+		
 
 		if ($CI->input->is_ajax_request() === false) {
 
