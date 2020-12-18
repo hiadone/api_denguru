@@ -763,7 +763,7 @@ class Denguruapi extends CI_Controller
         $pet = element(0,$pet_arr);
         
         $pet_info = $this->get_pet_info(element('mem_id', $member),element('pet_id', $pet));
-
+        
         $data['mem_id'] = element('mem_id',$member);
         $data['mem_userid'] = element('mem_userid',$member);
         $data['mem_email'] = element('mem_email',$member);
@@ -924,6 +924,7 @@ class Denguruapi extends CI_Controller
         
 
         $data['pet_id'] = element('pet_id',$pet);
+        $data['pet_main'] = element('pet_main',$pet);
         $data['pet_name'] = element('pet_name',$pet);
         $data['pet_birthday'] = element('pet_birthday',$pet);
         $data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
