@@ -78,7 +78,7 @@ class Denguruapi extends CI_Controller
             return false;
         }
 
-        $cmall_item['cit_image'] = cdn_url('cmallitem',element('cit_file_1',$cmall_item)).'?w=200';
+        $cmall_item['cit_image'] = cdn_url('cmallitem',element('cit_file_1',$cmall_item));
         $cmall_item['cit_outlink_url'] = base_url('postact/cit_link/'.$cit_id);
         $cmall_item['cit_inlink_url'] = cmall_item_url($cit_id);
         if(empty(element('cit_price_sale',$cmall_item)))
@@ -763,7 +763,7 @@ class Denguruapi extends CI_Controller
         $pet = element(0,$pet_arr);
         
         $pet_info = $this->get_pet_info(element('mem_id', $member),element('pet_id', $pet));
-
+        
         $data['mem_id'] = element('mem_id',$member);
         $data['mem_userid'] = element('mem_userid',$member);
         $data['mem_email'] = element('mem_email',$member);
