@@ -1191,7 +1191,7 @@ class Cmall_review extends CB_Controller
             $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
 
 
-
+            $this->Cmall_review_model->reconnect();
             if ($cre_id) {
 
                 // 이벤트가 존재하면 실행합니다
