@@ -93,17 +93,17 @@ class Mypage extends CB_Controller
 					$param =& $this->querystring;
 					$brd_url_key_ = parse_url(trim(element('brd_url_key',$board_crawl)));
 
-
+					$brd_info = $this->denguruapi->get_brd_info(element('brd_id', $oval));
 
 					if(element('brd_order_key',$board_crawl)==='sixshop' || element('brd_order_key',$board_crawl)==='parse'){
-						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval),'brd_name' =>element('brd_name',$brd_info));
 					} else {
-						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$oval),element('query',$brd_url_key_)),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$oval),element('query',$brd_url_key_)),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval),'brd_name' =>element('brd_name',$brd_info));
 					}
 
 					if(element('cor_pay_type',$oval) =='naverpay'){
 						$brd_url_key_ = parse_url(trim('https://m.pay.naver.com/o/orderStatus'));
-						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval));
+						$data['orderstatus'][$okey] = array('brd_orderstatus_url' => element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$oval),'cor_id' =>element('cor_id',$oval),'brd_id' =>element('brd_id',$oval),'brd_name' =>element('brd_name',$brd_info));
 					}
 					
 				}
@@ -2334,7 +2334,8 @@ class Mypage extends CB_Controller
 
 	        if ($this->input->post_put('pet_photo_del')) {
 	            $updatedata['pet_photo'] = '';
-	        } elseif ($updatephoto) {
+	        } 
+	        if ($updatephoto) {
 	            $updatedata['pet_photo'] = $updatephoto;
 	        }
 	        if (element('pet_photo', $getdata) && ($this->input->post_put('pet_photo_del') OR $updatephoto)) {
