@@ -3372,13 +3372,13 @@ class Cmall extends CB_Controller
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
          */
         $param =& $this->querystring;
-        // $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
+        $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
         
         $mem_id = (int) $this->member->item('mem_id');
 
 
-        // $per_page = $this->cbconfig->item('list_count') ? (int) $this->cbconfig->item('list_count') : 20;
-        // $offset = ($page - 1) * $per_page;
+        $per_page = get_listnum();        
+        $offset = ($page - 1) * $per_page;
 
         $all_kind = $this->Cmall_kind_model->get_all_kind();
         $all_attr = $this->Cmall_attr_model->get_all_attr();
@@ -3392,7 +3392,7 @@ class Cmall extends CB_Controller
 
         
 
-        
+        $this->Board_model->_select = 'board.*';
         if($sattr || $skind){
             $cmallwhere = 'where
                 cit_status = 1
@@ -3400,14 +3400,14 @@ class Cmall extends CB_Controller
                 AND cit_is_soldout = 0
             ';
             $_join = '';
-            $this->Board_model->_select = 'board.*';
+            
 
             $_join = "
                 select cit_id,brd_id from cb_cmall_item ".$cmallwhere;
 
             // $set_join[] = array("
             //  (select cit_id,brd_id from cb_cmall_item ".$cmallwhere.") as cb_cmall_item",'cmall_item.brd_id = board.brd_id','inner');
-        }
+        } 
         if($sattr && is_array($sattr)){
                         
             $sattr_id = array();
@@ -3478,18 +3478,16 @@ class Cmall extends CB_Controller
             // $this->Board_model->set_group_by('cmall_item.cit_id');
         }
         if($sattr || $skind){           
-            $this->Board_model->group_by('brd_id');
-            $result = $this->Board_model
-                ->get_rank_list('','', $where, '', '', 'brd_order asc');
-        } else 
-            $result['list'] = $this->Board_model->get_board_list($where);
-
+            $this->Board_model->group_by('brd_id');            
+        }
+        $result = $this->Board_model
+                ->get_rank_list($per_page, $offset, $where, '', '', 'brd_order asc');
         // echo count($result['list']);
         // $list_num = $result['total_rows'] - ($page - 1) * $per_page;
         if (element('list', $result)) {         
             foreach (element('list', $result) as $key => $val) {                
                 $result['list'][$key] = $this->denguruapi->convert_brd_info($val);
-                $result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
+                // $result['list'][$key]['brd_attr'] = $this->denguruapi->get_popular_brd_attr(element('brd_id', $val),8);
 
                 
                 // $result[$key]['cit_type3_count'] = $this->Cmall_item_model->count_by(array('cit_type3' => 1,'brd_id' => element('brd_id', $val)));
@@ -3501,6 +3499,15 @@ class Cmall extends CB_Controller
 
 
         $view['view']['data']['rank'] = $result;
+
+        $config['base_url'] = site_url('cmall/storeranklist') . '?' . $param->replace('page');
+        $config['total_rows'] = $result['total_rows'];
+        $config['per_page'] = $per_page;
+        $this->pagination->initialize($config);
+        // $view['view']['paging'] = $this->pagination->create_links();
+        $view['view']['data']['rank']['next_link'] = $this->pagination->get_next_link();
+        $view['view']['data']['rank']['page'] = $page;
+
 
         $result = $this->Theme_model->get_theme();
         $result_= array();

@@ -787,70 +787,74 @@ class Board_model extends CB_Model
 		$qry = $this->db->get();
 		$result['list'] = $qry->result_array();
 
-		// $this->db->select('count(*) rownum');
-		// $this->db->from('board');
-		// // $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
-
-		// if ($this->_join) {
-
-		// 	foreach($this->_join as $jval){
-		// 		$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
-		// 	}
-		// }
-		// // $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
-		// // $this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');
-		// // $this->db->join('crawl_tag', 'crawl_tag.brd_id = board.brd_id', 'inner');
-		// // $this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
-		// // $this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');
-
-		// if ($where) {
-		// 	$this->db->where($where);
-		// }
-		// if ($search_where) {
-		// 	$this->db->where($search_where);
-		// }
-
-		// if ($this->set_where) {			
-		// 	foreach ($this->set_where as $skey => $sval) {
-		// 		$this->db->where($skey, $sval,false);				
-		// 	}
-		// }
-		// if ($this->where_in) {
-		// 	foreach($this->where_in as $wval){
-		// 		$this->db->where_in(key($wval),$wval[key($wval)]);	
-		// 	}
-			
-		// }
-		// // if ($category_id) {
-		// // 	$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
-		// // 	$this->db->where('cca_id', $category_id);
-		// // }
+		$this->db->select('count(*) rownum');
+		$this->db->from('board');
+		// $this->db->join('cmall_item', 'cmall_item.brd_id = board.brd_id', 'inner');
 		
-		// if ($like) {
-		// 	$this->db->like($like);
-		// }
-		// if ($search_like) {
-		// 	foreach ($search_like as $item) {
-		// 		foreach ($item as $skey => $sval) {
-		// 			$this->db->like($skey, $sval);
-		// 		}
-		// 	}
-		// }
-		// if ($search_or_like) {
-		// 	$this->db->group_start();
-		// 	foreach ($search_or_like as $item) {
-		// 		foreach ($item as $skey => $sval) {
-		// 			$this->db->or_like($skey, $sval);
-		// 		}
-		// 	}
-		// 	$this->db->group_end();
-		// }	
-
-		// $this->db->group_by($this->_group_by);
+		if ($this->_join) {
 			
-		// $qry = $this->db->get();
-		// $rows = $qry->row_array();
-		// $result['total_rows'] = $rows['rownum'];
+			foreach($this->_join as $jval){
+				$this->db->join(element(0,$jval),element(1,$jval),element(2,$jval));	
+			}
+		}
+
+		if ($where) {
+			$this->db->where($where);
+		}
+		if ($search_where) {
+			$this->db->where($search_where);
+		}
+
+		if ($this->set_where) {			
+			foreach ($this->set_where as $skey => $sval) {
+				$this->db->where($skey, $sval,false);				
+			}
+		}
+
+		if ($this->where_in) {
+			foreach($this->where_in as $wval){
+				$this->db->where_in(key($wval),$wval[key($wval)]);	
+			}
+			
+		}
+		// $category_id = (int) $category_id;
+		// if ($category_id) {
+		// 	$this->db->join('cmall_category_rel', 'cmall_item.cit_id = cmall_category_rel.cit_id', 'inner');
+		// 	$this->db->where('cca_id', $category_id);
+		// }
+
+		if ($like) {
+			$this->db->like($like);
+		}
+		if ($search_like) {
+			foreach ($search_like as $item) {
+				foreach ($item as $skey => $sval) {
+					$this->db->like($skey, $sval);
+				}
+			}
+		}
+		if ($search_or_like) {
+			$this->db->group_start();
+			foreach ($search_or_like as $item) {
+				foreach ($item as $skey => $sval) {
+					$this->db->or_like($skey, $sval);
+				}
+			}
+			$this->db->group_end();
+		}		
+
+		$this->db->group_by($this->_group_by);
+			
+		$qry = $this->db->get();
+		$rows = $qry->row_array();
+
+		if($this->_group_by){			
+			$result['total_rows'] = count($qry->result_array());
+		} else {
+			$rows = $qry->row_array();
+			$result['total_rows'] = $rows['rownum'];
+		}
+		
 
 		return $result;
 	}
