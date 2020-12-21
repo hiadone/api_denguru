@@ -402,7 +402,7 @@ class Denguruapi extends CI_Controller
             return false;
         }
         $this->CI->load->model('Board_crawl_model');
-        $result = $this->CI->Board_crawl_model->get_one('','brd_id,brd_url,brd_order_url,brd_register_url,brd_orderstatus_url,brd_phone,brd_order_key,brd_url_key,brd_register_id,brd_register_name,brd_register_zipcode,brd_register_addr1,brd_register_addr2,brd_register_hidden,brd_register_phone,brd_register_handphone,brd_register_email,brd_register_birthday,brd_register_quest,brd_register_answer,brd_nomember_order_url',array('brd_id' => $brd_id));
+        $result = $this->CI->Board_crawl_model->get_one('','brd_id,brd_url,brd_order_url,brd_register_url,brd_orderstatus_url,brd_phone,brd_order_key,brd_url_key,brd_register_id,brd_register_name,brd_register_zipcode,brd_register_addr1,brd_register_addr2,brd_register_hidden,brd_register_phone,brd_register_handphone,brd_register_email,brd_register_birthday,brd_register_quest,brd_register_answer,brd_nomember_order_url,brd_site_type',array('brd_id' => $brd_id));
 
 
 

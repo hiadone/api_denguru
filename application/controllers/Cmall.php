@@ -2952,6 +2952,8 @@ class Cmall extends CB_Controller
                 $result_['list'][$key]['brd_info']  = $this->denguruapi->get_brd_info(element('brd_id', $val));
 
                 $orderdetail = $this->Cmall_order_detail_model->get_by_item(element('cor_id',$val));
+                $board_crawl = $this->denguruapi->get_all_crawl(element('brd_id',$val));   
+
                 if ($orderdetail) {
                     foreach ($orderdetail as $value) {
                         $result_['list'][$key]['item'][] 
@@ -2971,7 +2973,8 @@ class Cmall extends CB_Controller
 
                 
                 
-                $result_['list'][$key]['orderresult_url'] = base_url('cmall/orderresult/'.element('cor_id',$val));                
+                $result_['list'][$key]['orderresult_url'] = base_url('cmall/orderresult/'.element('cor_id',$val));
+                $result_['list'][$key]['brd_site_type'] = element('brd_site_type',$board_crawl) ;
                 
                 // $result['list'][$key]['num'] = $list_num--;
             }
