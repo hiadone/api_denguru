@@ -2937,7 +2937,7 @@ class Cmall extends CB_Controller
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
         $where = array();
-        // $where['mem_id'] = $this->member->item('mem_id');
+        $where['mem_id'] = $this->member->item('mem_id');
         $where['is_del'] = 0;
 
         $result_= array();
