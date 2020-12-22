@@ -2482,6 +2482,26 @@ class Cmall extends CB_Controller
         $result['cor_order_delete_url'] = base_url('cmall/orderresult/'.element('cor_id',$order));
 
 
+        $result['brd_site_type'] = element('brd_site_type',$board_crawl) ;
+        $result['brd_nomember_order_url'] = element('brd_nomember_order_url',$board_crawl) ;
+
+        $order_crawl = $this->Cmall_order_model->get_one(element('cor_id',$order), 'cor_id,brd_id,cor_key,cor_pay_type');
+
+        $param =& $this->querystring;
+        $brd_url_key_ = parse_url(trim(element('brd_url_key',$board_crawl)));
+
+        
+
+        if(element('brd_order_key',$board_crawl)==='sixshop' || element('brd_order_key',$board_crawl)==='parse'){
+            $result['brd_orderstatus_url'] = element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$order_crawl);
+        } else {
+            $result['brd_orderstatus_url'] = element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).'?'.$param->replace(element('brd_order_key',$board_crawl),element('cor_key',$order_crawl),element('query',$brd_url_key_));
+        }
+
+        if(element('cor_pay_type',$order_crawl) =='naverpay'){
+            $brd_url_key_ = parse_url(trim('https://m.pay.naver.com/o/orderStatus'));
+            $result['brd_orderstatus_url'] = element('scheme',$brd_url_key_)."://".element('host',$brd_url_key_).element('path',$brd_url_key_).element('cor_key',$order_crawl);
+        }
         
         $result_=array();
         $orderdetail = $this->Cmall_order_detail_model->get_by_item(element('cor_id',$order));
