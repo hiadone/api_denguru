@@ -181,7 +181,7 @@ if ( ! function_exists('cdn_url')) {
 
 
 			if(empty($type) || empty($uri))
-				return thumb_url();
+				return null;
 			else 
 				return get_instance()->config->cdn_url($type."/".$uri, $protocol);
 		
