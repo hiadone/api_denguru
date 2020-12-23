@@ -248,7 +248,10 @@ class Notice extends CB_Controller
                 }
 
                 // if(element('is_image',$getdata)) 
-                $getdata['noti_file_url'] = cdn_url('notice',element('noti_file',$getdata));       
+                // 
+                if (element('is_image', $getdata)) {
+                    $getdata['noti_file_url'] = cdn_url('notice',element('noti_file',$getdata));       
+                }
                 $view['view']['data'] = $getdata;
             }
 

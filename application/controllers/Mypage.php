@@ -1695,8 +1695,8 @@ class Mypage extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key]['post_url'] = base_url('postact/event_link/'.element('egr_id', $val));
-
+                
+				$result['list'][$key]['post_url'] = base_url('event/post/'. element('egr_id', $val));
                 $result['list'][$key]['display_datetime'] = display_datetime(
                     element('egr_datetime', $val),'full'
                 );
@@ -1708,6 +1708,9 @@ class Mypage extends CB_Controller
                 
                 $result['list'][$key]['egr_image_url'] = '';
                 
+
+                $result['list'][$key]['egr_status'] = 2; 
+
                 if (element('egr_image', $val)) {
                     
                     $result['list'][$key]['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $val));
@@ -1732,7 +1735,7 @@ class Mypage extends CB_Controller
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }
-        $view['view'] = $result;
+        // $view['view'] = $result;
         
 
         /**
@@ -1893,7 +1896,8 @@ class Mypage extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key]['post_url'] = base_url('postact/event_link/'.element('egr_id', $val));
+                
+                $result['list'][$key]['post_url'] = base_url('event/post/'. element('egr_id', $val));
 
                 $result['list'][$key]['display_datetime'] = display_datetime(
                     element('egr_datetime', $val),'full'
@@ -1910,7 +1914,9 @@ class Mypage extends CB_Controller
                     
                     $result['list'][$key]['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $val));
                     
-                } 
+                }
+
+                $result['list'][$key]['egr_status'] = 2; 
                 // else {
                 //     $thumb_url = get_post_image_url(element('egr_content', $val));
                 //     $result['list'][$key]['egr_image_url'] = $thumb_url
@@ -1930,7 +1936,7 @@ class Mypage extends CB_Controller
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }
-        $view['view'] = $result;
+        // $view['view'] = $result;
         
 
         /**
