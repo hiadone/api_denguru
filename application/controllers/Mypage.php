@@ -1640,7 +1640,7 @@ class Mypage extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$this->load->model(array('Event_model'));
+		$this->load->model(array('Event_model','Event_group_model','Event_rel_model'));
 
 		
         
@@ -1652,7 +1652,7 @@ class Mypage extends CB_Controller
          */
         $param =& $this->querystring;
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
-        $findex = '(CASE WHEN eve_order=0 THEN -999 ELSE eve_order END),eve_id';
+        $findex = '(0.1/egr_order),egr_id';
         $forder = 'desc';
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
@@ -1669,58 +1669,65 @@ class Mypage extends CB_Controller
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
-        $where = array();
+        
         // $where['cre_status'] = 1;
         // if($cit_id) $where['cit_id'] = $cit_id;
 
         $where = array();
         
-        $where['eve_activated'] = '1';
-
-        $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
-            ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
-            : $this->cbconfig->item('cmall_product_review_thumb_width');
+        $where['egr_activated'] = '1';
         
+        $field = array(
+            'event_group' => array('egr_id','egr_start_date','egr_end_date','egr_title','egr_datetime','egr_image','egr_content','egr_type'),
+            
+        );
 
-        $result = $this->Event_model
+        $select = get_selected($field);
+
+        // $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+        //     ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+        //     : $this->cbconfig->item('cmall_product_review_thumb_width');
+        $this->Event_group_model->_select = $select;
+
+        $result = $this->Event_group_model
             ->get_admin_list($per_page, $offset, $where, '', $findex, $forder, $sfield, $skeyword);
         $list_num = $result['total_rows'];
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key]['post_url'] = base_url('event/post/'.element('eve_id', $val));
+                $result['list'][$key]['post_url'] = base_url('postact/event_link/'.element('egr_id', $val));
 
                 $result['list'][$key]['display_datetime'] = display_datetime(
-                    element('eve_datetime', $val),'full'
+                    element('egr_datetime', $val),'full'
                 );
 
-                $result['list'][$key]['thumb_url'] = '';
-                $result['list'][$key]['origin_image_url'] = '';
-            
-                
-                if (element('eve_image', $val)) {
+                $result['list'][$key]['display_content'] = display_html_content(
+                    element('egr_content', $val),
                     
-                    $result['list'][$key]['thumb_url'] = thumb_url('event', element('eve_image', $val));
-                    $result['list'][$key]['origin_image_url'] = thumb_url('event', element('eve_image', $val));
-                } else {
-                    $thumb_url = get_post_image_url(element('eve_content', $val));
-                    $result['list'][$key]['thumb_url'] = $thumb_url
-                        ? $thumb_url
-                        : thumb_url('', '');
-
-                    $result['list'][$key]['origin_image_url'] = $thumb_url;
-                }
+                );
+                
+                $result['list'][$key]['egr_image_url'] = '';
+                
+                if (element('egr_image', $val)) {
+                    
+                    $result['list'][$key]['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $val));
+                    
+                } 
+                // else {
+                //     $thumb_url = get_post_image_url(element('egr_content', $val));
+                //     $result['list'][$key]['egr_image_url'] = $thumb_url
+                //         ? $thumb_url
+                //         : thumb_url('', '');
+                // }
               
 
-                if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
-                    $result['list'][$key]['eve_start_date'] = display_datetime(
-                                        element('eve_datetime', $val),'full'
-                                        );
+                if (empty($val['egr_start_date']) OR $val['egr_start_date'] === '0000-00-00') {
+                    $result['list'][$key]['egr_start_date'] = '0000-00-00';
 
 
                 }
-                if (empty($val['eve_end_date']) OR $val['eve_end_date'] === '0000-00-00') {
-                    $result['list'][$key]['eve_end_date'] = '지속';
+                if (empty($val['egr_end_date']) OR $val['egr_end_date'] === '0000-00-00') {
+                    $result['list'][$key]['egr_end_date'] = '0000-00-00';
                 }
                 // $result['list'][$key]['num'] = $list_num--;
             }
@@ -1831,7 +1838,7 @@ class Mypage extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$this->load->model(array('Event_model'));
+		$this->load->model(array('Event_model','Event_group_model','Event_rel_model'));
 
 		
         
@@ -1843,7 +1850,7 @@ class Mypage extends CB_Controller
          */
         $param =& $this->querystring;
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
-        $findex = '(CASE WHEN eve_order=0 THEN -999 ELSE eve_order END),eve_id';
+        $findex = '(0.1/egr_order),egr_id';
         $forder = 'desc';
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
@@ -1860,60 +1867,67 @@ class Mypage extends CB_Controller
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
-        $where = array();
+        
         // $where['cre_status'] = 1;
         // if($cit_id) $where['cit_id'] = $cit_id;
 
         $where = array();
         
-        $where['eve_activated'] = '1';
-
-        $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
-            ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
-            : $this->cbconfig->item('cmall_product_review_thumb_width');
+        $where['egr_activated'] = '1';
         
+        $field = array(
+            'event_group' => array('egr_id','egr_start_date','egr_end_date','egr_title','egr_datetime','egr_image','egr_content','egr_type'),
+            
+        );
 
-        $result = $this->Event_model
+        $select = get_selected($field);
+
+        // $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
+        //     ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
+        //     : $this->cbconfig->item('cmall_product_review_thumb_width');
+        $this->Event_group_model->_select = $select;
+
+        $result = $this->Event_group_model
             ->get_admin_list($per_page, $offset, $where, '', $findex, $forder, $sfield, $skeyword);
         $list_num = $result['total_rows'];
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key]['post_url'] = base_url('event/post/'.element('eve_id', $val));
+                $result['list'][$key]['post_url'] = base_url('postact/event_link/'.element('egr_id', $val));
 
                 $result['list'][$key]['display_datetime'] = display_datetime(
-                    element('eve_datetime', $val),'full'
+                    element('egr_datetime', $val),'full'
                 );
 
-                $result['list'][$key]['thumb_url'] = '';
-                $result['list'][$key]['origin_image_url'] = '';
-            
-                
-                if (element('eve_image', $val)) {
+                $result['list'][$key]['display_content'] = display_html_content(
+                    element('egr_content', $val),
                     
-                    $result['list'][$key]['thumb_url'] = thumb_url('event', element('eve_image', $val));
-                    $result['list'][$key]['origin_image_url'] = thumb_url('event', element('eve_image', $val));
-                } else {
-                    $thumb_url = get_post_image_url(element('eve_content', $val));
-                    $result['list'][$key]['thumb_url'] = $thumb_url
-                        ? $thumb_url
-                        : thumb_url('', '');
-
-                    $result['list'][$key]['origin_image_url'] = $thumb_url;
-                }
+                );
+                
+                $result['list'][$key]['egr_image_url'] = '';
+                
+                if (element('egr_image', $val)) {
+                    
+                    $result['list'][$key]['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $val));
+                    
+                } 
+                // else {
+                //     $thumb_url = get_post_image_url(element('egr_content', $val));
+                //     $result['list'][$key]['egr_image_url'] = $thumb_url
+                //         ? $thumb_url
+                //         : thumb_url('', '');
+                // }
               
 
-                if (empty($val['eve_start_date']) OR $val['eve_start_date'] === '0000-00-00') {
-                    $result['list'][$key]['eve_start_date'] = display_datetime(
-                                        element('eve_datetime', $val),'full'
-                                        );
+                if (empty($val['egr_start_date']) OR $val['egr_start_date'] === '0000-00-00') {
+                    $result['list'][$key]['egr_start_date'] = '0000-00-00';
 
 
                 }
-                if (empty($val['eve_end_date']) OR $val['eve_end_date'] === '0000-00-00') {
-                    $result['list'][$key]['eve_end_date'] = '지속';
+                if (empty($val['egr_end_date']) OR $val['egr_end_date'] === '0000-00-00') {
+                    $result['list'][$key]['egr_end_date'] = '0000-00-00';
                 }
-                $result['list'][$key]['num'] = $list_num--;
+                // $result['list'][$key]['num'] = $list_num--;
             }
         }
         $view['view'] = $result;
