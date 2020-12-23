@@ -151,8 +151,11 @@ class Cmall_item_model extends CB_Model
         // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
         if($cit_id)
             $this->db->where('crawl_link_click_log.cit_id', $cit_id);
-        // $this->db->where('cit_status', 1);
-        // $this->db->where('cit_is_del', 0);
+
+        $this->db->where('pat_parent >', 0);
+        $this->db->where('pag_parent >', 0);
+        $this->db->where('cat_parent >', 0);
+        
         // $this->db->group_by('ckd_value_kr,pag_value,cat_value');
         // $this->db->order_by('cnt', 'desc');
         if ($limit) {
