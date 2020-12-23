@@ -66,7 +66,7 @@ class Notice extends CB_Controller
         $param =& $this->querystring;
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
         
-        $findex = '(CASE WHEN noti_order=0 THEN -999 ELSE noti_order END),noti_id';
+        $findex = '(0.1/noti_order),noti_id';
         $forder = 'desc';
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
@@ -80,7 +80,7 @@ class Notice extends CB_Controller
          */
         $this->{$this->modelname}->allow_search_field = array('noti_id', 'noti_title', 'noti_content'); // 검색이 가능한 필드
         $this->{$this->modelname}->search_field_equal = array('noti_id'); // 검색중 like 가 아닌 = 검색을 하는 필드
-        $this->{$this->modelname}->allow_order_field = array('noti_title', 'noti_id', 'noti_start_date', 'noti_end_date', 'noti_activated','(CASE WHEN noti_order=0 THEN -999 ELSE noti_order END),noti_id'); // 정렬이 가능한 필드
+        $this->{$this->modelname}->allow_order_field = array('noti_title', 'noti_id', 'noti_start_date', 'noti_end_date', 'noti_activated','(0.1/noti_order),noti_id'); // 정렬이 가능한 필드
 
         $where = array();
         
