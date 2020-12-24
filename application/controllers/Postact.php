@@ -4315,12 +4315,14 @@ class Postact extends CB_Controller
         if(element('dev_id',$dev_info)){
 
         	$updatedata = array(
-            'mem_id' => $mem_id,
+            // 'mem_id' => $mem_id,
             'dev_token' => $dev_token,
             'dev_update_datetime' => cdate('Y-m-d H:i:s'),
             
         	);
-        
+
+        	if($mem_id) $updatedata['mem_id'] = $mem_id;
+
         	$dev_id = $this->Device_model->update(element('dev_id',$dev_info),$updatedata);	
         	
         } else {
@@ -4330,7 +4332,7 @@ class Postact extends CB_Controller
             'dev_register_datetime' => cdate('Y-m-d H:i:s'),
             
         	);
-        
+        	
         	$dev_id = $this->Device_model->insert($insertdata);	
         }
         
