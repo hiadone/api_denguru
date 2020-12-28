@@ -69,6 +69,7 @@ class Cmall extends CB_Controller
             'mem_id' => $mem_id,
             'pet_id' => $this->member->item('pet_id'),
         );
+
         $view['view']['data']['ai_recom'] = $this->_itemairecomlists($config);
             // }
         
@@ -378,7 +379,16 @@ class Cmall extends CB_Controller
 
         $pet = $this->Member_pet_model->get_one($pet_id);
 
+
         if (empty(element('pet_id', $pet))) {
+            return false;
+        }
+
+        if (empty(element('mem_id', $pet))) {
+            return false;
+        }
+
+        if ($mem_id != element('mem_id', $pet)) {
             return false;
         }
 
@@ -777,6 +787,14 @@ class Cmall extends CB_Controller
         $pet = $this->Member_pet_model->get_one($pet_id);
 
         if (empty(element('pet_id', $pet))) {
+            return false;
+        }
+
+        if (empty(element('mem_id', $pet))) {
+            return false;
+        }
+
+        if ($mem_id != element('mem_id', $pet)) {
             return false;
         }
 

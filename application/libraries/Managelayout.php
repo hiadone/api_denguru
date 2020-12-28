@@ -230,9 +230,9 @@ class Managelayout extends CI_Controller
 		
 			$data['popup'] = $CI->popuplib->display_popup();
 
-			$data['banner']['main_top'] =array();
-			$data['banner']['main_middle'] =array();
-			$data['banner']['main_bottom'] =array();
+			$data['banner']['main_top'] = null;
+			$data['banner']['main_middle'] = null;
+			$data['banner']['main_bottom'] = null;
 			$result = $CI->Banner_model->get_banner('main_top', "", 1);
 
 			if ($result) {

@@ -94,7 +94,7 @@ $config['enable_emulate_request'] = TRUE;
 | e.g: My Secret REST API
 |
 */
-$config['rest_realm'] = 'REST API';
+$config['rest_realm'] = 'Denguru REST API';
 
 /*
 |--------------------------------------------------------------------------
@@ -210,7 +210,7 @@ $config['auth_library_function'] = '';
 | Array of usernames and passwords for login, if ldap is configured this is ignored
 |
 */
-$config['rest_valid_logins'] = ['admin' => '1234'];
+$config['rest_valid_logins'] = ['admin' => '28182818'];
 
 /*
 |--------------------------------------------------------------------------
