@@ -500,6 +500,7 @@ class Cmall extends CB_Controller
                 cit_status = 1
                 AND cit_is_del = 0
                 AND cit_is_soldout = 0
+                AND cit_is_soldout = 1
                 AND '.element('sort', $config).' = 1
             ';
             $_join = '';
