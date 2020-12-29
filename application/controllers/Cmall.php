@@ -500,7 +500,7 @@ class Cmall extends CB_Controller
                 cit_status = 1
                 AND cit_is_del = 0
                 AND cit_is_soldout = 0
-                AND cit_type3 = 1
+                AND '.element('sort', $config).' = 1
             ';
             $_join = '';
 
@@ -907,7 +907,7 @@ class Cmall extends CB_Controller
                 cit_status = 1
                 AND cit_is_del = 0
                 AND cit_is_soldout = 0
-                AND cit_type3 = 1
+                AND '.element('sort', $config).' = 1
             ';
 
 
@@ -1147,7 +1147,7 @@ class Cmall extends CB_Controller
                     'cit_status' => 1,
                     'cit_is_del' => 0,
                     'cit_is_soldout' => 0,
-                    'cit_type3' => 1,
+                    element('sort', $config) => 1,
                     );
             $where = array('kinditem_group.ckd_id' => $skind);
 
