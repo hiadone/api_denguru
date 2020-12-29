@@ -4047,16 +4047,26 @@ class Postact extends CB_Controller
 
         if ( $review && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_review_blame')) {
 
+        	$deep_link_info = null;
+
+            $deep_link_info = array(
+                                'schema'=>'content',
+                                'path'=>'/cmall_review/itemreviewpost',
+                                'key'=>'cit_id',
+                                'keyValue'=>element('cit_id', $getdata),
+                            );
         	$this->load->library('notificationlib');
         	$not_message = $this->member->item('mem_nickname') . '님께서 회원님의 리뷰를 신고 하셨습니다.';
         	$not_url = base_url('cmall_review/itemreviewpost/'.element('cit_id',$review).'/'.element('cre_id',$review));
-        	$this->notificationlib->set_noti(
-        		element('mem_id', $review),
+        	$this->notificationlib->set_noti(        		
+        		element('mem_id', $review),        		
         		$mem_id,
         		'review_blame',
         		element('cre_id',$review),
         		$not_message,
-        		$not_url
+        		$not_url,
+        		'',
+        		json_encode($deep_link_info),
         	);
         }
 

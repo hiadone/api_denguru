@@ -527,8 +527,8 @@ class Profile extends CB_Controller
         	$not_message = $this->member->item('mem_nickname') . '님께서 회원님을 Reviewer 하셨습니다.';
         	
         	$this->notificationlib->set_noti(
-        		element('mem_id', $target),
-        		$mem_id,
+        		element('mem_id', $target),        		
+        		$mem_id,        		
         		'reviewer',
         		$rve_id,
         		$not_message,
@@ -618,7 +618,7 @@ class Profile extends CB_Controller
         	$this->load->library('notificationlib');
         	$not_message = $this->member->item('mem_nickname') . '님께서 회원님을 Reviewer 해제되었습니다.';
         	
-        	$this->notificationlib->set_noti(
+        	$this->notificationlib->set_noti(        		        		
         		element('mem_id', $target),
         		$mem_id,
         		'reviewer',
