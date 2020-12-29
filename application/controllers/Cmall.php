@@ -499,7 +499,7 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
-                AND cit_is_soldout = 0 AND cit_is_soldout = 1
+                AND cit_is_soldout = 0
                 AND '.$sort.' = 1
             ';
             $_join = '';
@@ -906,7 +906,7 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
-                AND cit_is_soldout = 0 AND cit_is_soldout = 1
+                AND cit_is_soldout = 0
                 AND '.$sort.' = 1
             ';
 
