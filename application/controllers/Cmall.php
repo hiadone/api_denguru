@@ -363,7 +363,7 @@ class Cmall extends CB_Controller
         $mem_id = element('mem_id', $config) ? element('mem_id', $config) : 0;
         $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
         $sort = element('sort', $config) ? element('sort', $config) : 'cit_type3';
-        $sort = $sort.',';
+        $sort_ = $sort.',';
 
         $view = array();
         $view['view'] = array();
@@ -499,8 +499,8 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
-                AND cit_is_soldout = 0
-                AND '.element('sort', $config).' = 1
+                AND cit_is_soldout = 0 AND cit_is_soldout = 1
+                AND '.$sort.' = 1
             ';
             $_join = '';
 
@@ -508,7 +508,7 @@ class Cmall extends CB_Controller
             
 
             $_join = "
-                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id,cit_version from cb_cmall_item ".$cmallwhere;
+                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort_."cbr_id,cit_version from cb_cmall_item ".$cmallwhere;
         
         if($sattr && is_array($sattr)){
                         
@@ -772,7 +772,7 @@ class Cmall extends CB_Controller
         $pet_id = element('pet_id', $config) ? element('pet_id', $config) : 0;
         $sort = element('sort', $config) ? element('sort', $config) : 'cit_type1';
 
-        $sort=$sort.',';
+        $sort_=$sort.',';
         $view = array();
         $view['view'] = array();
         if(empty($mem_id)) return false;
@@ -906,8 +906,8 @@ class Cmall extends CB_Controller
             $cmallwhere = 'where
                 cit_status = 1
                 AND cit_is_del = 0
-                AND cit_is_soldout = 0
-                AND '.element('sort', $config).' = 1
+                AND cit_is_soldout = 0 AND cit_is_soldout = 1
+                AND '.$sort.' = 1
             ';
 
 
@@ -917,7 +917,7 @@ class Cmall extends CB_Controller
             
 
             $_join = "
-                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort."cbr_id,cit_version from cb_cmall_item ".$cmallwhere;
+                select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort_."cbr_id,cit_version from cb_cmall_item ".$cmallwhere;
         
         if($sattr && is_array($sattr)){
                         
@@ -1147,7 +1147,7 @@ class Cmall extends CB_Controller
                     'cit_status' => 1,
                     'cit_is_del' => 0,
                     'cit_is_soldout' => 0,
-                    element('sort', $config) => 1,
+                    $sort => 1,
                     );
             $where = array('kinditem_group.ckd_id' => $skind);
 
