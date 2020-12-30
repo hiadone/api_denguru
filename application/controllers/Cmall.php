@@ -3414,7 +3414,6 @@ class Cmall extends CB_Controller
     {
         
 
-        
 
         $view = array();
         $view['view'] = array();
@@ -3427,6 +3426,7 @@ class Cmall extends CB_Controller
         $skind = element('skind', $config) ? element('skind', $config) : false;
         $is_mypet_match = element('is_mypet_match', $config) ? element('is_mypet_match', $config) : false;
 
+        
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
          */
@@ -3662,11 +3662,13 @@ class Cmall extends CB_Controller
 
         if($mem_id && $this->input->get('is_mypet_match')){
 
+            
+
             $sattr =  array();
             $skind = '';
-            if((int) $view['view']['data']['member']['pet_age'] < 1) array_push($sattr,12);
-            elseif((int) $view['view']['data']['member']['pet_age'] < 7) array_push($sattr,13);
-            elseif((int) $view['view']['data']['member']['pet_age'] > 7) array_push($sattr,14);
+            // if((int) $view['view']['data']['member']['pet_age'] < 1) array_push($sattr,12);
+            // elseif((int) $view['view']['data']['member']['pet_age'] < 7) array_push($sattr,13);
+            // elseif((int) $view['view']['data']['member']['pet_age'] > 7) array_push($sattr,14);
 
             $skind = $view['view']['data']['member']['ckd_id'];
 
