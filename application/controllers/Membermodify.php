@@ -2303,6 +2303,15 @@ class Membermodify extends CB_Controller
 
 		$this->load->library('form_validation');
 
+		if(empty($str)) {
+
+           $this->form_validation->set_message(
+				'_mem_smsmap_check',
+				'휴대폰 번호를 입력해 주세요'
+			);
+           return false;
+       }
+       
 		$mem_phone = $this->form_validation->valid_mobile($str);
 		
 		
