@@ -230,8 +230,7 @@ class Membermodify extends CB_Controller
 		 * 로그인이 필요한 페이지입니다
 		 */
 		required_user_login();
-		$post = json_encode($this->input->post());
-		log_message('error', $post);
+		
 		$mem_id = (int) $this->member->item('mem_id');
 
 		$selfcert_type = $this->member->item('selfcert_type');
@@ -1760,11 +1759,11 @@ class Membermodify extends CB_Controller
 		 * 전송된 데이터의 유효성을 체크합니다
 		 */
 		$config = array(
-			array(
-				'field' => 'mem_password',
-				'label' => '패스워드',
-				'rules' => 'trim|required|min_length[' . $password_length . ']|callback__cur_password_check',
-			),
+			// array(
+			// 	'field' => 'mem_password',
+			// 	'label' => '패스워드',
+			// 	'rules' => 'trim|required|min_length[' . $password_length . ']|callback__cur_password_check',
+			// ),
 		);
 
 		
@@ -2311,7 +2310,7 @@ class Membermodify extends CB_Controller
 			);
            return false;
        }
-       
+
 		$mem_phone = $this->form_validation->valid_mobile($str);
 		
 		
@@ -2638,8 +2637,6 @@ class Membermodify extends CB_Controller
                 }
             }
 
-            
-            
             
             
             $usattr_val = array();
