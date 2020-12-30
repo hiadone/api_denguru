@@ -137,7 +137,7 @@ class CB_Form_validation extends CI_Form_validation
 	{
         $value = trim($value);
         if ($value === '') {
-            return true;
+            return '';
         } else {
             if(substr($value,0,3) =="010"){
                 if (preg_match('/^\(?[0-9]{3}\)?[-. ]?[0-9]{4}[-. ]?[0-9]{4}$/', $value)) {

@@ -336,7 +336,7 @@ class Membermodify extends CB_Controller
 		if ( ! $selfcert_phone) {
 			$configbasic['mem_phone'] = array(
 				'field' => 'mem_phone',
-				'label' => '전화번호',
+				'label' => '휴대폰번호',
 				'rules' => 'trim|valid_mobile|required|callback__mem_smsmap_check',
 			);
 		}
@@ -2073,7 +2073,17 @@ class Membermodify extends CB_Controller
 	 * 이메일 체크 함수입니다
 	 */
 	public function _mem_email_check($str)
-	{
+	{	
+
+		if(empty($str)) {
+
+           $this->form_validation->set_message(
+				'_mem_email_check',
+				'이메일을 입력해 주세요.'
+			);
+           return false;
+        }
+
 		list($emailid, $emaildomain) = explode('@', $str);
 		$denied_list = explode(',', $this->cbconfig->item('denied_email_list'));
 		$emaildomain = trim($emaildomain);
@@ -2097,7 +2107,8 @@ class Membermodify extends CB_Controller
 		 if ( ! function_exists('password_hash')) {
 			$this->load->helper('password');
 		}
-		
+
+
 		if ( ! $this->member->item('mem_id') OR ! $this->member->item('mem_password')) {
 			$this->form_validation->set_message(
 				'_cur_password_check',
@@ -2168,7 +2179,7 @@ class Membermodify extends CB_Controller
 		if (empty($mem_phone)) {
 			$result = array(
 				'result' => 'error',
-				'msg' => '잘못된 핸드폰 번호입니다.',
+				'msg' => '잘못된 휴대폰 번호입니다.',
 			);
 			return $this->response($result, 200);
 		}
@@ -2180,7 +2191,7 @@ class Membermodify extends CB_Controller
 		if (empty($mem_phone)) {
 		    $result = array(
 				'result' => 'error',
-				'msg' => '잘못된 핸드폰 번호입니다.',
+				'msg' => '잘못된 휴대폰 번호입니다.',
 			);
 			return $this->response($result, 200);
 		}
@@ -2292,6 +2303,8 @@ class Membermodify extends CB_Controller
 
 		$mem_phone = $this->form_validation->valid_mobile($str);
 		
+		
+
 		if ($mem_phone === $this->member->item('mem_phone')) {
 			return true;
 		}
@@ -2302,7 +2315,7 @@ class Membermodify extends CB_Controller
 
        
        
-       
+      	
        
        
        
@@ -2311,7 +2324,7 @@ class Membermodify extends CB_Controller
 
            $this->form_validation->set_message(
 				'_mem_smsmap_check',
-				'잘못된 핸드폰 번호입니다.'
+				'잘못된 휴대폰 번호입니다.'
 			);
            return false;
        }

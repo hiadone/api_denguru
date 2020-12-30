@@ -317,7 +317,7 @@ class Register extends CB_Controller
 		if ( ! $selfcert_phone) {
 			$configbasic['mem_phone'] = array(
 				'field' => 'mem_phone',
-				'label' => '전화번호',
+				'label' => '휴대폰번호',
 				'rules' => 'trim|valid_mobile|required',
 			);
 		}
@@ -1478,6 +1478,15 @@ class Register extends CB_Controller
 	 */
 	public function _mem_email_check($str)
 	{	
+
+		if(empty($str)) {
+
+           $this->form_validation->set_message(
+				'_mem_email_check',
+				'이메일을 입력해 주세요.'
+			);
+           return false;
+        }
 		list($emailid, $emaildomain) = explode('@', $str);
 		$denied_list = explode(',', $this->cbconfig->item('denied_email_list'));
 		$emaildomain = trim($emaildomain);
@@ -1627,7 +1636,7 @@ class Register extends CB_Controller
 		if (empty($mem_phone)) {
 			$result = array(
 				'result' => 'error',
-				'msg' => '잘못된 핸드폰 번호입니다.',
+				'msg' => '잘못된 휴대폰 번호입니다.',
 			);
 			return $this->response($result, 200);
 		}
@@ -1639,7 +1648,7 @@ class Register extends CB_Controller
 		if (empty($mem_phone)) {
 		    $result = array(
 				'result' => 'error',
-				'msg' => '잘못된 핸드폰 번호입니다.',
+				'msg' => '잘못된 휴대폰 번호입니다.',
 			);
 			return $this->response($result, 200);
 		}
@@ -1759,7 +1768,7 @@ class Register extends CB_Controller
        $mem_phone = $this->form_validation->valid_mobile($this->input->post('mem_phone'));
        
        if(empty($mem_phone)) {
-           $result = array('result'=>'error','msg' => '잘못된 핸드폰 번호입니다.');
+           $result = array('result'=>'error','msg' => '잘못된 휴대폰 번호입니다.');
            return $this->response($result, 200);
            
        }
@@ -1840,7 +1849,7 @@ class Register extends CB_Controller
 
            $this->form_validation->set_message(
 				'_mem_smsmap_check',
-				'잘못된 핸드폰 번호입니다.'
+				'잘못된 휴대폰 번호입니다.'
 			);
            return false;
        }
