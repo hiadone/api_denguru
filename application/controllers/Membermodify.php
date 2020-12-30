@@ -629,8 +629,9 @@ class Membermodify extends CB_Controller
 
 			$view['msg'] = $file_error . $file_error2.validation_errors();
             
+            $post = json_encode($this->input->post());
             
-			log_message('error', 'msg:'.$file_error . $file_error2.validation_errors() .' pointer:'.current_url());
+			log_message('error', 'msg:'.$post.$file_error . $file_error2.validation_errors() .' pointer:'.current_url());
 			
 			$k = 0;
 			if ($form && is_array($form)) {
