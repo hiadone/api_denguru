@@ -230,7 +230,8 @@ class Membermodify extends CB_Controller
 		 * 로그인이 필요한 페이지입니다
 		 */
 		required_user_login();
-
+		$post = json_encode($this->input->post());
+		log_message('error', $post);
 		$mem_id = (int) $this->member->item('mem_id');
 
 		$selfcert_type = $this->member->item('selfcert_type');
