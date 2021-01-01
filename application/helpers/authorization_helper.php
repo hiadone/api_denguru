@@ -12,7 +12,8 @@ class AUTHORIZATION
         } elseif($token != false){
             $tokenData['mem_id'] = '0'; //TODO: Replace with data for token
             $tokenData['timestamp'] = ctimestamp(); //TODO: Replace with data for token
-            $this->validateTimestamp($tokenData);
+            
+            return self::validateTimestamp(self::generateToken($tokenData));
         }
 
         return false;

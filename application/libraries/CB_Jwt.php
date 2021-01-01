@@ -158,6 +158,7 @@ class CB_Jwt {
         
         $data = $this->_verify_request($headers);            
         
+        
 
         foreach ($data as $key => $value)
         {   
