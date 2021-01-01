@@ -24,6 +24,7 @@ class Auth extends CB_Controller
     {
         $tokenData = array();
         $tokenData['mem_id'] = '0'; //TODO: Replace with data for token
+        $tokenData['timestamp'] = ctimestamp(); //TODO: Replace with data for token
         $output['token'] = AUTHORIZATION::generateToken($tokenData);
         $this->set_response($output, parent::HTTP_OK);
     }

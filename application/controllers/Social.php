@@ -899,8 +899,10 @@ class Social extends CB_Controller
 				$this->member->update_login_log($mem_id, '', 1, element($social_type, $this->socialtype) . ' 로그인 성공');
 				// $this->session->set_userdata('mem_id', $mem_id);
 
+				//TODO: Replace with data for token
 				$tokenData = array();
-				$tokenData['mem_id'] = $mem_id; //TODO: Replace with data for token
+				$tokenData['mem_id'] = $mem_id; 
+				$tokenData['timestamp'] = ctimestamp(); 
 				$output['token'] = AUTHORIZATION::generateToken($tokenData);
 
 				$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
@@ -1265,8 +1267,10 @@ class Social extends CB_Controller
 				$this->member->update_login_log($mem_id, '', 1, element($social_type, $this->socialtype) . ' 로그인 성공');
 				// $this->session->set_userdata('mem_id', $mem_id);
 
+				//TODO: Replace with data for token
 				$tokenData = array();
-				$tokenData['mem_id'] = $mem_id; //TODO: Replace with data for token
+				$tokenData['mem_id'] = $mem_id; 
+				$tokenData['timestamp'] = ctimestamp(); 
 				$output['token'] = AUTHORIZATION::generateToken($tokenData);
 
 				$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
@@ -1302,8 +1306,10 @@ class Social extends CB_Controller
 	public function _connected_close($social_type,$mem_id)
 	{	
 
+		//TODO: Replace with data for token
 		$tokenData = array();
-		$tokenData['mem_id'] = $mem_id; //TODO: Replace with data for token
+		$tokenData['mem_id'] = $mem_id; 
+		$tokenData['timestamp'] = ctimestamp(); 
 		$output['token'] = AUTHORIZATION::generateToken($tokenData);
 
 		$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';

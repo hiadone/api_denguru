@@ -199,8 +199,11 @@ class Login extends CB_Controller
 			$change_password_date = $this->cbconfig->item('change_password_date');
 			$site_title = $this->cbconfig->item('site_title');
 
-			$tokenData = array();
-			$tokenData['mem_id'] = element('mem_id', $userinfo); //TODO: Replace with data for token
+			//TODO: Replace with data for token
+			$tokenData = array();			
+			$tokenData['mem_id'] = element('mem_id', $userinfo); 
+			$tokenData['timestamp'] = ctimestamp(); 
+
 			$output['token'] = AUTHORIZATION::generateToken($tokenData);
 			// $this->set_response($output, parent::HTTP_OK);
 

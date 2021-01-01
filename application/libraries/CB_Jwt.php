@@ -183,7 +183,7 @@ class CB_Jwt {
         try {
             // Validate the token
             // Successfull validation will return the decoded user data else returns false
-            $data = AUTHORIZATION::validateToken($token);
+            $data = AUTHORIZATION::validateTimestamp($token);
             if ($data === false) {
                 $status = 300;
                 $response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
@@ -192,7 +192,6 @@ class CB_Jwt {
                 
                 
             } else {
-                
                 return $data;
             }
         } catch (Exception $e) {

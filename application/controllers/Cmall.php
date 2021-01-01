@@ -48,7 +48,7 @@ class Cmall extends CB_Controller
      */
     protected function _main()
     {
-        
+
 
         $view = array();
         $view['view'] = array();
@@ -3426,7 +3426,7 @@ class Cmall extends CB_Controller
         $skind = element('skind', $config) ? element('skind', $config) : false;
         $is_mypet_match = element('is_mypet_match', $config) ? element('is_mypet_match', $config) : false;
 
-        
+
         /**
          * 페이지에 숫자가 아닌 문자가 입력되거나 1보다 작은 숫자가 입력되면 에러 페이지를 보여줍니다.
          */

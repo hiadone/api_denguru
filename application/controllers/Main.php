@@ -46,10 +46,10 @@ class Main extends CB_Controller
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_main_index';
 		$this->load->event($eventname);
-
+		
 		$view = array();
 		$view['view'] = array();
-
+		
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 

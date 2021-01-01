@@ -5,10 +5,16 @@ class AUTHORIZATION
     public static function validateTimestamp($token)
     {
         $CI =& get_instance();
-        $token = self::validateToken($token);
-        if ($token != false && (now() - $token->timestamp < ($CI->config->item('token_timeout') * 60))) {
+        $token = self::validateToken($token);        
+
+        if ($token != false && !empty($token->timestamp) && (ctimestamp() - $token->timestamp < ($CI->config->item('token_timeout') * 60))) {
             return $token;
+        } elseif($token != false){
+            $tokenData['mem_id'] = '0'; //TODO: Replace with data for token
+            $tokenData['timestamp'] = ctimestamp(); //TODO: Replace with data for token
+            $this->validateTimestamp($tokenData);
         }
+
         return false;
     }
 
