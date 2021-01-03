@@ -124,15 +124,15 @@ class CB_Jwt {
 
         $token = AUTHORIZATION::validateToken($token);     
         
-echo "0<br>";
+
         if(!empty($token)){
             if(!empty($token->timestamp)){
-                echo "a<br>";
+
                 if ($token != false && !empty($token->timestamp) && (ctimestamp() - $token->timestamp < (config_item('token_timeout') * 60))) {                     
-                    echo "b<br>";
+
                     return $token;
                 } elseif(!empty($token)){   
-                    echo "c<br>";
+
                     $this->CI->load->database();                 
                     $this->CI->db->select('mem_id,jwt_refresh_token');            
                     $this->CI->db->from('jwt');
@@ -156,13 +156,13 @@ echo "0<br>";
                         return $refresh_token;                        
 
                     } else {                        
-                        echo "c<br>";          
+
                         return AUTHORIZATION::validateToken(config_item('default_Authorization'));
                     }
 
                 } 
             } else {      
-             echo "g<br>";          
+
                 return AUTHORIZATION::validateToken(config_item('default_Authorization'));
             }
         }
