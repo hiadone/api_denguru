@@ -55,8 +55,7 @@ class CB_Jwt {
      */
     public $userdata;
     private $CI;
-    protected $_config;
-    protected $_sid_regexp;
+    protected $_token;    
 
     // ------------------------------------------------------------------------
 
@@ -78,10 +77,12 @@ class CB_Jwt {
 
         $this->CI = & get_instance();
 
+        $this->CI->load->helper('array');
+
         // Configuration ...
-        $this->_configure($params);
+        $this->_token = $this->_configure($params);
 
-
+        
         $this->_ci_init_vars();
 
         log_message('info', "Jwt:  initialized ");
@@ -112,31 +113,63 @@ class CB_Jwt {
      * @return  void
      */
     protected function _configure($params)
-    {
-        $expiration = config_item('token_timeout');
-        $params['default_Authorization'] = config_item('default_Authorization');
+    {   
 
-        if (isset($params['cookie_lifetime']))
-        {
-            $params['cookie_lifetime'] = (int) $params['cookie_lifetime'];
-        }
-        else
-        {
-            $params['cookie_lifetime'] = ( ! isset($expiration) && config_item('sess_expire_on_close'))
-                ? 0 : (int) $expiration;
-        }
+        $headers = $this->CI->input->request_headers();
 
+        if(empty($headers['Authorization']))
+            return AUTHORIZATION::validateToken(config_item('default_Authorization'));
+
+        $token = $headers['Authorization'];
+
+        $token = AUTHORIZATION::validateToken($token);     
         
-        if (empty($expiration))
-        {
-            $params['expiration'] = 1;
-        }
-        else
-        {
-            $params['expiration'] = (int) $expiration;            
-        }
+echo "0<br>";
+        if(!empty($token)){
+            if(!empty($token->timestamp)){
+                echo "a<br>";
+                if ($token != false && !empty($token->timestamp) && (ctimestamp() - $token->timestamp < (config_item('token_timeout') * 60))) {                     
+                    echo "b<br>";
+                    return $token;
+                } elseif(!empty($token)){   
+                    echo "c<br>";
+                    $this->CI->load->database();                 
+                    $this->CI->db->select('mem_id,jwt_refresh_token');            
+                    $this->CI->db->from('jwt');
+                    $this->CI->db->where('mem_Id', $token->mem_id);
+                    $this->CI->db->limit(1,0);
+                    $result = $this->CI->db->get();
+                    $jwt = $result->row_array();
 
-        $this->_config = $params;        
+                    $refresh_token = AUTHORIZATION::validateToken(element('jwt_refresh_token',$jwt));
+
+                    if ($refresh_token != false && !empty($refresh_token->timestamp) && (ctimestamp() - $refresh_token->timestamp < (config_item('refresh_token_timeout') * 60))) {
+                        
+                        $tokenData = array();
+                        $tokenData['mem_id'] = element('mem_id',$jwt); //TODO: Replace with data for token
+                        $tokenData['timestamp'] = ctimestamp(); //TODO: Replace with data for token
+                        $output['token'] = AUTHORIZATION::generateToken($tokenData);                        
+                        
+                        $this->CI->db->where('mem_id', element('mem_id',$jwt));
+                        $this->CI->db->set(array('jwt_refresh_token'=>element('token', $output),'jwt_datetime'=>cdate('Y-m-d H:i:s')));
+                        $result = $this->CI->db->update('jwt');
+                        return $refresh_token;                        
+
+                    } else {                        
+                        echo "c<br>";          
+                        return AUTHORIZATION::validateToken(config_item('default_Authorization'));
+                    }
+
+                } 
+            } else {      
+             echo "g<br>";          
+                return AUTHORIZATION::validateToken(config_item('default_Authorization'));
+            }
+        }
+        
+
+        return false;
+        
     }
 
    
@@ -152,13 +185,13 @@ class CB_Jwt {
      */
     protected function _ci_init_vars()
     {
-        $headers = $this->CI->input->request_headers();
+        
         
         $jwt=array();
         
-        $data = $this->_verify_request($headers);            
+        $data = $this->_verify_request();            
         
-        
+
 
         foreach ($data as $key => $value)
         {   
@@ -169,12 +202,10 @@ class CB_Jwt {
 
     }
 
-    private function _verify_request($headers)
+    private function _verify_request()
     {
         
-        if(empty($headers['Authorization']))
-            $headers['Authorization'] = $this->_config['default_Authorization'];
-        $token = $headers['Authorization'];
+        
 
         
 
@@ -184,7 +215,8 @@ class CB_Jwt {
         try {
             // Validate the token
             // Successfull validation will return the decoded user data else returns false
-            $data = AUTHORIZATION::validateTimestamp($token);
+            $data = $this->_token;
+            
             if ($data === false) {
                 $status = 300;
                 $response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
@@ -216,53 +248,7 @@ class CB_Jwt {
      * @param   string  $key    'session_id' or a session data key
      * @return  mixed
      */
-    public function __get($key)
-    {
-        // Note: Keep this order the same, just in case somebody wants to
-        //       use 'session_id' as a session data key, for whatever reason
-        if (isset($_SESSION[$key]))
-        {
-            return $_SESSION[$key];
-        }
-        elseif ($key === 'session_id')
-        {
-            return session_id();
-        }
-
-        return NULL;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * __isset()
-     *
-     * @param   string  $key    'session_id' or a session data key
-     * @return  bool
-     */
-    public function __isset($key)
-    {
-        if ($key === 'session_id')
-        {
-            return (session_status() === PHP_SESSION_ACTIVE);
-        }
-
-        return isset($_SESSION[$key]);
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * __set()
-     *
-     * @param   string  $key    Session data key
-     * @param   mixed   $value  Session data value
-     * @return  void
-     */
-    public function __set($key, $value)
-    {
-        $_SESSION[$key] = $value;
-    }
+    
 
    
    
@@ -356,6 +342,14 @@ class CB_Jwt {
         }
 
         $this->userdata[$data] = $value;
+    }
+
+    public function validateTimestamp($token)
+    {
+        
+        
+        
+        
     }
 
 }

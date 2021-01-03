@@ -204,7 +204,14 @@ class Login extends CB_Controller
 			$tokenData['mem_id'] = element('mem_id', $userinfo); 
 			$tokenData['timestamp'] = ctimestamp(); 
 
-			$output['token'] = AUTHORIZATION::generateToken($tokenData);
+			$output['token'] = AUTHORIZATION::generateToken($tokenData);			
+
+			if ( ! empty($output)) {
+				$this->db->replace('jwt', array('mem_id'=>element('mem_id', $userinfo),'jwt_refresh_token'=>element('token', $output),'jwt_datetime'=>cdate('Y-m-d H:i:s')));
+			}
+			
+
+
 			// $this->set_response($output, parent::HTTP_OK);
 
 			if ($change_password_date) {

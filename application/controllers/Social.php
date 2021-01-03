@@ -905,7 +905,12 @@ class Social extends CB_Controller
 				$tokenData['timestamp'] = ctimestamp(); 
 				$output['token'] = AUTHORIZATION::generateToken($tokenData);
 
+				if ( ! empty($output)) {
+					$this->db->replace('jwt', array('mem_id'=>element('mem_id', $userinfo),'jwt_refresh_token'=>element('token', $output),'jwt_datetime'=>cdate('Y-m-d H:i:s')));
+				}
+
 				$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
+
 
 				$view['membermodify'] = 0;
 				$view['token'] = $output['token'];
@@ -1272,6 +1277,9 @@ class Social extends CB_Controller
 				$tokenData['mem_id'] = $mem_id; 
 				$tokenData['timestamp'] = ctimestamp(); 
 				$output['token'] = AUTHORIZATION::generateToken($tokenData);
+				if ( ! empty($output)) {
+					$this->db->replace('jwt', array('mem_id'=>element('mem_id', $userinfo),'jwt_refresh_token'=>element('token', $output),'jwt_datetime'=>cdate('Y-m-d H:i:s')));
+				}
 
 				$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
 
@@ -1311,6 +1319,10 @@ class Social extends CB_Controller
 		$tokenData['mem_id'] = $mem_id; 
 		$tokenData['timestamp'] = ctimestamp(); 
 		$output['token'] = AUTHORIZATION::generateToken($tokenData);
+
+		if ( ! empty($output)) {
+			$this->db->replace('jwt', array('mem_id'=>element('mem_id', $userinfo),'jwt_refresh_token'=>element('token', $output),'jwt_datetime'=>cdate('Y-m-d H:i:s')));
+		}
 
 		$view['msg'] = element($social_type, $this->socialtype) .'로그인 성공';
 
