@@ -38,6 +38,8 @@ class Cmall_order_detail_model extends CB_Model
 		$this->db->select('cit_id');
 		$this->db->where('cor_id', $cor_id);
 		$this->db->group_by('cit_id');
+		$this->db->order_by('cod_id');
+		$this->db->group_by('cit_id');
 		$qry = $this->db->get($this->_table);
 		$result = $qry->result_array();
 
