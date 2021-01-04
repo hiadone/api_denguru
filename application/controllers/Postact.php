@@ -4356,4 +4356,76 @@ class Postact extends CB_Controller
         
 
 	}
+
+	/**
+	 * 리뷰 신고 하기
+	 */
+	public function event_registr_put($egr_id = 0, $mem_id = 0)
+	{
+		
+		$result = array();
+		$erl_status = 1; // 이벤트 등록 
+		
+
+		required_user_login();
+
+		$mem_id = (int) $mem_id;
+		if (empty($mem_id) OR $mem_id < 1) {
+			show_404();
+		}
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Event_register_list_model','Event_group_model'));
+		
+
+		$event_group = $this->Event_group_model->get_one($egr_id);
+
+		
+
+		if (empty(element('egr_activated',$event_group))) {
+		    alert('종료된 이벤트 입니다.','',406);
+		}
+
+		if (!empty($event_group['egr_start_date']) && $event_group['egr_start_date'] >= cdate('Y-m-d')) {
+		    alert('이벤트 기간이 지난 이벤트 입니다.','',406);
+		}
+
+		if (!empty($event_group['egr_end_date']) && $event_group['egr_end_date'] <= cdate('Y-m-d')) {
+		    alert('이벤트 기간이 지난 이벤트 입니다.','',406);
+		}
+
+		$event_register = $this->Event_register_list_model->get_one('','',array('egr_id' => $egr_id,'mem_id' => $mem_id));
+
+       
+
+		
+
+		if (element('erl_id', $event_register)) {
+			alert('이미 이 이벤트에 참여 하셨습니다.','',409);
+		}
+
+		$insertdata = array(
+			'egr_id' => $egr_id,
+			'mem_id' => $mem_id,
+			'erl_status' => 1,
+			'erl_event_datetime' => cdate('Y-m-d H:i:s'),
+			'erl_ip' => $this->input->ip_address(),
+		);
+		$this->Event_register_list_model->insert($insertdata);
+
+        
+
+
+        $result = array(
+            'success' => '이벤트 참여 하였습니다.',            
+        );
+
+        
+        
+        return $this->response($result, 201);
+
+        
+
+	}
 }

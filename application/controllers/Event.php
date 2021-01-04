@@ -24,7 +24,7 @@ class Event extends CB_Controller
     /**
      * 모델을 로딩합니다
      */
-    protected $models = array('Event','Event_group','Event_rel');
+    protected $models = array('Event','Event_group','Event_rel','Event_register_list');
 
     /**
      * 이 컨트롤러의 메인 모델 이름입니다
@@ -140,6 +140,8 @@ class Event extends CB_Controller
                 if (empty($val['egr_end_date']) OR $val['egr_end_date'] === '0000-00-00') {
                     $result['list'][$key]['egr_end_date'] = '0000-00-00';
                 }
+
+                
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }
@@ -256,8 +258,14 @@ class Event extends CB_Controller
         // $getdata = array();
         // if ($pid) {
             $getdata = $this->{$this->modelname}->get_one($pid);
-
             
+            $mem_id = (int) $this->member->item('mem_id');
+
+            $getdata2 = $this->Event_register_list_model->get_one('','',array('egr_id' => $pid,'erl_status' => 1,'mem_id' => $mem_id));
+
+            $getdata['erl_status'] = element('erl_status',$getdata2,0);
+            $getdata['event_registr_url'] = site_url('postact/event_registr/' .$pid.'/'.$mem_id );
+
             $getdata['display_datetime'] = display_datetime(
                 element('egr_datetime', $getdata),'full'
             );
