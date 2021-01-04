@@ -742,7 +742,7 @@ class Search extends CB_Controller
 		        			'cat_id' => element('cat_id',$val),
 		        			'cat_value' => element(element('cat_value',$val),$color_code),
 		        			// 'url' => site_url(config_item('uploads_dir') . '/'.element(element('cat_value',$val),$color_url)),
-		        			'url' => element(element('cat_value',$val),$color_url) ? thumb_url('', element(element('cat_value',$val),$color_url),50 )  : null,
+		        			'url' => element(element('cat_value',$val),$color_url) ? thumb_url('etc', element(element('cat_value',$val),$color_url),50 )  : null,
 		        			'rownum' => element('rownum',$val),		        			
 		        			);
 

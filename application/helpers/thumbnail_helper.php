@@ -15,7 +15,7 @@ if ( ! function_exists('thumb_url')) {
 		if (empty($type) OR empty($filename)) {
 			$filename = 'noimage.png';
 			$thumb = thumbnail(
-				'',
+				'etc',
 				$filename,
 				$thumb_width,
 				$thumb_height,
@@ -54,8 +54,9 @@ if ( ! function_exists('thumbnail')) {
 		if ($type) {
 			$source_file .= $type . '/';
 		}
+		
 		$source_file .= $filename;
-
+		
 		if (is_file($source_file) === false) { // 원본 파일이 없다면
 			return;
 		}
@@ -63,7 +64,7 @@ if ( ! function_exists('thumbnail')) {
 		if (empty($thumb_width) && empty($thumb_height)) {
 			return $source_file;
 		}
-
+		
 		$size = @getimagesize($source_file);
 		if ($size[2] < 1 OR $size[2] > 3) { // gif, jpg, png 에 대해서만 적용
 			return;
