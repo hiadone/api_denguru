@@ -95,12 +95,29 @@ class Denguruapi extends CI_Controller
         
 
         
-        
+        $cmall_item = array();
         if (empty($cit_id) OR $cit_id < 1) {
-            return $arr;
+
+                $cmall_item['cit_id'] = 0;
+                $cmall_item['cit_name'] = '알수 없는 상품입니다';
+                $cmall_item['cit_review_average'] = 0;
+                $cmall_item['cit_price'] = 0;
+                $cmall_item['cit_price_sale'] = 0;            
+
+                $cmall_item['cit_image'] = thumb_url();
+                $cmall_item['cit_outlink_url'] = '';
+                $cmall_item['cit_inlink_url'] = '';
+                
+                $cmall_item['cit_price_sale_percent'] = 0;
+                
+            
+            $cmall_item = array_merge($arr, $cmall_item);
+
+            return $cmall_item;
+            // return $arr;
         }
         
-        $cmall_item = array();
+        
         $this->CI->load->model('Board_model');
         $cit_info = $this->CI->Board_model->get_cit_one($cit_id);
 
