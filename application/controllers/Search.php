@@ -569,6 +569,33 @@ class Search extends CB_Controller
 			}
 
 			if($is_color && $option ==='color'){
+				$color_code = array(
+								'블랙'=>'#000000',
+								'화이트'=>'#ffffff',
+								'베이지'=>'#F5F5DC',
+								'그레이'=>'#2F4F4F',
+								'레드'=>'#FF0000',
+								'핑크'=>'#FFC0CB',
+								'오렌지'=>'#FFA500',
+								'옐로우'=>'#FFFF00',
+								'민트'=>'#F5FFFA',
+								'그린'=>'#008000',
+								'카키'=>'#F0E68C',
+								'블루'=>'#0000FF',
+								'네이비'=>'#000080',
+								'퍼플'=>'#800080',
+								'버건디'=>'#760c0c',
+								'브라운'=>'#A52A2A',
+								'데님'=>'#79BAEC',
+							);
+
+				$color_url = array(
+								'스트라이프'  => 'color-stripe.png',
+								'도트' => 'color-dotted.png',
+								'체크/헤링본' => 'color-check.png',
+								'플라워' => 'color-flower.png',
+								'기타패턴' => 'color-etc.png',
+							);
 
 				$group_by='cmall_attr.cat_id';
 
@@ -713,8 +740,10 @@ class Search extends CB_Controller
 				foreach($result as $key => $val){
 		        		$cmall_color[] = array(
 		        			'cat_id' => element('cat_id',$val),
-		        			'cat_value' => element('cat_value',$val),
-		        			'rownum' => element('rownum',$val),
+		        			'cat_value' => element(element('cat_value',$val),$color_code),
+		        			// 'url' => site_url(config_item('uploads_dir') . '/'.element(element('cat_value',$val),$color_url)),
+		        			'url' => element(element('cat_value',$val),$color_url) ? thumb_url('', element(element('cat_value',$val),$color_url),50 )  : null,
+		        			'rownum' => element('rownum',$val),		        			
 		        			);
 
 
