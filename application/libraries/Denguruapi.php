@@ -944,6 +944,10 @@ class Denguruapi extends CI_Controller
         $data['pet_main'] = element('pet_main',$pet);
         $data['pet_name'] = element('pet_name',$pet);
         $data['pet_birthday'] = element('pet_birthday',$pet);
+        if($data['pet_birthday']){
+            $interval = date_diff(date_create($data['pet_birthday']), date_create(date('Y-m-d')));
+            $data['pet_months'] = ($interval->format('%y') *12 + $interval->format('%m'));
+        }
         $data['pet_age'] = date('Y') - cdate('Y',strtotime($data['pet_birthday']));
         $data['pet_sex'] = element('pet_sex',$pet);
         $data['pet_photo_url'] = cdn_url('member_photo',element('pet_photo',$pet)).'?w=200';

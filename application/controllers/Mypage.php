@@ -2320,11 +2320,18 @@ class Mypage extends CB_Controller
 	        $pat_id = $this->input->post_put('pat_id') ? $this->input->post_put('pat_id') : 0;
 	        $ckd_id = $this->input->post_put('ckd_id') ? $this->input->post_put('ckd_id') : 0;
 	        $pet_is_allergy = $this->input->post_put('pet_is_allergy') ? $this->input->post_put('pet_is_allergy') : 0;
+	        $pet_birthday = $this->input->post_put('pet_birthday', null, '');
+	        if($pet_birthday){
+	        	$birthday_arr = explode('-',$pet_birthday);
+	        	if(element(1,$birthday_arr,0) > 12) $birthday_arr[1] = 12;
+	        	if(element(2,$birthday_arr,0) > 31) $birthday_arr[2] = 31;
 
+	        	$pet_birthday = implode('-',$birthday_arr);
+	        }
 	        $updatedata = array(
 	            
 	            'pet_name' => $this->input->post_put('pet_name', null, ''),
-	            'pet_birthday' => $this->input->post_put('pet_birthday', null, ''),
+	            'pet_birthday' => $pet_birthday,
 	            'pet_sex' => $pet_sex,
 	            'pet_neutral' => $pet_neutral,
 	            'pet_weight' => $pet_weight,                
