@@ -596,7 +596,32 @@ class Search extends CB_Controller
 								'플라워' => 'color-flower.png',
 								'기타패턴' => 'color-etc.png',
 							);
+				$check_code = array(
+								'블랙'=>'icon-check-white.svg',
+								'화이트'=>'icon-check-pink.svg',
+								'베이지'=>'icon-check-pink.svg',
+								'그레이'=>'icon-check-pink.svg',
+								'레드'=>'icon-check-white.svg',
+								'핑크'=>'icon-check-white.svg',
+								'오렌지'=>'icon-check-white.svg',
+								'옐로우'=>'icon-check-white.svg',
+								'민트'=>'icon-check-white.svg',
+								'그린'=>'icon-check-white.svg',
+								'카키'=>'icon-check-white.svg',
+								'블루'=>'icon-check-white.svg',
+								'네이비'=>'icon-check-white.svg',
+								'퍼플'=>'icon-check-white.svg',
+								'버건디'=>'icon-check-white.svg',
+								'브라운'=>'icon-check-white.svg',
+								'데님'=>'icon-check-white.svg',
+								'스트라이프'  => 'icon-check-pink.svg',
+								'도트' => 'icon-check-pink.svg',
+								'체크/헤링본' => 'icon-check-pink.svg',
+								'플라워' => 'icon-check-pink.svg',
+								'기타패턴' => 'icon-check-pink.svg',
+							);
 
+				
 				$group_by='cmall_attr.cat_id';
 
 				// if($sstart_price){            
@@ -744,6 +769,7 @@ class Search extends CB_Controller
 		        			'color_code' => element(element('cat_value',$val),$color_code),
 		        			// 'url' => site_url(config_item('uploads_dir') . '/'.element(element('cat_value',$val),$color_url)),
 		        			'color_url' => element(element('cat_value',$val),$color_url) ? thumb_url('etc', element(element('cat_value',$val),$color_url),50 )  : null,
+		        			'check_code' => element(element('cat_value',$val),$check_code) ? element(element('cat_value',$val),$check_code)  : null,
 		        			'rownum' => element('rownum',$val),		        			
 		        			);
 
