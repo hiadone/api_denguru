@@ -45,7 +45,7 @@ class Gotourl extends CB_Controller
 	/**
 	 * banner url 이동 관련 함수입니다
 	 */
-	public function banner($ban_id = 0)
+	public function banner_get($ban_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_gotourl_banner';
@@ -72,9 +72,9 @@ class Gotourl extends CB_Controller
 			show_404();
 		}
 
-		if ( ! $this->session->userdata('banner_click_' . $ban_id )) {
+		if ( ! $this->cb_jwt->userdata('banner_click_' . $ban_id )) {
 
-			$this->session->set_userdata(
+			$this->cb_jwt->set_userdata(
 				'banner_click_' . $ban_id,
 				'1'
 			);
