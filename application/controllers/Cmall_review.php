@@ -901,19 +901,19 @@ class Cmall_review extends CB_Controller
         /**
          * 수정 페이지일 경우 기존 데이터를 가져옵니다
          */
-        $getdata = array();
+        $review = array();
         if ($cre_id) {
-            $getdata = $this->Cmall_review_model->get_one($cre_id);
-            if ( ! element('cre_id', $getdata)) {
+            $review = $this->Cmall_review_model->get_one($cre_id);
+            if ( ! element('cre_id', $review)) {
                 alert('이 리뷰는 현재 존재하지 않습니다',"",406);
             }
             $is_admin = $this->member->is_admin();
             if ($is_admin === false
-                && (int) element('mem_id', $getdata) !== $mem_id) {
+                && (int) element('mem_id', $review) !== $mem_id) {
                 alert_close('본인의 글 외에는 접근하실 수 없습니다');
             }
 
-            $getdata = $this->denguruapi->convert_review_info($getdata);
+            $review = $this->denguruapi->convert_review_info($review);
         }
 
         /**
@@ -1085,7 +1085,7 @@ class Cmall_review extends CB_Controller
                             $filedata = $this->upload->data();
 
                             $oldcrefile = $this->Review_file_model->get_one($i);
-                            if ((int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $item)) {
+                            if ((int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $review)) {
                                 alert('잘못된 접근입니다');
                             }
                             @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
@@ -1133,7 +1133,7 @@ class Cmall_review extends CB_Controller
                 log_message('error', 'msg:'.$file_error .validation_errors() .' pointer:'.current_url());
                 // $view['view']['wishlist_url'] = base_url('cmall/wishlist');
                 // $view['view']['itemlists_url'] = base_url('cmall/itemlists');
-                // $view['view']['data']['review'] = $getdata;
+                // $view['view']['data']['review'] = $review;
                 // $view['view']['data']['item'] = $item;
 
                 /**
@@ -1147,7 +1147,7 @@ class Cmall_review extends CB_Controller
 
                 $view['wishlist_url'] = base_url('cmall/wishlist');
                 $view['itemlists_url'] = base_url('cmall/itemlists');
-                $view['data']['review'] = $getdata;
+                $view['data']['review'] = $review;
                 $view['data']['item'] = $item;
 
                 /**
@@ -1334,7 +1334,7 @@ class Cmall_review extends CB_Controller
                 foreach ($this->input->post('cre_file_del') as $key => $val) {
                     if ($val === '1' && ! isset($uploadfiledata2[$key])) {
                         $oldcrefile = $this->Review_file_model->get_one($key);
-                        if ( ! element('cre_id', $oldcrefile) OR (int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $item)) {
+                        if ( ! element('cre_id', $oldcrefile) OR (int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $review)) {
                             alert('잘못된 접근입니다.');
                         }
                         @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $oldcrefile));

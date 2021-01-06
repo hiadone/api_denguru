@@ -4072,7 +4072,7 @@ class Postact extends CB_Controller
 
 
         $result = array(
-            'success' => '이 글을 신고 하셨습니다',
+            'msg' => '이 글을 신고 하셨습니다',
             'count' => $count,
         );
 
@@ -4357,9 +4357,7 @@ class Postact extends CB_Controller
 
 	}
 
-	/**
-	 * 리뷰 신고 하기
-	 */
+	
 	public function event_registr_put($egr_id = 0, $mem_id = 0)
 	{
 		
@@ -4418,7 +4416,7 @@ class Postact extends CB_Controller
 
 
         $result = array(
-            'success' => '이벤트 참여 하였습니다.',            
+            'msg' => '이벤트 참여 하였습니다.',            
         );
 
         
@@ -4426,6 +4424,64 @@ class Postact extends CB_Controller
         return $this->response($result, 201);
 
         
+
+	}
+
+	public function cre_type2_insert_post($cre_id = 0,$flag = 0)
+	{
+
+		
+
+		$result = array();
+		
+		
+
+		required_user_login();
+
+		$cre_id = (int) $cre_id;
+		if (empty($cre_id) OR $cre_id < 1) {
+			show_404();
+		}
+
+		$flag = (int) $flag;
+		if (empty($flag) OR $flag < 1) {
+			show_404();
+		}
+
+		$mem_id = (int) $this->member->item('mem_id');
+
+		$this->load->model(array('Cmall_review_model'));
+		
+
+		$review = $this->Cmall_review_model->get_one($cre_id);
+
+		// $cmall_item = $this->Cmall_item_model->get_one(element('cit_id',$review));
+
+		if ( ! element('cre_id', $review)) {
+			alert('존재하지 않는 게시물입니다','',406);
+		}
+		
+
+		if (element('cre_type2', $review)) {
+			alert('이미 추천 하셨습니다','',409);
+		}
+        
+        $updatedata = array(
+        	'cre_type2' => $flag,
+        );
+        $this->Cmall_review_model->update($cre_id, $updatedata);
+
+       	if($flag === 1){
+	        $result = array(
+	            'msg' => '추천 하셨습니다',
+	        );
+    	} else {
+    		$result = array(
+	            'msg' => '',
+	        );
+    	}
+        
+        return $this->response($result, 201);
 
 	}
 }
