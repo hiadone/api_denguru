@@ -956,6 +956,11 @@ class Cmall_review extends CB_Controller
                 'label' => '평점',
                 'rules' => 'trim|required|numeric|is_natural_no_zero|greater_than_equal_to[1]|less_than_equal_to[5]',
             ),
+            array(
+                'field' => 'cre_type2',
+                'label' => '상품추천',
+                'rules' => 'trim|numeric',
+            ),            
         );
         $this->form_validation->set_rules($config);
         $form_validation = $this->form_validation->run();
@@ -1181,6 +1186,7 @@ class Cmall_review extends CB_Controller
                 'cre_bad' => $this->input->post_put('cre_bad', null, ''),
                 'cre_tip' => $this->input->post_put('cre_tip', null, ''),
                 'cre_score' => $this->input->post_put('cre_score', null, 0),
+                'cre_type2' => $this->input->post_put('cre_type2', null, 0),
             );
 
             
@@ -1332,15 +1338,15 @@ class Cmall_review extends CB_Controller
             }
             if ($this->input->post('cre_file_del')) {
                 foreach ($this->input->post('cre_file_del') as $key => $val) {
-                    if ($val === '1' && ! isset($uploadfiledata2[$key])) {
-                        $oldcrefile = $this->Review_file_model->get_one($key);
+                    if ($val && ! isset($uploadfiledata2[$val])) {
+                        $oldcrefile = $this->Review_file_model->get_one($val);
                         if ( ! element('cre_id', $oldcrefile) OR (int) element('cre_id', $oldcrefile) !== (int) element('cre_id', $review)) {
                             alert('잘못된 접근입니다.');
                         }
                         @unlink(config_item('uploads_dir') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
 
                         $deleted = $this->aws_s3->delete_file(config_item('s3_folder_name') . '/cmall_review/' . element('rfi_filename', $oldcrefile));
-                        $this->Review_file_model->delete($key);
+                        $this->Review_file_model->delete($val);
                         // $this->point->delete_point(
                         //     $mem_id,
                         //     'fileupload',
