@@ -423,6 +423,7 @@ class Cmall extends CB_Controller
 
         $skind = element('ckd_id',$pet_info);
 
+        
         if(element('pet_attr',$pet_info)){
 
             foreach(element('pet_attr',$pet_info) as $val){
@@ -484,6 +485,12 @@ class Cmall extends CB_Controller
 
         $all_kind = $this->Cmall_kind_model->get_all_kind();
         $all_attr = $this->Cmall_attr_model->get_all_attr();
+
+
+        $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind);
+        
+        
+        
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
@@ -682,11 +689,11 @@ class Cmall extends CB_Controller
         }
 
 
-        if($skind){
+        if($skind_arr){
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id = ".$skind." )" ;
+            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr)."))";
 
     //         if(empty($sattr))
                 // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
@@ -891,6 +898,9 @@ class Cmall extends CB_Controller
 
         $all_kind = $this->Cmall_kind_model->get_all_kind();
         $all_attr = $this->Cmall_attr_model->get_all_attr();
+
+
+        $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind);
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
@@ -1091,11 +1101,11 @@ class Cmall extends CB_Controller
         }
 
 
-        if($skind){
+        if($skind_arr){
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id = ".$skind." )" ;
+            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr)."))";
 
     //         if(empty($sattr))
                 // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
