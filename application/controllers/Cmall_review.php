@@ -957,7 +957,7 @@ class Cmall_review extends CB_Controller
             array(
                 'field' => 'cre_score',
                 'label' => '평점',
-                'rules' => 'trim|required|numeric|is_natural_no_zero|greater_than_equal_to[1]|less_than_equal_to[5]',
+                'rules' => 'trim|required|numeric|greater_than_equal_to[1]|less_than_equal_to[5]',
             ),
             array(
                 'field' => 'cre_type2',
