@@ -114,22 +114,71 @@ class Cmall_item_model extends CB_Model
         $this->db->select('count(*) as cnt, cat_value,cmall_attr.cat_id ', false);
         $this->db->from('cmall_item');
         $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
-        $this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');        
+        $this->db->join('cmall_attr', 'cmall_attr.cat_id = cmall_attr_rel.cat_id', 'inner');                
 
         // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
         if($brd_id)
             $this->db->where('cmall_item.brd_id', $brd_id);
         $this->db->where('cit_status', 1);
         $this->db->where('cit_is_del', 0);
-        $this->db->where('cat_parent >', 0);
-        $this->db->group_by('cat_value');
-        $this->db->order_by('cat_parent = 1', 'desc',false);        
+        $this->db->where('cat_parent >', 0);        
+        $this->db->where_in('cmall_attr.cat_id',array(4,5,6) );        
+        $this->db->group_by('cat_value');        
         $this->db->order_by('cnt', 'desc');
         if ($limit) {
-            $this->db->limit($limit);
+            $this->db->limit(3);
         }
         $qry = $this->db->get();
         $result = $qry->result_array();
+
+
+        $this->db->select('count(*) as cnt, cca_value,cmall_category.cca_id ', false);
+        $this->db->from('cmall_item');        
+        $this->db->join('cmall_category_rel', 'cmall_category_rel.cit_id = cmall_item.cit_id', 'inner');
+        $this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');        
+        
+
+        // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
+        if($brd_id)
+            $this->db->where('cmall_item.brd_id', $brd_id);
+        $this->db->where('cit_status', 1);
+        $this->db->where('cit_is_del', 0);
+        $this->db->where('cca_parent >', 0);        
+        $this->db->group_by('cca_value');        
+        $this->db->order_by('cnt', 'desc');
+        if ($limit) {
+            $this->db->limit(3);
+        }
+        $qry = $this->db->get();
+        $result_ = $qry->result_array();
+
+        foreach($result_ as $val){
+            array_push($result,$val);
+        }
+        
+        $this->db->select('count(*) as cnt, ckd_value_kr,cmall_kind.ckd_id ', false);
+        $this->db->from('cmall_item');
+        $this->db->join('cmall_kind_rel', 'cmall_kind_rel.cit_id = cmall_item.cit_id', 'inner');
+        $this->db->join('cmall_kind', 'cmall_kind.ckd_id = cmall_kind_rel.ckd_id', 'inner');        
+
+        // $this->db->where('left(crawl_datetime, 10) >=', $start_date);
+        if($brd_id)
+            $this->db->where('cmall_item.brd_id', $brd_id);
+        $this->db->where('cit_status', 1);
+        $this->db->where('cit_is_del', 0);
+        $this->db->where('ckd_parent', 0);        
+        $this->db->group_by('ckd_value_kr');
+        
+        $this->db->order_by('cnt', 'desc');
+        if ($limit) {
+            $this->db->limit(3);
+        }
+        $qry = $this->db->get();
+        $result_ = $qry->result_array();
+
+        foreach($result_ as $val){
+            array_push($result,$val);
+        }
 
         return $result;
     }
