@@ -3438,7 +3438,7 @@ class Postact extends CB_Controller
 
 		// 이벤트가 존재하면 실행합니다
 		// Events::trigger('before', $eventname);
-
+		
 		$target_type = 3; //리뷰
 
 		$result = array();

@@ -83,10 +83,12 @@ class Cmall_kind_model extends CB_Model
     public function get_kind_child($all_kind = array(),$skind = 0,$result = array())
     {
         
-        array_push($result,element('ckd_id',element(0,element($skind,$all_kind))));
+        array_push($result,$skind);
+        
 
         $a = element('ckd_id',element(0,element($skind,$all_kind)));
-
+        if($a)
+            array_push($result,$a);
         if(element('ckd_id',element(0,element($a,$all_kind)))){
             array_push($result,element('ckd_id',element(0,element($a,$all_kind))));
             $aa = element('ckd_id',element(0,element($a,$all_kind)));
