@@ -335,10 +335,10 @@ class Board_model extends CB_Model
 	 */
 	public function get_search_list($limit = '', $offset = '', $where = '', $like = '', $category_id = 0, $orderby = '', $sfield = '', $skeyword = '', $sop = 'OR')
 	{
-		if ( ! in_array(strtolower($orderby), $this->allow_order)) {
-			$orderby = '(0.1/cit_order)';
-		}
-
+		// if ( ! in_array(strtolower($orderby), $this->allow_order)) {
+		// 	$orderby = '(0.1/cit_order)';
+		// }
+		if(empty($orderby)) $orderby = '(0.1/cit_order)';;
 		$sop = (strtoupper($sop) === 'AND') ? 'AND' : 'OR';
 		if (empty($sfield)) {
 			$sfield = array('cit_name', 'cta_tag', 'cca_value','cbr_value_kr','cbr_value_en');
@@ -448,8 +448,15 @@ class Board_model extends CB_Model
 
 		$this->db->group_by($this->_group_by);
 
+
 		$this->db->order_by('cit_version');
-		$this->db->order_by($orderby);
+
+		if(is_array($orderby))
+			$this->db->order_by(implode(' desc,',$orderby),'',false);
+		else
+			$this->db->order_by($orderby);
+			
+		
 		if ($limit) {
 			$this->db->limit($limit, $offset);
 		}

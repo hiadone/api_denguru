@@ -374,7 +374,7 @@ class Cmall extends CB_Controller
 
 
 
-        $this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model'));
+        $this->load->model(array('Board_model','Member_pet_model','Cmall_kind_model','Cmall_attr_model','Kinditem_group_model'));
 
 
         $pet = $this->Member_pet_model->get_one($pet_id);
@@ -424,73 +424,79 @@ class Cmall extends CB_Controller
         $skind = element('ckd_id',$pet_info);
 
         
-        if(element('pet_attr',$pet_info)){
+        // if(element('pet_attr',$pet_info)){
 
-            foreach(element('pet_attr',$pet_info) as $val){
+        //     foreach(element('pet_attr',$pet_info) as $val){
                 
-                if(element('pat_id',$val) === '4') array_push($sattr,79);
-                if(element('pat_id',$val) === '5') array_push($sattr,80);
-                if(element('pat_id',$val) === '6') array_push($sattr,81);
+        //         if(element('pat_id',$val) === '4') array_push($sattr,79);
+        //         if(element('pat_id',$val) === '5') array_push($sattr,80);
+        //         if(element('pat_id',$val) === '6') array_push($sattr,81);
 
-                if(element('pat_id',$val) === '7') array_push($sattr,82);
-                if(element('pat_id',$val) === '8') array_push($sattr,83);
-                if(element('pat_id',$val) === '9') array_push($sattr,84);
+        //         if(element('pat_id',$val) === '7') array_push($sattr,82);
+        //         if(element('pat_id',$val) === '8') array_push($sattr,83);
+        //         if(element('pat_id',$val) === '9') array_push($sattr,84);
 
-                if(element('pat_id',$val) === '10') array_push($sattr,85);
-                if(element('pat_id',$val) === '11') array_push($sattr,86);
-                if(element('pat_id',$val) === '12') array_push($sattr,87);
+        //         if(element('pat_id',$val) === '10') array_push($sattr,85);
+        //         if(element('pat_id',$val) === '11') array_push($sattr,86);
+        //         if(element('pat_id',$val) === '12') array_push($sattr,87);
 
-                if(element('pat_id',$val) === '13') array_push($sattr,88);
-            }
-        }
+        //         if(element('pat_id',$val) === '13') array_push($sattr,88);
+        //     }
+        // }
 
-        if(element('pet_allergy_rel',$pet_info)){
-            foreach(element('pet_allergy_rel',$pet_info) as $val){
+        // if(element('pet_allergy_rel',$pet_info)){
+        //     foreach(element('pet_allergy_rel',$pet_info) as $val){
                 
-                if(element('pag_id',$val) === '3') array_push($usattr,22);
-                if(element('pag_id',$val) === '4') array_push($usattr,53);
-                if(element('pag_id',$val) === '5') array_push($usattr,54);
+        //         if(element('pag_id',$val) === '3') array_push($usattr,22);
+        //         if(element('pag_id',$val) === '4') array_push($usattr,53);
+        //         if(element('pag_id',$val) === '5') array_push($usattr,54);
                 
-                if(element('pag_id',$val) === '6') array_push($usattr,55);
-                if(element('pag_id',$val) === '7') array_push($usattr,56);
-                if(element('pag_id',$val) === '8') array_push($usattr,57);
+        //         if(element('pag_id',$val) === '6') array_push($usattr,55);
+        //         if(element('pag_id',$val) === '7') array_push($usattr,56);
+        //         if(element('pag_id',$val) === '8') array_push($usattr,57);
                 
-                if(element('pag_id',$val) === '9') array_push($usattr,58);
-                if(element('pag_id',$val) === '10') array_push($usattr,59);
-                if(element('pag_id',$val) === '11') array_push($usattr,60);
+        //         if(element('pag_id',$val) === '9') array_push($usattr,58);
+        //         if(element('pag_id',$val) === '10') array_push($usattr,59);
+        //         if(element('pag_id',$val) === '11') array_push($usattr,60);
                 
-                if(element('pag_id',$val) === '12') array_push($usattr,61);
-                if(element('pag_id',$val) === '13') array_push($usattr,62);
-                if(element('pag_id',$val) === '14') array_push($usattr,63);
+        //         if(element('pag_id',$val) === '12') array_push($usattr,61);
+        //         if(element('pag_id',$val) === '13') array_push($usattr,62);
+        //         if(element('pag_id',$val) === '14') array_push($usattr,63);
 
-                if(element('pag_id',$val) === '15') array_push($usattr,64);
-                if(element('pag_id',$val) === '16') array_push($usattr,65);
-                if(element('pag_id',$val) === '17') array_push($usattr,66);
+        //         if(element('pag_id',$val) === '15') array_push($usattr,64);
+        //         if(element('pag_id',$val) === '16') array_push($usattr,65);
+        //         if(element('pag_id',$val) === '17') array_push($usattr,66);
 
-                if(element('pag_id',$val) === '18') array_push($usattr,67);
-                if(element('pag_id',$val) === '19') array_push($usattr,68);
-                if(element('pag_id',$val) === '20') array_push($usattr,69);
+        //         if(element('pag_id',$val) === '18') array_push($usattr,67);
+        //         if(element('pag_id',$val) === '19') array_push($usattr,68);
+        //         if(element('pag_id',$val) === '20') array_push($usattr,69);
 
-                if(element('pag_id',$val) === '21') array_push($usattr,70);
-                if(element('pag_id',$val) === '22') array_push($usattr,89);
-                if(element('pag_id',$val) === '23') array_push($usattr,90);
+        //         if(element('pag_id',$val) === '21') array_push($usattr,70);
+        //         if(element('pag_id',$val) === '22') array_push($usattr,89);
+        //         if(element('pag_id',$val) === '23') array_push($usattr,90);
 
-                if(element('pag_id',$val) === '24') array_push($usattr,91);
-                if(element('pag_id',$val) === '25') array_push($usattr,92);
-                if(element('pag_id',$val) === '26') array_push($usattr,93);
+        //         if(element('pag_id',$val) === '24') array_push($usattr,91);
+        //         if(element('pag_id',$val) === '25') array_push($usattr,92);
+        //         if(element('pag_id',$val) === '26') array_push($usattr,93);
 
-                if(element('pag_id',$val) === '27') array_push($usattr,94);
-            }
-        }
+        //         if(element('pag_id',$val) === '27') array_push($usattr,94);
+        //     }
+        // }
 
         $all_kind = $this->Cmall_kind_model->get_all_kind();
         $all_attr = $this->Cmall_attr_model->get_all_attr();
 
+        $ckd_value_kr_arr = array();
+        foreach(element(0,$all_kind) as $val){
+            
+            $ckd_value_kr_arr[element('ckd_value_kr',$val)] = element('ckd_id',$val);
+        }
 
-        $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind);
+        
+        $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind,$ckd_value_kr_arr);
         
         
-        
+
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
@@ -511,7 +517,7 @@ class Cmall extends CB_Controller
             ';
             $_join = '';
 
-            $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
+            $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale,ckd_id';
             
 
             $_join = "
@@ -693,16 +699,22 @@ class Cmall extends CB_Controller
 
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr)."))";
+            // $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr)."))";
 
+            $orderby_ = array();
+            foreach($skind_arr as $val){
+                $orderby_[] = ' ckd_id='.$val;
+            }
     //         if(empty($sattr))
                 // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
-            
+            $this->Board_model->set_where("ckd_id in (".implode(',',$skind_arr).")");
         }
         
         if(!empty($_join))
             $set_join[] = array("
-                (".$_join." ORDER BY RAND()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+                (".$_join." ) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+
+        $set_join[] = array("cb_cmall_kind_rel ",'cb_cmall_kind_rel.cit_id = cb_cmall_item.cit_id','inner');
 
 
         
@@ -723,22 +735,70 @@ class Cmall extends CB_Controller
             // $this->Board_model->set_group_by('cmall_item.cit_id');
         }
         $result = $this->Board_model
-            ->get_search_list(20,'' , $where,'','','');
+            ->get_search_list('','' , $where,'','',$orderby_);
         $list_num = $result['total_rows'];
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
-                $result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
-                $result['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
+                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+                $result[$val['ckd_id']]['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
 
                 
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }   
 
+        $reault_ = array();
+        $reault__['list'] = array();
+        foreach($skind_arr as $key => $val){
+
+            if(!empty($result[$val]['list'])){
+                shuffle($result[$val]['list']);
+                $reault_['list'] = $result[$val]['list'];
+            }
+
+            
+            $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
+            
+
+            if(count($reault__['list']) > 20)  break;
+        }
+        
         
         $result['pet_info'] = $pet_info;
+
+        if (!empty($skind)) {
+            
+
+            $where = array(
+                    'brd_search' => 1,
+                    'brd_blind' => 0,
+                    'cit_status' => 1,
+                    'cit_is_del' => 0,
+                    'cit_is_soldout' => 0,
+                    $sort => 1,
+                    );
+            $where = array('kinditem_group.ckd_id' => $skind);
+
+            $this->Kinditem_group_model->set_where("(kir_start_date <='".cdate('Y-m-d')."' or kir_start_date IS NULL) and (kir_end_date >='".cdate('Y-m-d')."' or kir_end_date IS NULL)");
+
+            $result2 = $this->Kinditem_group_model
+                ->get_item_list('','', $where);
+
+
+            $list_num = $result2['total_rows'];
+            if (element('list', $result2)) {
+                foreach (element('list', $result2) as $key => $val) {
+                    
+                    $result2['list'][$key] = $this->denguruapi->convert_cit_info($result2['list'][$key]);
+                    $result2['list'][$key] = $this->denguruapi->convert_brd_info($result2['list'][$key]);                    
+                }
+            }
+
+            $result['list'] = array_merge($result2['list'],$reault__['list']);
+        }
+
         $view['view'] = $result;
         
         return $view['view'];
@@ -833,7 +893,7 @@ class Cmall extends CB_Controller
         elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
         elseif((int) element('pet_age',$pet_info) > 6) array_push($sattr,14);
 
-        $skind = element('ckd_id',$pet_info);
+        // $skind = element('ckd_id',$pet_info);
 
         
         
@@ -900,7 +960,7 @@ class Cmall extends CB_Controller
         $all_attr = $this->Cmall_attr_model->get_all_attr();
 
 
-        $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind);
+        // $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind);
         /**
          * 게시판 목록에 필요한 정보를 가져옵니다.
          */
@@ -917,7 +977,7 @@ class Cmall extends CB_Controller
                 cit_status = 1
                 AND cit_is_del = 0
                 AND cit_is_soldout = 0
-                AND '.$sort.' = 1
+                AND cit_version = 1
             ';
 
 
@@ -1101,12 +1161,15 @@ class Cmall extends CB_Controller
         }
 
 
-        if($skind_arr){
-
+        if(!empty($skind_arr)){
+            $orderby_ = array();
+            foreach($skind_arr as $val){
+                $orderby_[] = ' ckd_id='.$val;
+            }
             // $this->Board_model->set_where_in('cmal1l_kind_rel.ckd_id',$skind);
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
-            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr)."))";
-
+            $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr).") order by ".implode(',',$orderby_).")";
+            
     //         if(empty($sattr))
                 // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
             
@@ -1114,7 +1177,7 @@ class Cmall extends CB_Controller
         
         if(!empty($_join))
             $set_join[] = array("
-                (".$_join." ORDER BY RAND()) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
+                (".$_join."  ) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
         // $field = array(
         //  'board' => array('brd_name'),
         //  'cmall_item' => array('cit_id','cit_name','cit_file_1','cit_review_average','cit_price','cit_price_sale'),
@@ -1125,6 +1188,7 @@ class Cmall extends CB_Controller
 
         // $this->Board_model->select = $select;
         
+
         if(!empty($set_join)) {
             $this->Board_model->set_join($set_join);
             // $this->Board_model->set_group_by('cmall_item.cit_id');
@@ -1148,7 +1212,7 @@ class Cmall extends CB_Controller
 
         $result['pet_info'] = $pet_info;
 
-        if ($skind) {
+        if (!empty($skind)) {
             
 
             $where = array(

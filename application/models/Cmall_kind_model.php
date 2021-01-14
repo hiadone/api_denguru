@@ -80,28 +80,36 @@ class Cmall_kind_model extends CB_Model
         return $result;
     }
 
-    public function get_kind_child($all_kind = array(),$skind = 0,$result = array())
+    public function get_kind_child($all_kind = array(),$skind = 0,$ckd_value_kr_arr = array())
     {
         
+        $result = array();
         array_push($result,$skind);
         
 
         $a = element('ckd_id',element(0,element($skind,$all_kind)));
-        if($a)
-            array_push($result,$a);
-        if(element('ckd_id',element(0,element($a,$all_kind)))){
-            array_push($result,element('ckd_id',element(0,element($a,$all_kind))));
-            $aa = element('ckd_id',element(0,element($a,$all_kind)));
-            if(element('ckd_id',element(0,element($aa,$all_kind)))){
-                array_push($result,element('ckd_id',element(0,element($aa,$all_kind))));
-                $aaa = element('ckd_id',element(0,element($aa,$all_kind)));
-                if(element('ckd_id',element(0,element($aaa,$all_kind)))){
 
-                    array_push($result,element('ckd_id',element(0,element($aaa,$all_kind))));
+        if($a){
+            
+            array_push($result,element(element('ckd_value_kr',element(0,element($skind,$all_kind))),$ckd_value_kr_arr));
+
+            $aa = element('ckd_id',element(0,element($a,$all_kind))); 
+
+            if($aa){
+
+                array_push($result,element(element('ckd_value_kr',element(0,element($a,$all_kind))),$ckd_value_kr_arr));
+
+                $aaa = element('ckd_id',element(0,element($aa,$all_kind))); 
+
+                if($aaa){
+                   
+                    array_push($result,element(element('ckd_value_kr',element(0,element($aa,$all_kind))),$ckd_value_kr_arr));
+
+                    
                 }
             }
-
         }
+        
         return $result;
 
     }
