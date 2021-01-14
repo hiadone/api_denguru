@@ -707,7 +707,7 @@ class Cmall extends CB_Controller
             }
     //         if(empty($sattr))
                 // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
-            $this->Board_model->set_where("ckd_id in (".implode(',',$skind_arr).")");
+            // $this->Board_model->set_where("ckd_id in (".implode(',',$skind_arr).")");
         }
         
         if(!empty($_join))
