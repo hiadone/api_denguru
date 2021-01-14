@@ -726,7 +726,7 @@ class Search extends CB_Controller
                 		// 	$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
                 		// else 
                 		if($skey != '9')
-                			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') ) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+                			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') group by cit_id) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
                 			
                 		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
                 		
@@ -892,7 +892,7 @@ class Search extends CB_Controller
 	                    		// 	$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
 	                    		// else 
 	                    		if($skey != '1')
-	                    			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+	                    			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') group by cit_id) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
 	                    			
 	                    		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
 	                    		
@@ -1335,7 +1335,7 @@ class Search extends CB_Controller
                 		// 	$_join = 'select A.cit_id,A.cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).')) AS A ';
                 		// else 
                 		if($skey != '8')
-                			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') ) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
+                			$_join .= 'INNER JOIN (select cit_id,cat_id from (select cit_id,cat_id from cb_cmall_attr_rel where cat_id in ('.implode(",",$sval).') group by cit_id) AS B'.$skey.') AS cb_cmall_attr_rel'.$skey.' ON `A`.`cit_id` = `cb_cmall_attr_rel'.$skey.'`.`cit_id`';
                 			
                 		// $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
                 		
