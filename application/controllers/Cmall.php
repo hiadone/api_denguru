@@ -526,7 +526,7 @@ class Cmall extends CB_Controller
         if($sattr && is_array($sattr)){
                         
             $sattr_id = array();
-            $usattr_id = array();
+            // $usattr_id = array();
             foreach($all_attr as $akey => $aval){
                 
                 foreach($aval as  $aaval){  
@@ -538,23 +538,23 @@ class Cmall extends CB_Controller
                 }
             }
 
-            foreach($all_attr as $akey => $aval){
+            // foreach($all_attr as $akey => $aval){
                 
-                foreach($aval as  $aaval){  
-                    foreach($usattr as $cval){
-                        if($cval == element('cat_id',$aaval)){
+            //     foreach($aval as  $aaval){  
+            //         foreach($usattr as $cval){
+            //             if($cval == element('cat_id',$aaval)){
 
-                            $usattr_id[$akey][] = $cval;
-                        }
-                    }   
-                }
-            }
+            //                 $usattr_id[$akey][] = $cval;
+            //             }
+            //         }   
+            //     }
+            // }
 
             
             
             
             $sattr_val = array();
-            $usattr_val = array();
+            // $usattr_val = array();
             foreach($sattr_id as $skey => $sval){
                 foreach($sval as $sval_){
                     array_push($sattr_val,$sval_);
@@ -564,20 +564,19 @@ class Cmall extends CB_Controller
                 
             }
 
-            foreach($usattr_id as $uskey => $usval){
-                foreach($usval as $usval_){
-                    array_push($usattr_val,$usval_);
-                }
+            // foreach($usattr_id as $uskey => $usval){
+            //     foreach($usval as $usval_){
+            //         array_push($usattr_val,$usval_);
+            //     }
                     
-                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+            //     // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
                 
-            }
+            // }
             
             
             if(!empty($sattr_val))
                 $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
-            if(!empty($usattr_val))
-                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
+            
         }
 
         if($sattr && is_array($sattr)){
@@ -619,41 +618,41 @@ class Cmall extends CB_Controller
             
         }
 
-        if($usattr && is_array($usattr)){
+        // if($usattr && is_array($usattr)){
                         
             
-            $usattr_id = array();
-            foreach($all_attr as $akey => $aval){
+        //     $usattr_id = array();
+        //     foreach($all_attr as $akey => $aval){
                 
-                foreach($aval as  $aaval){  
-                    foreach($usattr as $cval){
-                        if($cval == element('cat_id',$aaval)){
+        //         foreach($aval as  $aaval){  
+        //             foreach($usattr as $cval){
+        //                 if($cval == element('cat_id',$aaval)){
 
-                            $usattr_id[$akey][] = $cval;
-                        }
-                    }   
-                }
-            }
+        //                     $usattr_id[$akey][] = $cval;
+        //                 }
+        //             }   
+        //         }
+        //     }
 
             
             
             
             
-            $usattr_val = array();
+        //     $usattr_val = array();
             
 
-            foreach($usattr_id as $uskey => $usval){
-                foreach($usval as $usval_){
-                    array_push($usattr_val,$usval_);
-                }
+        //     foreach($usattr_id as $uskey => $usval){
+        //         foreach($usval as $usval_){
+        //             array_push($usattr_val,$usval_);
+        //         }
                     
-                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
+        //         // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
                 
-            }
+        //     }
             
-            if(!empty($usattr_val))
-                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
-        }
+        //     if(!empty($usattr_val))
+        //         $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
+        // }
 
         if($sattr2 && is_array($sattr2)){
                         
@@ -707,7 +706,7 @@ class Cmall extends CB_Controller
             }
     //         if(empty($sattr))
                 // $this->Board_model->set_join(array('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner')); 
-            // $this->Board_model->set_where("ckd_id in (".implode(',',$skind_arr).")");
+            $this->Board_model->set_where("ckd_id in (".implode(',',$skind_arr).")");
         }
         
         if(!empty($_join))
@@ -989,62 +988,7 @@ class Cmall extends CB_Controller
             $_join = "
                 select cit_id,brd_id,cit_order,cit_order1,cit_order2,cit_order3,cit_order4,cit_name,cit_file_1,cit_review_average,cit_price,cit_price_sale,".$sort_."cbr_id,cit_version from cb_cmall_item ".$cmallwhere;
         
-        if($sattr && is_array($sattr)){
-                        
-            $sattr_id = array();
-            $usattr_id = array();
-            foreach($all_attr as $akey => $aval){
-                
-                foreach($aval as  $aaval){  
-                    foreach($sattr as $cval){
-                        if($cval == element('cat_id',$aaval)){
-                            $sattr_id[$akey][] = $cval;
-                        }
-                    }   
-                }
-            }
-
-            foreach($all_attr as $akey => $aval){
-                
-                foreach($aval as  $aaval){  
-                    foreach($usattr as $cval){
-                        if($cval == element('cat_id',$aaval)){
-
-                            $usattr_id[$akey][] = $cval;
-                        }
-                    }   
-                }
-            }
-
-            
-            
-            
-            $sattr_val = array();
-            $usattr_val = array();
-            foreach($sattr_id as $skey => $sval){
-                foreach($sval as $sval_){
-                    array_push($sattr_val,$sval_);
-                }
-                    
-                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
-                
-            }
-
-            foreach($usattr_id as $uskey => $usval){
-                foreach($usval as $usval_){
-                    array_push($usattr_val,$usval_);
-                }
-                    
-                // $this->Board_model->set_where_in('cmall_attr_rel.cat_id',$sval);
-                
-            }
-            
-            
-            if(!empty($sattr_val))
-                $_join .= " and cit_id in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$sattr_val)."))";
-            if(!empty($usattr_val))
-                $_join .= " and cit_id not in (select cit_id from cb_cmall_attr_rel where cat_id in (".implode(',',$usattr_val)."))";
-        }
+        
 
         if($sattr && is_array($sattr)){
                         
@@ -1188,6 +1132,7 @@ class Cmall extends CB_Controller
 
         // $this->Board_model->select = $select;
         
+        $this->Board_model->set_where('cit_id is not null');
 
         if(!empty($set_join)) {
             $this->Board_model->set_join($set_join);
