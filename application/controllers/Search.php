@@ -202,12 +202,12 @@ class Search extends CB_Controller
 			$offset = ($page - 1) * $per_page;
 
 			if($sstart_price){            
-	            $cmallwhere .=' AND ( cit_price >='.$sstart_price.' or cit_price_sale >='.$sstart_price.')';
+	            $cmallwhere .=' AND (case when cit_price_sale > 0 then cit_price_sale >='.$sstart_price.' else cit_price >='.$sstart_price.' end)';
 	                
 	        }
 
 	        if($send_price){            
-	        	$cmallwhere .=' AND ( cit_price <='.$send_price.' or cit_price_sale <='.$send_price.')';
+	        	$cmallwhere .=' AND (case when cit_price_sale > 0 then cit_price_sale <='.$send_price.' else cit_price <='.$send_price.' end)';
 	        }
 
 	        
