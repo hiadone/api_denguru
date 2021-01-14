@@ -2085,7 +2085,7 @@ class Mypage extends CB_Controller
 	        array(
                 'field' => 'pet_name',
                 'label' => '펫 이름',
-                'rules' => 'trim|required|min_length[2]|max_length[20]',
+                'rules' => 'trim|required|min_length[1]|max_length[20]',
             ),
             array(
                 'field' => 'pet_birthday',
