@@ -739,8 +739,8 @@ class Cmall extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
-                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result[$val['ckd_id']]['list'][$key]);
+                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result[$val['ckd_id']]['list'][$key]);
                 $result[$val['ckd_id']]['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
 
                 
