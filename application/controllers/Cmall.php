@@ -733,35 +733,36 @@ class Cmall extends CB_Controller
             $this->Board_model->set_join($set_join);
             // $this->Board_model->set_group_by('cmall_item.cit_id');
         }
+        $reault_ = array();
         $result = $this->Board_model
             ->get_search_list('','' , $where,'','',$orderby_);
         $list_num = $result['total_rows'];
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result[$val['ckd_id']]['list'][$key]);
-                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result[$val['ckd_id']]['list'][$key]);
-                $result[$val['ckd_id']]['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
+                $result_[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+                $result_[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+                $result_[$val['ckd_id']]['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
 
                 
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }   
 
-        $reault_ = array();
-        $reault__['list'] = array();
+        $reault__ = array();
+        $reault___['list'] = array();
         foreach($skind_arr as $key => $val){
 
-            if(!empty($result[$val]['list'])){
-                shuffle($result[$val]['list']);
-                $reault_['list'] = $result[$val]['list'];
+            if(!empty($result_[$val]['list'])){
+                shuffle($result_[$val]['list']);
+                $reault__['list'] = $result_[$val]['list'];
             }
 
             
-            $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
+            $reault___['list'] = array_merge($reault___['list'],$reault__['list']);
             
 
-            if(count($reault__['list']) > 20)  break;
+            if(count($reault___['list']) > 20)  break;
         }
         
         
@@ -795,7 +796,7 @@ class Cmall extends CB_Controller
                 }
             }
 
-            $result['list'] = array_merge($result2['list'],$reault__['list']);
+            $result['list'] = array_merge($result2['list'],$reault___['list']);
         }
 
         $view['view'] = $result;
