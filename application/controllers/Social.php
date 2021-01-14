@@ -419,7 +419,8 @@ class Social extends CB_Controller
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_social_naver_login';
 		$this->load->event($eventname);
-
+		$post = json_encode($_POST);
+        log_message('error', $post);
 		// 이벤트가 존재하면 실행합니다
 		Events::trigger('before', $eventname);
 
@@ -1076,6 +1077,9 @@ class Social extends CB_Controller
 				$insertdata['mem_register_ip'] = $this->input->ip_address();
 				$insertdata['mem_lastlogin_datetime'] = cdate('Y-m-d H:i:s');
 				$insertdata['mem_lastlogin_ip'] = $this->input->ip_address();
+
+				$insertdata['mem_receive_email'] = 1;
+				$insertdata['mem_receive_sms'] = 1;
 
 				if ( ! function_exists('password_hash')) {
 					$this->load->helper('password');
