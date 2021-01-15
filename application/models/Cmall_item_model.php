@@ -171,7 +171,7 @@ class Cmall_item_model extends CB_Model
         
         $this->db->order_by('cnt', 'desc');
         if ($limit) {
-            $this->db->limit(3);
+            $this->db->limit(2);
         }
         $qry = $this->db->get();
         $result_ = $qry->result_array();
