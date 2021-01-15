@@ -111,6 +111,7 @@ class Cmall_item_model extends CB_Model
 	
 	public function get_popular_attr($brd_id = 0, $limit = '')
     {
+        
         $this->db->select('count(*) as cnt, cat_value,cmall_attr.cat_id ', false);
         $this->db->from('cmall_item');
         $this->db->join('cmall_attr_rel', 'cmall_attr_rel.cit_id = cmall_item.cit_id', 'inner');
@@ -132,7 +133,7 @@ class Cmall_item_model extends CB_Model
         $result = $qry->result_array();
 
 
-        $this->db->select('count(*) as cnt, cca_value,cmall_category.cca_id ', false);
+        $this->db->select('count(*) as cnt, cca_value as cat_value,cmall_category.cca_id ', false);
         $this->db->from('cmall_item');        
         $this->db->join('cmall_category_rel', 'cmall_category_rel.cit_id = cmall_item.cit_id', 'inner');
         $this->db->join('cmall_category', 'cmall_category.cca_id = cmall_category_rel.cca_id', 'inner');        
@@ -156,7 +157,7 @@ class Cmall_item_model extends CB_Model
             array_push($result,$val);
         }
         
-        $this->db->select('count(*) as cnt, ckd_value_kr,cmall_kind.ckd_id ', false);
+        $this->db->select('count(*) as cnt, ckd_value_kr as cat_value,cmall_kind.ckd_id ', false);
         $this->db->from('cmall_item');
         $this->db->join('cmall_kind_rel', 'cmall_kind_rel.cit_id = cmall_item.cit_id', 'inner');
         $this->db->join('cmall_kind', 'cmall_kind.ckd_id = cmall_kind_rel.ckd_id', 'inner');        
@@ -171,7 +172,7 @@ class Cmall_item_model extends CB_Model
         
         $this->db->order_by('cnt', 'desc');
         if ($limit) {
-            $this->db->limit(2);
+            $this->db->limit(3);
         }
         $qry = $this->db->get();
         $result_ = $qry->result_array();
@@ -181,6 +182,7 @@ class Cmall_item_model extends CB_Model
         }
 
         return $result;
+    
     }
 
     public function get_popular_cit_tags($cit_id = 0, $limit = '')
