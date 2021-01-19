@@ -4387,7 +4387,7 @@ class Cmall extends CB_Controller
 
         // $view['view']['brd_register_url'] = trim(element('brd_register_url',$board_crawl));  
         // $view['view']['brd_order_url'] = trim(element('brd_order_url',$board_crawl));
-        $view['view']['brd_updated_datetime'] = element('cit_updated_datetime', $board);
+        $view['view']['brd_updated_datetime'] = display_datetime(element('cit_updated_datetime', $board),'sns');
         
         if ( ! element('brd_id', $board)) {
             alert('이 스토어는 현재 존재하지 않습니다',"",406);

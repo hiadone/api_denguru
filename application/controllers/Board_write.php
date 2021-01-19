@@ -1634,6 +1634,8 @@ class Board_write extends CB_Controller
 
 		$this->form_validation->set_rules($config);
 		$form_validation = $this->form_validation->run();
+		$post = json_encode($_POST);
+        log_message('error', $post);
 		$file_error = '';
 		$uploadfiledata = array();
 		$uploadfiledata2 = array();

@@ -1701,7 +1701,7 @@ class Mypage extends CB_Controller
                 $result['list'][$key]['egr_image_url'] = '';
                 
 
-                $result['list'][$key]['egr_status'] = 2; 
+                
 
                 if (element('egr_image', $val)) {
                     
@@ -1727,7 +1727,7 @@ class Mypage extends CB_Controller
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }
-        // $view['view'] = $result;
+        $view['view']['data'] = $result;
         
 
         /**
@@ -1816,6 +1816,7 @@ class Mypage extends CB_Controller
 
 	protected function _resultevent()
 	{
+
 		// 이벤트 라이브러리를 로딩합니다
 		// $eventname = 'event_mypage_post';
 		// $this->load->event($eventname);
@@ -1833,7 +1834,7 @@ class Mypage extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		// $view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$this->load->model(array('Event_model','Event_group_model','Event_rel_model'));
+		$this->load->model(array('Event_model','Event_group_model','Event_register_list_model'));
 
 		
         
@@ -1845,7 +1846,7 @@ class Mypage extends CB_Controller
          */
         $param =& $this->querystring;
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
-        $findex = '(0.1/egr_order),egr_id';
+        $findex = '(0.1/egr_order),event_group.egr_id';
         $forder = 'desc';
         $sfield = $this->input->get('sfield', null, '');
         $skeyword = $this->input->get('skeyword', null, '');
@@ -1869,28 +1870,21 @@ class Mypage extends CB_Controller
         $where = array();
         
         $where['egr_activated'] = '1';
+        $where['event_register_list.mem_id'] = $mem_id;
+        $where['erl_status'] = 1;
+        $where['erl_event_result > '] = 0;
         
-        $field = array(
-            'event_group' => array('egr_id','egr_start_date','egr_end_date','egr_title','egr_datetime','egr_image','egr_content','egr_type'),
-            
-        );
+        
+        
 
-        $select = get_selected($field);
-
-        // $thumb_width = ($this->cbconfig->get_device_view_type() === 'mobile')
-        //     ? $this->cbconfig->item('cmall_product_review_mobile_thumb_width')
-        //     : $this->cbconfig->item('cmall_product_review_thumb_width');
-        $this->Event_group_model->_select = $select;
-
-        $result = $this->Event_group_model
+        $result = $this->Event_register_list_model
             ->get_admin_list($per_page, $offset, $where, '', $findex, $forder, $sfield, $skeyword);
         $list_num = $result['total_rows'];
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
                 
-                $result['list'][$key]['post_url'] = base_url('event/post/'. element('egr_id', $val));
-
+				$result['list'][$key]['post_url'] = base_url('event/post/'. element('egr_id', $val));
                 $result['list'][$key]['display_datetime'] = display_datetime(
                     element('egr_datetime', $val),'full'
                 );
@@ -1902,13 +1896,14 @@ class Mypage extends CB_Controller
                 
                 $result['list'][$key]['egr_image_url'] = '';
                 
+
+                
+
                 if (element('egr_image', $val)) {
                     
                     $result['list'][$key]['egr_image_url'] = cdn_url('eventgroup', element('egr_image', $val));
                     
-                }
-
-                $result['list'][$key]['egr_status'] = 2; 
+                } 
                 // else {
                 //     $thumb_url = get_post_image_url(element('egr_content', $val));
                 //     $result['list'][$key]['egr_image_url'] = $thumb_url
@@ -1928,7 +1923,7 @@ class Mypage extends CB_Controller
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }
-        // $view['view'] = $result;
+        $view['view']['data'] = $result;
         
 
         /**
@@ -1956,6 +1951,7 @@ class Mypage extends CB_Controller
         return $view;
 
 		
+	
 	}
 
 	public function resultevent_get()
