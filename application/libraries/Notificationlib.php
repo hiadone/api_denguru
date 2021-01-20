@@ -28,7 +28,7 @@ class Notificationlib extends CI_Controller
 	/**
 	 * 알림 내용을 인서트하는 함수입니다
 	 */
-	public function set_noti($mem_id = 0, $target_mem_id = 0, $not_type = '', $not_content_id = '', $not_message = '', $not_url = '')
+	public function set_noti($mem_id = 0, $target_mem_id = 0, $not_type = '', $not_content_id = '', $not_message = '', $not_url = '',$image_url='',$deep_link_info='')
 	{
 		$mem_id = (int) $mem_id;
 		$target_mem_id = (int) $target_mem_id;
@@ -125,6 +125,8 @@ class Notificationlib extends CI_Controller
 			'not_message' => $not_message,
 			'not_url' => $not_url,
 			'not_datetime' => cdate('Y-m-d H:i:s'),
+			'image_url' => $image_url,
+			'deep_link_info' => $deep_link_info,
 		);
 		$not_id = $this->CI->Notification_model->insert($insertdata);
 
