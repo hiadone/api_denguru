@@ -346,7 +346,7 @@ class Search extends CB_Controller
 			
 			// print_r2($result);
 			$view['view']['data'] = $result;
-			$view['view']['data']['member'] ='';
+			$view['view']['data']['member'] =false;
 			if($mem_id)
 				$view['view']['data']['member'] = $this->denguruapi->get_mem_info($this->member->item('mem_id'));					
 
