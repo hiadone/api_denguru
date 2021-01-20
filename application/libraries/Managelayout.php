@@ -215,54 +215,7 @@ class Managelayout extends CI_Controller
 			$data['member'] = $CI->denguruapi->get_mem_info($CI->member->item('mem_id'));			
 		}
 
-		if(element('path', $config) == 'cmall' && element('skin', $config) == 'main' ){
-
-			$CI->load->model(array('Banner_model'));
-			$CI->load->library('popuplib');			
-			if ($CI->member->is_member()) {		
-				$CI->load->model(
-					array(
-						'Member_pet_model',
-					)
-				);
-				$data['member']['petlist']= $CI->denguruapi->get_mem_pet_info($CI->member->item('mem_id'));
-			}
 		
-			$data['popup'] = $CI->popuplib->display_popup();
-
-			$data['banner']['main_top'] = null;
-			$data['banner']['main_middle'] = null;
-			$data['banner']['main_bottom'] = null;
-			$result = $CI->Banner_model->get_banner('main_top', "", 1);
-
-			if ($result) {
-				foreach ($result as $key => $val) {
-
-					$data['banner']['main_top']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
-					$data['banner']['main_top']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
-				}
-			}
-
-			$result = $CI->Banner_model->get_banner('main_middle', '', 1);
-
-			if ($result) {
-				foreach ($result as $key => $val) {
-
-					$data['banner']['main_middle']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
-					$data['banner']['main_middle']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
-				}
-			}
-
-			$result = $CI->Banner_model->get_banner('main_bottom', '', 1);
-
-			if ($result) {
-				foreach ($result as $key => $val) {
-
-					$data['banner']['main_bottom']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
-					$data['banner']['main_bottom']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
-				}
-			}
-		}
 		
 
 

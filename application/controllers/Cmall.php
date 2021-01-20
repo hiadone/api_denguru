@@ -259,6 +259,54 @@ class Cmall extends CB_Controller
 
         // redirect(site_url('/board/b-a-1'));
 
+        if(element('path', $config) == 'cmall' && element('skin', $config) == 'main' ){
+
+            $CI->load->model(array('Banner_model'));
+            $CI->load->library('popuplib');         
+            if ($CI->member->is_member()) {     
+                $CI->load->model(
+                    array(
+                        'Member_pet_model',
+                    )
+                );
+                $data['member']['petlist']= $CI->denguruapi->get_mem_pet_info($CI->member->item('mem_id'));
+            }
+        
+            $data['popup'] = $CI->popuplib->display_popup();
+
+            $data['banner']['main_top'] = null;
+            $data['banner']['main_middle'] = null;
+            $data['banner']['main_bottom'] = null;
+            $result = $CI->Banner_model->get_banner('main_top', "", 1);
+
+            if ($result) {
+                foreach ($result as $key => $val) {
+
+                    $data['banner']['main_top']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+                    $data['banner']['main_top']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+                }
+            }
+
+            $result = $CI->Banner_model->get_banner('main_middle', '', 1);
+
+            if ($result) {
+                foreach ($result as $key => $val) {
+
+                    $data['banner']['main_middle']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+                    $data['banner']['main_middle']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+                }
+            }
+
+            $result = $CI->Banner_model->get_banner('main_bottom', '', 1);
+
+            if ($result) {
+                foreach ($result as $key => $val) {
+
+                    $data['banner']['main_bottom']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+                    $data['banner']['main_bottom']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+                }
+            }
+        }
         return $view['view'];
     }
 
@@ -316,6 +364,55 @@ class Cmall extends CB_Controller
             'page_name' => $page_name,
         );
         $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+
+
+
+        $this->load->model(array('Banner_model'));
+        $this->load->library('popuplib');         
+        if ($this->member->is_member()) {     
+            $this->load->model(
+                array(
+                    'Member_pet_model',
+                )
+            );
+            $view['view']['layout']['member']['petlist']= $this->denguruapi->get_mem_pet_info($this->member->item('mem_id'));
+        }
+    
+        $view['view']['layout']['popup'] = $this->popuplib->display_popup();
+
+        $view['view']['layout']['banner']['main_top'] = null;
+        $view['view']['layout']['banner']['main_middle'] = null;
+        $view['view']['layout']['banner']['main_bottom'] = null;
+        $result = $this->Banner_model->get_banner('main_top', "", 1);
+
+        if ($result) {
+            foreach ($result as $key => $val) {
+
+                $view['view']['layout']['banner']['main_top']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+                $view['view']['layout']['banner']['main_top']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+            }
+        }
+
+        $result = $this->Banner_model->get_banner('main_middle', '', 1);
+
+        if ($result) {
+            foreach ($result as $key => $val) {
+
+                $view['view']['layout']['banner']['main_middle']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+                $view['view']['layout']['banner']['main_middle']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+            }
+        }
+
+        $result = $this->Banner_model->get_banner('main_bottom', '', 1);
+
+        if ($result) {
+            foreach ($result as $key => $val) {
+
+                $view['view']['layout']['banner']['main_bottom']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
+                $view['view']['layout']['banner']['main_bottom']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
+            }
+        }
+        
         $this->data = $view['view'];
         // $this->layout = element('layout_skin_file', element('layout', $view));
         // $this->view = element('view_skin_file', element('layout', $view));
@@ -4871,6 +4968,69 @@ class Cmall extends CB_Controller
         $data['search_keyword_rank'] = $view['search'];
 
         return $this->response($data, 200);
+    }
+
+    public function layout_get()
+    {
+        // 이벤트 라이브러리를 로딩합니다
+        $eventname = 'event_cmall_index';
+        //$this->load->event($eventname);
+
+        $view = array();
+        $view['view'] = array();
+        
+
+        // 이벤트가 존재하면 실행합니다
+        // $view['view']['event']['before'] = Events::trigger('before', $eventname);
+        /**
+         * 레이아웃을 정의합니다
+         */
+        $page_title = $this->cbconfig->item('site_meta_title_cmall');
+        $meta_description = $this->cbconfig->item('site_meta_description_cmall');
+        $meta_keywords = $this->cbconfig->item('site_meta_keywords_cmall');
+        $meta_author = $this->cbconfig->item('site_meta_author_cmall');
+        $page_name = $this->cbconfig->item('site_page_name_cmall');
+
+        $searchconfig = array(
+            '{컨텐츠몰명}',
+        );
+        $replaceconfig = array(
+            $this->cbconfig->item('cmall_name'),
+        );
+
+        $page_title = str_replace($searchconfig, $replaceconfig, $page_title);
+        $meta_description = str_replace($searchconfig, $replaceconfig, $meta_description);
+        $meta_keywords = str_replace($searchconfig, $replaceconfig, $meta_keywords);
+        $meta_author = str_replace($searchconfig, $replaceconfig, $meta_author);
+        $page_name = str_replace($searchconfig, $replaceconfig, $page_name);
+
+        $layoutconfig = array(
+            'path' => 'cmall',
+            'layout' => 'layout',
+            'skin' => 'main',
+            'layout_dir' => $this->cbconfig->item('layout_cmall'),
+            'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_cmall'),
+            'use_sidebar' => $this->cbconfig->item('sidebar_cmall'),
+            'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_cmall'),
+            'skin_dir' => $this->cbconfig->item('skin_cmall'),
+            'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_cmall'),
+            'page_title' => $page_title,
+            'meta_description' => $meta_description,
+            'meta_keywords' => $meta_keywords,
+            'meta_author' => $meta_author,
+            'page_name' => $page_name,
+        );
+        $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+        $this->data = $view['view'];
+        // $this->layout = element('layout_skin_file', element('layout', $view));
+        // $this->view = element('view_skin_file', element('layout', $view));
+
+        
+        
+
+        // redirect(site_url('/board/b-a-1'));
+
+        return $this->response($this->data, parent::HTTP_OK);
     }
 }
 

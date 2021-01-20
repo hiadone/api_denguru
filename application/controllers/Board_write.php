@@ -1242,8 +1242,7 @@ class Board_write extends CB_Controller
 		// 이벤트가 존재하면 실행합니다
 		$view['view']['event']['before'] = Events::trigger('before', $eventname);
 
-		$post = json_encode($_POST);
-        log_message('error', $post);
+		
 		/**
 		 * 프라이머리키에 숫자형이 입력되지 않으면 에러처리합니다
 		 */
