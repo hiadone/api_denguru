@@ -294,7 +294,7 @@ class Cmall_review extends CB_Controller
 
         $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
 
-        $per_page = 1;
+        $per_page = 2;
         if($mem_id){
             $reviewwhere = array('mem_id' => $mem_id);
             
@@ -670,7 +670,7 @@ class Cmall_review extends CB_Controller
 
         $review_flag = 0; //모든 리뷰를 볼수 있는 권한이 있는가
 
-        $per_page = 1;
+        $per_page = 2;
         if($mem_id){
             $reviewwhere = array('mem_id' => $mem_id);
             
