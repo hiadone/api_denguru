@@ -96,9 +96,10 @@ class Login extends CB_Controller
 		 */
 		if ($this->form_validation->run() === false) {
 
-			$view['msg'] = validation_errors();
+			
 
 			if(validation_errors()){
+				$view['msg'] = validation_errors();
 				log_message('error', 'msg:'. validation_errors() .' pointer:'.current_url());
             	$view['http_status_codes'] = 400;
 			}
@@ -276,6 +277,7 @@ class Login extends CB_Controller
 									'use_sociallogin_kakao' => $this->cbconfig->item('use_sociallogin_kakao') ? 1:0,
 									'use_sociallogin_google' => $this->cbconfig->item('use_sociallogin_google') ? 1:0,
 									'use_sociallogin_naver' => $this->cbconfig->item('use_sociallogin_naver') ? 1:0,
+									'login_url' => base_url('login/login'),
 								);
 
 

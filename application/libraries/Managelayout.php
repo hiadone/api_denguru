@@ -247,7 +247,7 @@ class Managelayout extends CI_Controller
 				if ($CI->member->is_member()) {
 					$CI->load->model('Notification_model');
 					$data['notification_num'] = $CI->Notification_model->unread_notification_num($mem_id);
-					$data['notification_url'] = base_url('notification/lists');
+					$data['notification_url'] = base_url('notification');
 				}
 			}
 
