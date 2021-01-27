@@ -3332,7 +3332,7 @@ class Postact extends CB_Controller
 		}
 
 		if (abs(element('mem_id', $review)) === $mem_id) {			
-			alert('본인의 글에는 추천/비추천 기능을 사용할 수 없습니다','',409);
+			// alert('본인의 글에는 추천/비추천 기능을 사용할 수 없습니다','',409);
 		}
 
 		$select = 'lik_id, lik_type';
@@ -3471,7 +3471,7 @@ class Postact extends CB_Controller
 		}
 
 		if (abs(element('mem_id', $review)) === $mem_id) {			
-			alert('본인의 글에는 추천/비추천 기능을 사용할 수 없습니다','',409);
+			// alert('본인의 글에는 추천/비추천 기능을 사용할 수 없습니다','',409);
 		}
 		
 		$deletewhere = array(

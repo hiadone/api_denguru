@@ -48,7 +48,7 @@ class Login extends CB_Controller
 		$view = array();
 		// $view['view'] = array();
 
-		
+		// print_r($_POST);
 
 		$this->load->library(array('form_validation'));
 
