@@ -67,7 +67,7 @@ class Event_group_model extends CB_Model
 
     public function get_today_list()
     {
-        $cachename = 'event_group/event_group-info';
+        $cachename = 'event_group/event-group-info';
         $data = array();
         if ( ! $data = $this->cache->get($cachename)) {
             $this->db->select($this->_select);
