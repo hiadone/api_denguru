@@ -211,7 +211,8 @@ class Board_model extends CB_Model
 			$this->db->group_end();
 		}
 
-		$this->db->order_by('cit_version');
+		if($limit !== 99999)
+			$this->db->order_by('cit_version');
 		$this->db->order_by($orderby);
 		if ($limit) {
 			$this->db->limit($limit, $offset);

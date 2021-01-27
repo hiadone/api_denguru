@@ -390,8 +390,8 @@ class Event extends CB_Controller
                         // if(!empty($eveval_id)){
 
                             $config = array(
-                                'per_page' => 9999,
-                                'findex' => '(0.1/evr_order) DESC',
+                                'per_page' => 99999,
+                                'findex' => '(0.1/evr_order) DESC,evr_id DESC',
                                 'set_join' => array('event_rel','cmall_item.cit_id = event_rel.cit_id','inner'),
                                 );
                             

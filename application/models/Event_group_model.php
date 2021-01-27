@@ -67,7 +67,7 @@ class Event_group_model extends CB_Model
 
     public function get_today_list()
     {
-        $cachename = 'event_group/event_group-info-' . cdate('Y-m-d');
+        $cachename = 'event_group/event_group-info';
         $data = array();
         if ( ! $data = $this->cache->get($cachename)) {
             $this->db->select($this->_select);
@@ -84,6 +84,7 @@ class Event_group_model extends CB_Model
             $this->db->or_where(array('egr_end_date' => null));
             $this->db->group_end();
             $this->db->order_by('(0.1/egr_order)', 'desc');            
+            $this->db->order_by('egr_id', 'desc');            
             $res = $this->db->get();
             $result['list'] = $res->result_array();
 
