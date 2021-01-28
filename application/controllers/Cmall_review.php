@@ -1034,6 +1034,15 @@ class Cmall_review extends CB_Controller
                             $uploadfiledata[$i]['rfi_type'] = str_replace('.', '', element('file_ext', $filedata));
                             $uploadfiledata[$i]['is_image'] = element('is_image', $filedata) ? element('is_image', $filedata) : 0;
 
+                            $play_extension = array('acc', 'flv', 'f4a', 'f4v', 'mov', 'mp3', 'mp4', 'm4a', 'm4v', 'oga', 'ogg', 'rss', 'webm');
+
+                            
+                            if ( in_array(element('rfi_type', $uploadfiledata[$i]), $play_extension)) {
+                                $retval = 1;
+                                $cmd ="/usr/bin/ffmpeg  -i ".$this->upload->upload_path.$this->upload->file_name."  -r 0.0033 -vf scale=-1:480 -vcodec png ".$this->upload->upload_path.$this->upload->file_name."%002d.png";
+                                @exec($cmd, $output, $retval);
+                            }
+
                             $upload = $this->aws_s3->upload_file($this->upload->upload_path,$this->upload->file_name,$upload_path);
                         } else {
                             $file_error = $this->upload->display_errors();
@@ -1113,6 +1122,15 @@ class Cmall_review extends CB_Controller
                             $uploadfiledata2[$i]['is_image'] = element('is_image', $filedata)
                                 ? element('is_image', $filedata) : 0;
 
+                            $play_extension = array('acc', 'flv', 'f4a', 'f4v', 'mov', 'mp3', 'mp4', 'm4a', 'm4v', 'oga', 'ogg', 'rss', 'webm');
+
+                            
+                            if ( in_array(element('rfi_type', $uploadfiledata2[$i]), $play_extension)) {
+                                $retval = 1;
+                                $cmd ="/usr/bin/ffmpeg  -i ".$this->upload->upload_path.$this->upload->file_name."  -r 0.0033 -vf scale=-1:480 -vcodec png ".$this->upload->upload_path.$this->upload->file_name."%002d.png";
+                                @exec($cmd, $output, $retval);
+                            }
+                            
                             $upload = $this->aws_s3->upload_file($this->upload->upload_path,$this->upload->file_name,$upload_path);
                         } else {
                             $file_error = $this->upload->display_errors();

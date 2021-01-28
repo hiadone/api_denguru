@@ -621,7 +621,13 @@ class Denguruapi extends CI_Controller
             $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
             if ($file && is_array($file)) {
                 foreach ($file as $fkey => $fvalue) {
-                    $review['review_file'][] = array('rfi_id' =>element('rfi_id', $fvalue),'uri' =>cdn_url('cmall_review', element('rfi_filename', $fvalue)));
+                   
+                    // if (file_exists(BASEPATH . config_item('uploads_dir').'/cmall_review'.element('rfi_filename', $fvalue).'01.png')) 
+                    //     $thumb_image_url = thumb_url('cmall_review', element('rfi_filename', $fvalue).'01.png');
+                    // else 
+                    //     $thumb_image_url = thumb_url();
+                    $thumb_image_url = thumb_url('cmall_review', element('rfi_filename', $fvalue).'01.png');
+                    $review['review_file'][] = array('rfi_id' =>element('rfi_id', $fvalue),'thumb_image_url' =>$thumb_image_url,'uri' =>cdn_url('cmall_review', element('rfi_filename', $fvalue)));
                 }
             }
         } 
@@ -714,8 +720,14 @@ class Denguruapi extends CI_Controller
 
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
+
+                                // if (file_exists(BASEPATH . config_item('uploads_dir').'/cmall_review'.element('rfi_filename', $fval).'01.png')) 
+                                //     $thumb_image_url = thumb_url('cmall_review', element('rfi_filename', $fval).'01.png');
+                                // else 
+                                //     $thumb_image_url = thumb_url();
+                                $thumb_image_url = thumb_url('cmall_review', element('rfi_filename', $fval).'01.png');
                                 $view['view']['list']['review_file'][] = 
-                                    array('rfi_id' =>element('rfi_id', $fval),'uri' =>cdn_url('cmall_review', element('rfi_filename', $fval)));
+                                    array('rfi_id' =>element('rfi_id', $fval),'thumb_image_url' =>$thumb_image_url,'uri' =>cdn_url('cmall_review', element('rfi_filename', $fval)));
 
                                 // [element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
                                 // $view['view']['list']['review_file'][element('rfi_id', $fval)] = cdn_url('cmall_review', element('rfi_filename', $fval));
