@@ -828,8 +828,9 @@ class Cmall extends CB_Controller
 
         if(!empty($set_join)) {
             $this->Board_model->set_join($set_join);
-            // $this->Board_model->set_group_by('cmall_item.cit_id');
+            
         }
+        $this->Board_model->set_group_by('cmall_item.cit_id');
         $result = $this->Board_model
             ->get_search_list('','' , $where,'','',$orderby_);
         $list_num = $result['total_rows'];
