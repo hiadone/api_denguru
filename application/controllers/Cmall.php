@@ -850,17 +850,19 @@ class Cmall extends CB_Controller
         foreach($skind_arr as $key => $val){
 
             if(!empty($result[$val]['list'])){
+
                 shuffle($result[$val]['list']);
                 $reault_['list'] = $result[$val]['list'];
+                $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
             }
 
             
-            $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
+            
             
 
             if(count($reault__['list']) > 20)  break;
         }
-        
+
         $result = array();
         $result['pet_info'] = $pet_info;
 
