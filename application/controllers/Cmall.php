@@ -861,7 +861,7 @@ class Cmall extends CB_Controller
             if(count($reault__['list']) > 20)  break;
         }
         
-        
+        $result = array();
         $result['pet_info'] = $pet_info;
 
         if (!empty($skind)) {
@@ -894,7 +894,7 @@ class Cmall extends CB_Controller
 
             $result['list'] = array_merge($result2['list'],$reault__['list']);
         }
-
+        $result['total_rows'] = empty(!$result['list']) ? count($result['list']) : 0;
         $view['view'] = $result;
         
         return $view['view'];
