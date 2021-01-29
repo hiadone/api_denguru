@@ -375,10 +375,10 @@ class Denguruapi extends CI_Controller
             else
                 $view['ckd_value_kr'][element('ckd_value_kr',$val)]=1;
 
-            if(element(element('pag_value',$val),element('pag_value',$view)))
-                $view['pag_value'][element('pag_value',$val)]++;
+            if(element(element('pat_value',$val),element('pat_value',$view)))
+                $view['pat_value'][element('pat_value',$val)]++;
             else
-                $view['pag_value'][element('pag_value',$val)]=1;
+                $view['pat_value'][element('pat_value',$val)]=1;
 
             if(element(element('cat_value',$val),element('cat_value',$view)))
                 $view['cat_value'][element('cat_value',$val)]++;

@@ -187,12 +187,13 @@ class Cmall_item_model extends CB_Model
 
     public function get_popular_cit_tags($cit_id = 0, $limit = '')
     {
-        $this->db->select('ckd_value_kr,pag_value,cat_value', false);
+        $this->db->select('ckd_value_kr,pat_value,cat_value', false);
         $this->db->from('crawl_link_click_log');
         $this->db->join('member_pet', 'crawl_link_click_log.mem_id = member_pet.mem_id', 'inner');
-        $this->db->join('pet_attr', 'pet_attr.pat_id = member_pet.pat_id', 'inner');
-        $this->db->join('pet_allergy_rel', 'pet_allergy_rel.pet_id = member_pet.pet_id', 'inner');
-        $this->db->join('pet_allergy', 'pet_allergy.pag_id = pet_allergy_rel.pag_id', 'inner');
+        $this->db->join('pet_attr_rel', 'pet_attr_rel.pet_id = member_pet.pet_id', 'inner');
+        $this->db->join('pet_attr', 'pet_attr.pat_id = pet_attr_rel.pat_id', 'inner');
+        
+        // $this->db->join('pet_allergy', 'pet_allergy.pag_id = pet_allergy_rel.pag_id', 'inner');
         $this->db->join('cmall_kind', 'cmall_kind.ckd_id = member_pet.ckd_id', 'inner');
         $this->db->join('cmall_attr', 'cmall_kind.ckd_size = cmall_attr.cat_id', 'inner');
 
@@ -204,7 +205,7 @@ class Cmall_item_model extends CB_Model
             $this->db->where('crawl_link_click_log.cit_id', $cit_id);
 
         $this->db->where('pat_parent >', 0);
-        $this->db->where('pag_parent >', 0);
+        // $this->db->where('pag_parent >', 0);
         $this->db->where('cat_parent >', 0);
         
         // $this->db->group_by('ckd_value_kr,pag_value,cat_value');

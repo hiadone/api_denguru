@@ -845,7 +845,7 @@ class Cmall extends CB_Controller
             }
         }   
 
-        $reault_ = array();
+        $reault_['list'] = array();
         $reault__['list'] = array();
         foreach($skind_arr as $key => $val){
 
