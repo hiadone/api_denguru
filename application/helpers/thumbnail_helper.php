@@ -58,7 +58,8 @@ if ( ! function_exists('thumbnail')) {
 		$source_file .= $filename;
 		
 		if (is_file($source_file) === false) { // 원본 파일이 없다면
-			return;
+
+			return thumb_url();
 		}
 
 		if (empty($thumb_width) && empty($thumb_height)) {
