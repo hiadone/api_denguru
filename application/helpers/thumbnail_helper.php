@@ -25,8 +25,19 @@ if ( ! function_exists('thumb_url')) {
 				$is_sharpen,
 				$um_value,
 				$create_animate_thumb
-			);
+			);			
 			return site_url($thumb);
+		}
+
+		$source_file = config_item('uploads_dir') . '/';
+		if ($type) {
+			$source_file .= $type . '/';
+		}
+		
+		$source_file .= $filename;
+		
+		if (is_file($source_file) === false) { // 원본 파일이 없다면			
+			return thumb_url();
 		}
 
 		$thumb = thumbnail(
@@ -41,6 +52,7 @@ if ( ! function_exists('thumb_url')) {
 			$um_value,
 			$create_animate_thumb
 		);
+
 		return site_url($thumb);
 	}
 }
@@ -57,9 +69,8 @@ if ( ! function_exists('thumbnail')) {
 		
 		$source_file .= $filename;
 		
-		if (is_file($source_file) === false) { // 원본 파일이 없다면
-
-			return thumb_url();
+		if (is_file($source_file) === false) { // 원본 파일이 없다면			
+			return ;
 		}
 
 		if (empty($thumb_width) && empty($thumb_height)) {
