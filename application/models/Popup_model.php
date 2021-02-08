@@ -37,7 +37,7 @@ class Popup_model extends CB_Model
 		$cachename = 'popup/popup-info-' . cdate('Y-m-d');
 		$data = array();
 		if ( ! $data = $this->cache->get($cachename)) {
-			$this->db->select('pop_id,pop_start_date,pop_end_date,pop_title,pop_content,pop_disable_hours,pop_activated,pop_image');
+			$this->db->select('pop_id,pop_start_date,pop_end_date,pop_title,pop_content,pop_disable_hours,pop_activated,pop_image','pop_deep_link_info');
 			$this->db->from($this->_table);
 			$this->db->where('pop_activated', 1);
 			$this->db->group_start();
