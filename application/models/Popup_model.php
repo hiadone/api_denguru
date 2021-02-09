@@ -52,7 +52,7 @@ class Popup_model extends CB_Model
 			$this->db->group_end();
 			$res = $this->db->get();
 			$result['list'] = $res->result_array();
-			print_r2($result['list']);
+			
 			$data['result'] = $result;
 			$data['cached'] = '1';
 
