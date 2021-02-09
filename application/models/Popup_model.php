@@ -52,7 +52,15 @@ class Popup_model extends CB_Model
 			$this->db->group_end();
 			$res = $this->db->get();
 			$result['list'] = $res->result_array();
-			
+
+			if($result['list']){
+				foreach($result['list'] as $key => $val){
+					if($val['pop_deep_link_info'])
+						$result['list'][$key]['pop_deep_link_info'] = json_decode($val['pop_deep_link_info']);	
+				}
+				
+			}
+
 			$data['result'] = $result;
 			$data['cached'] = '1';
 

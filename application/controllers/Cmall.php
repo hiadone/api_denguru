@@ -390,7 +390,7 @@ class Cmall extends CB_Controller
 
                 $view['view']['layout']['banner']['main_top']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
                 $view['view']['layout']['banner']['main_top']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
-                $view['view']['layout']['banner']['main_top']['ban_deep_link_info'] = element('ban_deep_link_info', $val);
+                $view['view']['layout']['banner']['main_top']['ban_deep_link_info'] = json_decode(element('ban_deep_link_info', $val));
             }
         }
 
@@ -401,7 +401,7 @@ class Cmall extends CB_Controller
 
                 $view['view']['layout']['banner']['main_middle']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
                 $view['view']['layout']['banner']['main_middle']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
-                $view['view']['layout']['banner']['main_middle']['ban_deep_link_info'] = element('ban_deep_link_info', $val);
+                $view['view']['layout']['banner']['main_middle']['ban_deep_link_info'] = json_decode(element('ban_deep_link_info', $val));
             }
         }
 
@@ -412,7 +412,7 @@ class Cmall extends CB_Controller
 
                 $view['view']['layout']['banner']['main_bottom']['ban_image_url'] = cdn_url('banner',element('ban_image', $val));
                 $view['view']['layout']['banner']['main_bottom']['ban_click_url'] = site_url('gotourl/banner/' . element('ban_id', $val));
-                $view['view']['layout']['banner']['main_bottom']['ban_deep_link_info'] = element('ban_deep_link_info', $val);
+                $view['view']['layout']['banner']['main_bottom']['ban_deep_link_info'] = json_decode(element('ban_deep_link_info', $val));
             }
         }
         
