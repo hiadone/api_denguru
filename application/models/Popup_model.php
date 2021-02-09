@@ -34,10 +34,10 @@ class Popup_model extends CB_Model
 
 	public function get_today_list()
 	{
-		$cachename = 'popup/popup-info-' . cdate('Y-m-d');
+		$cachename = 'popup/popup-info';
 		$data = array();
 		if ( ! $data = $this->cache->get($cachename)) {
-			$this->db->select('pop_id,pop_start_date,pop_end_date,pop_title,pop_content,pop_disable_hours,pop_activated,pop_image','pop_deep_link_info');
+			$this->db->select('pop_id,pop_start_date,pop_end_date,pop_title,pop_content,pop_disable_hours,pop_activated,pop_image,pop_deep_link_info');
 			$this->db->from($this->_table);
 			$this->db->where('pop_activated', 1);
 			$this->db->group_start();
@@ -52,7 +52,7 @@ class Popup_model extends CB_Model
 			$this->db->group_end();
 			$res = $this->db->get();
 			$result['list'] = $res->result_array();
-
+			print_r2($result['list']);
 			$data['result'] = $result;
 			$data['cached'] = '1';
 
