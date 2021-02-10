@@ -4053,7 +4053,7 @@ class Postact extends CB_Controller
                                 'schema'=>'content',
                                 'path'=>'/cmall_review/itemreviewpost',
                                 'key'=>'cit_id',
-                                'keyValue'=>element('cit_id', $getdata),
+                                'keyValue'=>element('cit_id', $review),
                             );
         	$this->load->library('notificationlib');
         	$not_message = $this->member->item('mem_nickname') . '님께서 회원님의 리뷰를 신고 하셨습니다.';
