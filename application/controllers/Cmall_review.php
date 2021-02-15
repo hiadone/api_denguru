@@ -1561,7 +1561,7 @@ class Cmall_review extends CB_Controller
 
         $this->data = $result;
         
-        return $this->response($this->data, 204);
+        return $this->response($this->data, 201);
     }
 
     public function _reviewwrite_required($str)
