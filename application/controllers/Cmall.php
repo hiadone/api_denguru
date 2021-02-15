@@ -1958,7 +1958,7 @@ class Cmall extends CB_Controller
         
         $this->data = $view['view'];
         
-        return $this->response($this->data, 204);
+        return $this->response($this->data, 201);
     }
 
     public function storewish_post($brd_id = 0,$stype='store')
@@ -2124,7 +2124,7 @@ class Cmall extends CB_Controller
         
         $this->data = $view['view'];
         
-        return $this->response($this->data, 204);
+        return $this->response($this->data, 201);
     }
 
     public function cartoption_post()

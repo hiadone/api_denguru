@@ -585,8 +585,8 @@ class Denguruapi extends CI_Controller
                 'target_type' => 3,
                 'mem_id' => $this->CI->member->is_member(),
             );
-
-            $review['reviewblamestatus'] = $this->CI->Like_model->count_by($where);  
+            
+            $review['reviewblamestatus'] = $this->CI->Blame_model->count_by($where);  
         }
 
         
@@ -670,7 +670,8 @@ class Denguruapi extends CI_Controller
                 'mem_id' => $this->CI->member->is_member(),
             );
 
-            $review['reviewblamestatus'] = $this->CI->Like_model->count_by($where);  
+
+            $review['reviewblamestatus'] = $this->CI->Blame_model->count_by($where);  
         }
 
         return $review;
