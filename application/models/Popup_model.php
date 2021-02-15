@@ -34,7 +34,7 @@ class Popup_model extends CB_Model
 
 	public function get_today_list()
 	{
-		$cachename = 'popup/popup-info';
+		$cachename = 'popup/popup-info-' . cdate('Y-m-d');
 		$data = array();
 		if ( ! $data = $this->cache->get($cachename)) {
 			$this->db->select('pop_id,pop_start_date,pop_end_date,pop_title,pop_content,pop_disable_hours,pop_activated,pop_image,pop_deep_link_info');
