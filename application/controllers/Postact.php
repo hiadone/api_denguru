@@ -3551,7 +3551,7 @@ class Postact extends CB_Controller
 
 		$result = array('msg' => $success, 'count' => $count);
 		
-		return $this->response($result, 204);
+		return $this->response($result, 201);
 	}
 
 	public function cit_link_get($cit_id = 0)
