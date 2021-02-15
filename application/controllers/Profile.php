@@ -628,6 +628,6 @@ class Profile extends CB_Controller
         	);
         }
 
-		return $this->response($result, 204);
+		return $this->response($result, 201);
 	}
 }
