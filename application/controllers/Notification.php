@@ -95,6 +95,8 @@ class Notification extends CB_Controller
 				$result['list'][$key]['num'] = $list_num--;
 				$result['list'][$key]['delete_url'] = site_url('notification/notification_delete/' . element('not_id', $val) . '?' . $param->output());
 				$result['list'][$key]['read_url'] = site_url('notification/read/' . element('not_id', $val) . '?' . $param->output());
+				$result['list'][$key]['deep_link_info'] = json_decode(element('deep_link_info', $val));;
+				
 				$result['list'][$key]['onClick'] = '';
 				if (element('not_type', $val) === 'note') {
 					$result['list'][$key]['read_url'] = 'javascript:;';
