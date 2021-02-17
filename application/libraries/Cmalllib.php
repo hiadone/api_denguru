@@ -328,7 +328,7 @@ class Cmalllib extends CI_Controller
 		);
 		$this->CI->Board_model->update($brd_id, $updatedata);
 
-		return $csi_id;
+		return array('result' => $csi_id , 'count' =>$count);
 	}
 
 	public function delwish($mem_id = 0, $cit_id = 0)
@@ -394,7 +394,7 @@ class Cmalllib extends CI_Controller
 		);
 		$result = $this->CI->Board_model->update($brd_id, $updatedata);
 
-		return $result;
+		return array('result' => $result , 'count' =>$count);
 	}
 
 	public function is_ordered_item($mem_id = 0, $cit_id = 0)

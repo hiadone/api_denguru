@@ -2025,8 +2025,8 @@ class Cmall extends CB_Controller
 
             if ($stype === 'store') {
                 $return = $this->cmalllib->addstore($mem_id, $brd_id);  
-                if ($return) {
-                    $result = array('msg' => 'success');
+                if ($return['result']) {
+                    $result = array('msg' => '즐겨 찾기 추가','count' => $return['count']);
                     $view['view']=$result;
                 }           
             } 
@@ -2106,8 +2106,8 @@ class Cmall extends CB_Controller
 
             if ($stype === 'store') {
                 $return = $this->cmalllib->delstore($mem_id, $brd_id);  
-                if ($return) {
-                    $result = array('msg' => 'success');
+                if ($return['result']) {
+                    $result = array('msg' => '즐겨 찾기 해제','count' => $return['count']);
                     $view['view']=$result;
                 }           
             } 
