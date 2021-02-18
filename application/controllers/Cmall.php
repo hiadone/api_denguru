@@ -1810,7 +1810,7 @@ class Cmall extends CB_Controller
             if ($stype === 'wish') {
                 $return = $this->cmalllib->addwish($mem_id, $cit_id);
                 if ($return) {
-                    $result = array('msg' => 'success');
+                    $result = array('msg' => 'pick 추가');
                     $view['view']=$result;
                 }
             } elseif ($stype === 'cart'
@@ -1919,7 +1919,7 @@ class Cmall extends CB_Controller
             if ($stype === 'wish') {
                 $return = $this->cmalllib->delwish($mem_id, $cit_id);
                 if ($return) {
-                    $result = array('msg' => 'success');
+                    $result = array('msg' => 'pick 해제');
                     $view['view']=$result;
                 }
             } elseif ($stype === 'cart'
