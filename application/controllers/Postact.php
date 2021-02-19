@@ -3935,27 +3935,28 @@ class Postact extends CB_Controller
 
 		$this->Cmall_wishlist_model->delete_where($where);
 
-		foreach ($cit_ids as $cit_id) {
-			$cit_id = (int) $cit_id;
-			if (empty($cit_id) OR $cit_id < 1) {
-				alert_close('잘못된 접근입니다');
-				// $result = array('error' => '잘못된 접근입니다');
-				// exit(json_encode($result));
-			}			
+		if (!empty($cit_ids))
+			foreach ($cit_ids as $cit_id) {
+				$cit_id = (int) $cit_id;
+				if (empty($cit_id) OR $cit_id < 1) {
+					alert_close('잘못된 접근입니다');
+					// $result = array('error' => '잘못된 접근입니다');
+					// exit(json_encode($result));
+				}			
 
-			
-			$insertdata = array(
-				'mem_id' => $mem_id,
-				'cit_id' => $cit_id,
-				'cwi_datetime' => cdate('Y-m-d H:i:s'),
-				'cwi_ip' => $this->input->ip_address(),
-			);
-			$cwi_id = $this->Cmall_wishlist_model->replace($insertdata);
+				
+				$insertdata = array(
+					'mem_id' => $mem_id,
+					'cit_id' => $cit_id,
+					'cwi_datetime' => cdate('Y-m-d H:i:s'),
+					'cwi_ip' => $this->input->ip_address(),
+				);
+				$cwi_id = $this->Cmall_wishlist_model->replace($insertdata);
 
-			
+				
 
-			
-		}
+				
+			}
 
 		foreach ($cit_id_arr as $val) {
 			$val['cit_id'] = (int) element('cit_id',$val);
