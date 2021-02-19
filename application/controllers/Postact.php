@@ -3917,8 +3917,12 @@ class Postact extends CB_Controller
 
 
 		$cit_ids = $this->input->post('chk_cit_id');
-		if (empty($cit_ids)) {
-			alert_close('선택된 게시물이 없습니다.');
+
+		$checkedAllPickFlag = $this->input->post('checkedAllPickFlag');
+
+		
+		if (empty($cit_ids) && !$checkedAllPickFlag) {
+			alert_close('선택된 항목이 없습니다.');
 			// $result = array('error' => '선택된 게시물이 없습니다.');
 			// exit(json_encode($result));
 		}
@@ -3977,8 +3981,10 @@ class Postact extends CB_Controller
 			
 		}
 
+		$result = array('msg' => '수정 되었습니다.');
+        $view['view']= $result;
 		// 이벤트가 존재하면 실행합니다
-		return $this->response('', 201);
+		return $this->response($view['view'], 201);
 
 	}
 
