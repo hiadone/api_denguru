@@ -628,7 +628,7 @@ class Cmall_review extends CB_Controller
             'meta_author' => $meta_author,
             'page_name' => $page_name,
         );
-        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+        $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
         $this->data = $view['view'];
    
         return $this->response($this->data, parent::HTTP_OK);
@@ -942,12 +942,12 @@ class Cmall_review extends CB_Controller
             array(
                 'field' => 'cre_good',
                 'label' => '좋았던 점 ',
-                'rules' => 'trim|required',
+                'rules' => 'trim|required|min_length[20]',
             ),
             array(
                 'field' => 'cre_bad',
                 'label' => '아쉬운 점',
-                'rules' => 'trim|required',
+                'rules' => 'trim|required|min_length[20]',
             ),
             array(
                 'field' => 'cre_tip',
