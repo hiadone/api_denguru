@@ -507,7 +507,7 @@ class Cmall extends CB_Controller
          */
         
 
-        $usattr = $sattr2 = $skind_arr = $sattr =  array();        
+        $orderby_ = $usattr = $sattr2 = $skind_arr = $sattr =  array();        
 
         $skind = '';
 
@@ -799,7 +799,7 @@ class Cmall extends CB_Controller
             // $this->Board_model->set_where('cb_cmall_attr.cat_id in(select ckd_size from cb_cmall_kind where ckd_id in ('.implode(",",$skind).'))','',false);
             // $_join .=" and cit_id in (select cit_id from cb_cmall_kind_rel where ckd_id in (".implode(',',$skind_arr)."))";
 
-            $orderby_ = array();
+            
             foreach($skind_arr as $val){
                 $orderby_[] = ' ckd_id='.$val;
             }
@@ -867,6 +867,7 @@ class Cmall extends CB_Controller
         }
 
         $result = array();
+        $result['list'] = array();
         $result['pet_info'] = $pet_info;
 
         if (!empty($skind)) {
