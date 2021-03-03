@@ -839,68 +839,72 @@ class Cmall extends CB_Controller
         if (element('list', $result)) {
             foreach (element('list', $result) as $key => $val) {
 
-                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
-                $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result[$val['ckd_id']]['list'][$key]);
-                $result[$val['ckd_id']]['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
+                $result['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+                $result['list'][$key] = $this->denguruapi->convert_brd_info($result['list'][$key]);
+                $result['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
+
+                // $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_cit_info($result['list'][$key]);
+                // $result[$val['ckd_id']]['list'][$key] = $this->denguruapi->convert_brd_info($result[$val['ckd_id']]['list'][$key]);
+                // $result[$val['ckd_id']]['list'][$key]['attr'] = $this->Cmall_attr_model->get_attr(element('cit_id',$val));
 
                 
                 // $result['list'][$key]['num'] = $list_num--;
             }
         }   
 
-        $reault_['list'] = array();
-        $reault__['list'] = array();
-        foreach($skind_arr as $key => $val){
+        // $reault_['list'] = array();
+        // $reault__['list'] = array();
+        // foreach($skind_arr as $key => $val){
 
-            if(!empty($result[$val]['list'])){
+        //     if(!empty($result[$val]['list'])){
 
-                shuffle($result[$val]['list']);
-                $reault_['list'] = $result[$val]['list'];
-                $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
-            }
+        //         shuffle($result[$val]['list']);
+        //         $reault_['list'] = $result[$val]['list'];
+        //         $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
+        //     }
 
             
             
             
 
-            if(count($reault__['list']) > 20)  break;
-        }
+        //     if(count($reault__['list']) > 20)  break;
+        // }
 
-        $result = array();
-        $result['list'] = array();
-        $result['pet_info'] = $pet_info;
+        // $result = array();
+        // $result['list'] = array();
+        // $result['pet_info'] = $pet_info;
 
-        if (!empty($skind)) {
+        // if (!empty($skind)) {
             
 
-            $where = array(
-                    'brd_search' => 1,
-                    'brd_blind' => 0,
-                    'cit_status' => 1,
-                    'cit_is_del' => 0,
-                    'cit_is_soldout' => 0,
-                    $sort => 1,
-                    );
-            $where = array('kinditem_group.ckd_id' => $skind);
+        //     $where = array(
+        //             'brd_search' => 1,
+        //             'brd_blind' => 0,
+        //             'cit_status' => 1,
+        //             'cit_is_del' => 0,
+        //             'cit_is_soldout' => 0,
+        //             $sort => 1,
+        //             );
+        //     $where = array('kinditem_group.ckd_id' => $skind);
 
-            $this->Kinditem_group_model->set_where("(kir_start_date <='".cdate('Y-m-d')."' or kir_start_date IS NULL) and (kir_end_date >='".cdate('Y-m-d')."' or kir_end_date IS NULL)");
+        //     $this->Kinditem_group_model->set_where("(kir_start_date <='".cdate('Y-m-d')."' or kir_start_date IS NULL) and (kir_end_date >='".cdate('Y-m-d')."' or kir_end_date IS NULL)");
 
-            $result2 = $this->Kinditem_group_model
-                ->get_item_list('','', $where);
+        //     $result2 = $this->Kinditem_group_model
+        //         ->get_item_list('','', $where);
 
 
-            $list_num = $result2['total_rows'];
-            if (element('list', $result2)) {
-                foreach (element('list', $result2) as $key => $val) {
+        //     $list_num = $result2['total_rows'];
+        //     if (element('list', $result2)) {
+        //         foreach (element('list', $result2) as $key => $val) {
                     
-                    $result2['list'][$key] = $this->denguruapi->convert_cit_info($result2['list'][$key]);
-                    $result2['list'][$key] = $this->denguruapi->convert_brd_info($result2['list'][$key]);                    
-                }
-            }
+        //             $result2['list'][$key] = $this->denguruapi->convert_cit_info($result2['list'][$key]);
+        //             $result2['list'][$key] = $this->denguruapi->convert_brd_info($result2['list'][$key]);                    
+        //         }
+        //     }
 
-            $result['list'] = array_merge($result2['list'],$reault__['list']);
-        }
-        $result['total_rows'] = empty(!$result['list']) ? count($result['list']) : 0;
+        //     $result['list'] = array_merge($result2['list'],$reault__['list']);
+        // }
+        // $result['total_rows'] = empty(!$result['list']) ? count($result['list']) : 0;
         $view['view'] = $result;
         
         return $view['view'];
