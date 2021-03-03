@@ -507,9 +507,8 @@ class Cmall extends CB_Controller
          */
         
 
-        $sattr =  array();
-        $sattr2 =  array();
-        $usattr =  array();
+        $usattr = $sattr2 = $skind_arr = $sattr =  array();        
+
         $skind = '';
 
 
@@ -521,7 +520,7 @@ class Cmall extends CB_Controller
         elseif((int) element('pet_age',$pet_info) < 7) array_push($sattr,13);
         elseif((int) element('pet_age',$pet_info) > 7) array_push($sattr,14);
 
-        $skind = element('ckd_id',$pet_info);
+        // $skind = element('ckd_id',$pet_info);
 
         
         // if(element('pet_attr',$pet_info)){
@@ -593,7 +592,7 @@ class Cmall extends CB_Controller
         }
 
         
-        $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind,$ckd_value_kr_arr);
+        // $skind_arr = $this->Cmall_kind_model->get_kind_child($all_kind,$skind,$ckd_value_kr_arr);
         
         
 
@@ -983,7 +982,7 @@ class Cmall extends CB_Controller
          */
         
 
-        $sattr =  array();
+        $skind_arr = $sattr =  array();
         $sattr2 =  array();
         $usattr =  array();
         $skind = '';
