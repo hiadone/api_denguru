@@ -872,7 +872,7 @@ class Cmall extends CB_Controller
 
         // $result = array();
         // $result['list'] = array();
-        // $result['pet_info'] = $pet_info;
+        $result['pet_info'] = $pet_info;
 
         // if (!empty($skind)) {
             
