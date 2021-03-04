@@ -681,10 +681,10 @@ class Denguruapi extends CI_Controller
     {
         $cit_id = (int) $cit_id;
         if (empty($cit_id) OR $cit_id < 1) {
-            return;
+            return false;
         }
 
-        $view['view'] = array();
+        $view['view'] = false;
         $this->CI->load->model(array('Cmall_review_model','Review_file_model'));
 
         $popular = $this->CI->Cmall_review_model->get_popular($cit_id,6);
