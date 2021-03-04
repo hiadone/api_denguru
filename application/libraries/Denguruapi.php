@@ -592,7 +592,7 @@ class Denguruapi extends CI_Controller
         
         $this->CI->load->model('Review_file_model');
 
-        $review['review_image'] = false;
+        $review['review_image'] = array();
         if (element('cre_image', $review)) {
             $imagewhere = array(
                 'cre_id' => element('cre_id', $review),
@@ -611,7 +611,7 @@ class Denguruapi extends CI_Controller
             
         } 
 
-        $review['review_file'] = false;
+        $review['review_file'] = array();
         if (element('cre_file', $review)) {
             $imagewhere = array(
                 'cre_id' => element('cre_id', $review),
@@ -700,7 +700,7 @@ class Denguruapi extends CI_Controller
                             'rfi_is_image' => 1,
                         );
                         $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
-                        $view['view']['list']['review_image'] = false;
+                        $view['view']['list']['review_image'] = array();
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
                                 $view['view']['list']['review_image'][] =
@@ -718,7 +718,7 @@ class Denguruapi extends CI_Controller
                         );
                         $file = $this->CI->Review_file_model->get('', '', $imagewhere, '', '', 'rfi_id', 'ASC');
 
-                        $view['view']['list']['review_file'] = false;
+                        $view['view']['list']['review_file'] = array();
                         foreach($file as $fval){
                             if (element('rfi_filename', $fval)) {
 
