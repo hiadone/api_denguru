@@ -616,7 +616,7 @@ class Cmall extends CB_Controller
             ';
             $_join = '';
 
-            $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale,ckd_id';
+            $this->Board_model->_select = 'board.brd_id,board.brd_name,board.brd_image,board.brd_blind,cmall_item.cit_id,cmall_item.cit_name,cmall_item.cit_file_1,cmall_item.cit_review_average,cmall_item.cit_price,cmall_item.cit_price_sale';
             
 
             $_join = "
@@ -812,7 +812,7 @@ class Cmall extends CB_Controller
             $set_join[] = array("
                 (".$_join." ) as cb_cmall_item ",'cmall_item.brd_id = board.brd_id','inner');
 
-        $set_join[] = array("cb_cmall_kind_rel ",'cb_cmall_kind_rel.cit_id = cb_cmall_item.cit_id','inner');
+        // $set_join[] = array("cb_cmall_kind_rel ",'cb_cmall_kind_rel.cit_id = cb_cmall_item.cit_id','inner');
 
 
         
@@ -856,12 +856,12 @@ class Cmall extends CB_Controller
         // $reault__['list'] = array();
         // foreach($skind_arr as $key => $val){
 
-        //     if(!empty($result[$val]['list'])){
+            if(!empty($result['list'])){
 
-        //         shuffle($result[$val]['list']);
-        //         $reault_['list'] = $result[$val]['list'];
-        //         $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
-        //     }
+                shuffle($result['list']);
+                // $reault_['list'] = $result[$val]['list'];
+                // $reault__['list'] = array_merge($reault__['list'],$reault_['list']);
+            }
 
             
             
