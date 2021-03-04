@@ -264,6 +264,7 @@ class Cmall_review extends CB_Controller
         $sform = element('sform', $config) ? element('sform', $config) : array();
         $sscore = element('sscore', $config) ? element('sscore', $config) : array();
         $sage = element('sage', $config) ? element('sage', $config) : array();
+        $sort = element('sort', $config) ? element('sort', $config) : 'cre_like';
         $is_mypet_match = element('is_mypet_match', $config) ? element('is_mypet_match', $config) : 0;
 
         $view = $data = array();
@@ -312,7 +313,7 @@ class Cmall_review extends CB_Controller
          */
         $param =& $this->querystring;
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
-        $findex = $this->input->get('findex', null, 'cre_like');
+        $findex = $sort ? $sort : 'cre_like';
         $forder = $this->input->get('forder', null, 'desc');
         $sfield = '';
         $skeyword = '';
@@ -331,11 +332,11 @@ class Cmall_review extends CB_Controller
         $where = array();
         
 
-        if($skind){            
-            $where['ckd_id'] = $skind;
+        // if($skind){            
+        //     $where['ckd_id'] = $skind;
             
                 
-        }
+        // }
         if($sform){    
             $this->Cmall_review_model->set_where_in('pat_id',$sform);        
                 
@@ -583,6 +584,7 @@ class Cmall_review extends CB_Controller
             'sform' => $sform,
             'sage' => $sage,
             'is_mypet_match' => $this->input->get('is_mypet_match'),
+            'sort' => $this->input->get('sort'),
             'sscore' => $sscore,
 
         );
