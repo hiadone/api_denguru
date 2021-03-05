@@ -1478,7 +1478,7 @@ class Cmall_review extends CB_Controller
         
 
         if (empty($cit_id) OR $cit_id < 1) {
-            show_404();
+            alert('상품이 현재 존재하지 않습니다',"",400);
         }
 
         $view = array();
