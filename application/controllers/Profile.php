@@ -489,9 +489,9 @@ class Profile extends CB_Controller
 		);
 		$reviewercount = $this->Reviewer_model
 		->count_by($countwhere);
-		if ($reviewercount > 0) {
-			$result = array('error' => '이미 Reviewer로 등록된 회원입니다');
-			exit(json_encode($result));
+		if ($reviewercount > 0) {			
+			alert('이미 Reviewer로 등록된 회원입니다','',409);
+			
 		}
 		$insertdata = array(
 			'mem_id' => $mem_id,
