@@ -767,7 +767,7 @@ class Denguruapi extends CI_Controller
 
         $data = array();
 
-        if($this->CI->member->is_member() !== $_mem_id){
+        // if($this->CI->member->is_member() !== $_mem_id){
             $data['member_reviewer_url']= base_url('/profile/reviewer/'.$_mem_id);
 
             
@@ -781,7 +781,7 @@ class Denguruapi extends CI_Controller
                 $data['reviewerstatus'] = $this->CI->Reviewer_model
                 ->count_by($countwhere);  
             }
-        }
+        // }
         $member = $this->CI->Member_model->get_by_memid($_mem_id);
         
         
