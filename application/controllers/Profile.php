@@ -520,14 +520,14 @@ class Profile extends CB_Controller
 		);
 		$this->Member_model->update($this->member->item('mem_id'), $updatedata);
 
-		$result['success'] = html_escape(element('mem_nickname', $target)) . ' 님을 Reviewer 하셨습니다';
+		$result['msg'] = html_escape(element('mem_nickname', $target)) . ' 님을 Reviewer 하셨습니다';
 		$result['my_count'] = $my_count;
 		$result['target_count'] = $target_count;
 
 		// 이벤트가 존재하면 실행합니다
 		$resutl['event']['after'] = Events::trigger('after', $eventname);
 
-		if ( $result['success'] && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_reviewer')) {
+		if ( $result['msg'] && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_reviewer')) {
 
         	$this->load->library('notificationlib');
         	$not_message = $this->member->item('mem_nickname') . '님께서 회원님을 Reviewer 하셨습니다.';
@@ -619,14 +619,14 @@ class Profile extends CB_Controller
 		);
 		$this->Member_model->update($mem_id, $updatedata);
 
-		$result['success'] = html_escape(element('mem_nickname', $target)) . ' 님이 Reviewer 해제되었습니다';
+		$result['msg'] = html_escape(element('mem_nickname', $target)) . ' 님이 Reviewer 해제되었습니다';
 		$result['my_count'] = $my_count;
 		$result['target_count'] = $target_count;
 
 		// 이벤트가 존재하면 실행합니다
 		$resutl['event']['after'] = Events::trigger('after', $eventname);
 
-		if ( $result['success'] && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_reviewer')) {
+		if ( $result['msg'] && $this->cbconfig->item('use_notification') && $this->cbconfig->item('notification_reviewer')) {
 
         	$this->load->library('notificationlib');
         	$not_message = $this->member->item('mem_nickname') . '님께서 회원님을 Reviewer 해제되었습니다.';
