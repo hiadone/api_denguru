@@ -496,7 +496,7 @@ class Profile extends CB_Controller
 		$insertdata = array(
 			'mem_id' => $mem_id,
 			'target_mem_id' => element('mem_id', $target),
-			'fol_datetime' => cdate('Y-m-d H:i:s'),
+			'rve_datetime' => cdate('Y-m-d H:i:s'),
 		);
 		$rve_id = $this->Reviewer_model->insert($insertdata);
 
