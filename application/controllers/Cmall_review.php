@@ -735,7 +735,10 @@ class Cmall_review extends CB_Controller
                 
 
                 
-                
+                $result['list'][$key]['display_datetime'] = display_datetime(
+                    element('cre_datetime', $val),
+                    'sns',
+                );
 
 
                 $result['list'][$key]['can_update'] = false;
