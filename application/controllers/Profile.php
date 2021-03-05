@@ -443,13 +443,13 @@ class Profile extends CB_Controller
 		exit(json_encode($result));
 	}
 
-	public function reviewer_post($mem_id = 0)
+	public function reviewer_post($target_mem_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_profile_add_follow';
 		$this->load->event($eventname);
 
-		if (empty($mem_id)) {
+		if (empty($target_mem_id)) {
 			show_404();
 		}
 
@@ -467,10 +467,10 @@ class Profile extends CB_Controller
 		$mem_id = (int) $this->member->item('mem_id');
 
 		$select = 'mem_id, mem_nickname, mem_homepage, mem_receive_email, mem_use_note, mem_open_profile, mem_denied';
-		$target = $this->Member_model->get_by_memid($mem_id, $select);
+		$target = $this->Member_model->get_by_memid($target_mem_id, $select);
 		if ( ! element('mem_id', $target)) {
 
-			$memberleave = $this->Memberleave_model->get_by_memid($mem_id, $select);
+			$memberleave = $this->Memberleave_model->get_by_memid($target_mem_id, $select);
 
 			if (element('mem_id', $memberleave)) 
 				alert('탈퇴 또는 차단된 회원입니다','',403);
@@ -550,13 +550,13 @@ class Profile extends CB_Controller
 	/**
 	 * 친구해제 관련 함수입니다
 	 */
-	public function reviewer_delete($mem_id = 0)
+	public function reviewer_delete($target_mem_id = 0)
 	{
 		// 이벤트 라이브러리를 로딩합니다
 		$eventname = 'event_profile_delete_follow';
 		$this->load->event($eventname);
 
-		if (empty($mem_id)) {
+		if (empty($target_mem_id)) {
 			show_404();
 		}
 
@@ -574,10 +574,10 @@ class Profile extends CB_Controller
 
 		$select = 'mem_id, mem_nickname, mem_homepage, mem_receive_email,
 			mem_use_note, mem_open_profile, mem_denied';
-		$target = $this->Member_model->get_by_memid($mem_id, $select);
+		$target = $this->Member_model->get_by_memid($target_mem_id, $select);
 		if ( ! element('mem_id', $target)) {			
 
-			$memberleave = $this->Memberleave_model->get_by_memid($mem_id, $select);
+			$memberleave = $this->Memberleave_model->get_by_memid($target_mem_id, $select);
 
 			if (element('mem_id', $memberleave)) 
 				alert('탈퇴 또는 차단된 회원입니다','',403);
