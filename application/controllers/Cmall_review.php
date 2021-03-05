@@ -844,7 +844,7 @@ class Cmall_review extends CB_Controller
             'meta_author' => $meta_author,
             'page_name' => $page_name,
         );
-        // $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+        $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
 
         $this->data = $view['view'];
    

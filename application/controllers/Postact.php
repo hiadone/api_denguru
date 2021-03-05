@@ -3544,7 +3544,7 @@ class Postact extends CB_Controller
 		$this->Cmall_review_model->update($cre_id, $updata);
 
 		$status = $like_type === 1 ? '추천' : '비추천';
-		$success = '이 글의 ' . $status . '삭제 하셨습니다';
+		$success = '이 글의 ' . $status . '을 삭제 하셨습니다';
 
 		// 이벤트가 존재하면 실행합니다
 		// Events::trigger('after', $eventname);
