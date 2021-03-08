@@ -301,7 +301,7 @@ class Cmall_review extends CB_Controller
             
             if($this->Cmall_review_model->count_by($reviewwhere)) {
                 $review_flag = 1;
-                $per_page = get_listnum(5);
+                $per_page = get_listnum(10000);
             }
             
         }
@@ -678,7 +678,7 @@ class Cmall_review extends CB_Controller
             
             if($this->Cmall_review_model->count_by($reviewwhere)) {
                 $review_flag = 1;
-                $per_page = get_listnum(5);
+                $per_page = get_listnum(10000);
             }
             
         }

@@ -2044,7 +2044,7 @@ class Mypage extends CB_Controller
 	    /**
 	     * 수정 페이지일 경우 기존 데이터를 가져옵니다
 	     */
-	    $getdata = array();
+	    $getdata = false;
 	    if ($pid) {
 	        $getdata = $this->Member_pet_model->get_one($pid);
 	        if(empty(element('pet_id',$getdata)))
