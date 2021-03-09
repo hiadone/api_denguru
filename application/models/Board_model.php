@@ -183,6 +183,7 @@ class Board_model extends CB_Model
 		if ($search_where) {
 			$this->db->where($search_where);
 		}
+		
 		if ($this->where_in) {
 			foreach($this->where_in as $wval){
 				$this->db->where_in(key($wval),$wval[key($wval)]);	

@@ -1454,7 +1454,7 @@ class Cmall extends CB_Controller
             $item_ids = $this->input->get('chk_item_id');
             $swhere  = array('cit_id' => $item_ids);
         }
-
+        
         $view['view']['data'] = $this->cmalllib->_itemlists($category_id,$brd_id,$swhere);  
             
         // 이벤트가 존재하면 실행합니다

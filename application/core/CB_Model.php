@@ -447,7 +447,7 @@ class CB_Model extends CI_Model
 			return false;
 		}
 
-		if ($where && is_array($where)) {
+		if ($where && is_array($where)) {			
 			$this->db->group_start();			
 			$this->db->where_in($field_key, $where);
 			$this->db->group_end();

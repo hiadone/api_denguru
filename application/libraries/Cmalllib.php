@@ -1611,7 +1611,7 @@ class Cmalllib extends CI_Controller
             foreach($swhere as $skey => $sval){
                 if(!empty($sval)){
                     if(is_array($sval) )
-                        $this->CI->Board_model->group_where_in($skey,$sval);
+                        $this->CI->Board_model->set_where_in($skey,$sval);
                     else
                         $where[$skey] = $sval;
                 }
