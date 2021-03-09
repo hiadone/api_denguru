@@ -909,7 +909,7 @@ class Cmall_review extends CB_Controller
         /**
          * 수정 페이지일 경우 기존 데이터를 가져옵니다
          */
-        $review = array();
+        $review = false;
         if ($cre_id) {
             $review = $this->Cmall_review_model->get_one($cre_id);
             if ( ! element('cre_id', $review)) {
