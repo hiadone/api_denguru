@@ -92,7 +92,7 @@ class Cmall_review extends CB_Controller
         $param =& $this->querystring;
         $page = (((int) $this->input->get('page')) > 0) ? ((int) $this->input->get('page')) : 1;
         $findex = $this->input->get('findex', null, 'cre_like');
-        $findex = 'cre_type1, cre_like';
+        $findex = 'cre_type1, cre_like,cre_id';
         $forder = $this->input->get('forder', null, 'desc');
         $sfield = '';
         $skeyword = '';

@@ -18,7 +18,7 @@ class Board_post extends CB_Controller
 	/**
 	 * 모델을 로딩합니다
 	 */
-	protected $models = array('Post', 'Post_meta', 'Post_extra_vars','Crawl_tag','Vision_api_label','Post_link','Cmall_item','Board_crawl');
+	protected $models = array('Post', 'Post_meta', 'Post_extra_vars','Crawl_tag','Vision_api_label','Post_link','Cmall_item','Board_crawl','Comment');
 
 	/**
 	 * 헬퍼를 로딩합니다
@@ -1938,7 +1938,7 @@ class Board_post extends CB_Controller
 			$category_id = '';
 		}
 
-		$this->Post_model->_select ='post_id,post_num,post_reply,brd_id,post_title,post_content,post.mem_id,post_datetime,post_updated_datetime,post_html,post_blame,post_userid,post_nickname,post_file,post_image';
+		$this->Post_model->_select ='post_id,post_num,post_reply,brd_id,post_title,post_content,post.mem_id,post_datetime,post_updated_datetime,post_html,post_blame,post_userid,post_nickname,post_file,post_image,post_comment_count';
 
 		$result = $this->Post_model
 			->get_post_list($per_page, $offset, $where, $category_id, $findex, $sfield, $skeyword);
@@ -1979,6 +1979,11 @@ class Board_post extends CB_Controller
 					$result['list'][$key]['display_name'] = '익명사용자';
 				}
 
+
+				if(element('post_comment_count', $val)){					
+					$comment = $this->Comment_model->get_one('','',array('post_id' => element('post_id', $val)));
+					$result['list'][$key]['comment'] = element('cmt_content', $comment);	
+				}
 				$result['list'][$key]['display_datetime'] = display_datetime(
 					element('post_datetime', $val),
 					$list_date_style,
