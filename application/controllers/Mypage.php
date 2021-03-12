@@ -2642,7 +2642,7 @@ class Mypage extends CB_Controller
 		$view = array();
 		if($mem_receive_type === 'mem_receive_email'){
 
-			$updatedata['mem_receive_email'] = $flag;			
+			$updatedata['mem_receive_email'] = $flag ? 1 : 0;			
 
 			$this->Member_model->update($mem_id, $updatedata);
 
@@ -2650,7 +2650,7 @@ class Mypage extends CB_Controller
 
         	
         } elseif($mem_receive_type === 'mem_receive_sms'){
-        		$updatedata['mem_receive_sms'] = $flag;			
+        		$updatedata['mem_receive_sms'] = $flag ? 1 : 0;			
 
         		$this->Member_model->update($mem_id, $updatedata);
 
