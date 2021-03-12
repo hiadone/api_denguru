@@ -353,6 +353,16 @@ class Comment_write extends CB_Controller
 
 				if ($this->cbconfig->item('use_notification')
 					&& $this->cbconfig->item('notification_comment')) {
+
+					$deep_link_info = null;
+
+           			$deep_link_info = array(
+			                                'schema'=>'content',
+			                                'path'=>'/cmall_review/complain',
+			                                'key'=>'post_id',
+			                                'keyValue'=>'',
+			                            );
+
 					$this->load->library('notificationlib');
 					$not_message = $updatedata['cmt_nickname'] . '님께서 [' . element('post_title', $post) . '] 에 댓글을 남기셨습니다';
 					$not_url = post_url(element('brd_key', $board), $post_id) . '#comment_' . $cmt_id;
@@ -362,7 +372,9 @@ class Comment_write extends CB_Controller
 						'comment',
 						$cmt_id,
 						$not_message,
-						$not_url
+						$not_url,
+						'',
+        				json_encode($deep_link_info),
 					);
 				}
 				if ($origin
