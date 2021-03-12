@@ -360,7 +360,7 @@ class Comment_write extends CB_Controller
 			                                'schema'=>'content',
 			                                'path'=>'/cmall_review/complain',
 			                                'key'=>'post_id',
-			                                'keyValue'=>'',
+			                                'keyValue'=>element('post_id', $post),
 			                            );
 
 					$this->load->library('notificationlib');
