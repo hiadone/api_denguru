@@ -60,7 +60,8 @@ class JWT
 				//throw new DomainException('Empty algorithm');
 			}
 			if ($sig != JWT::sign("$headb64.$bodyb64", $key, $header->alg)) {
-				throw new UnexpectedValueException('Signature verification failed');
+				return false;
+				// throw new UnexpectedValueException('Signature verification failed');
 			}
 		}
 		return $payload;
