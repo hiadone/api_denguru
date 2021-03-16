@@ -1362,7 +1362,7 @@ class Register extends CB_Controller
 		if (empty($nickname)) {
 			$result = array(
 				'result' => 'error',
-				'msg' => '닉네임값이 넘어오지 않았습니다',
+				'msg' => '닉네임을 입력해 주세요',
 			);
 			return $this->response($result, 200);
 		}
@@ -1800,18 +1800,7 @@ class Register extends CB_Controller
 				'mem_phone' => $mem_phone,
 			);
 			$mem_info = $this->Member_model->get_one('','mem_email',$where);
-
-			if(element('mem_email',$mem_info)){
-
-
-				$mem_email = explode('@',element('mem_email',$mem_info));
-
-				if(element(1,$mem_email))
-					$msg= "이미 ".$this->mytory_asterisk(element(0,$mem_email)).'@'.element(1,$mem_email)." 으로 가입 하셨습니다.\n가입은 그대로 진행 합니다.";
-				else
-					$msg= "이미 ".$this->mytory_asterisk(element(0,$mem_email))." 으로 가입 하셨습니다.\n가입은 그대로 진행 합니다.";
-	       			
-	       	}
+			
             $result = array('result'=>'success','msg' => $msg);
             return $this->response($result, 200);
            
