@@ -393,6 +393,11 @@ class Register extends CB_Controller
 			'label' => '추천인아이디',
 			'rules' => 'trim|min_length[3]|max_length[50]|callback__mem_recommend_check',
 		);
+		$configbasic['agree'] = array(
+				'field' => 'agree',
+				'label' => '서비스 이용약관',
+				'rules' => 'trim|required',
+		);		
 
 		// if ($this->member->is_admin() === false && ! $this->session->userdata('registeragree')) {
 		// 	$this->session->set_flashdata(
