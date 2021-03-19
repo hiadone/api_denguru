@@ -416,13 +416,11 @@ class Social extends CB_Controller
 	 */
 	 public function naver_login_post()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_social_naver_login';
-		$this->load->event($eventname);
+	
 		$post = json_encode($_POST);
         log_message('error', $post);
 		// 이벤트가 존재하면 실행합니다
-		Events::trigger('before', $eventname);
+		
 
 		if ( ! $this->cbconfig->item('use_sociallogin_naver')) {
 			alert_close('이 웹사이트는 네이버 로그인 기능을 지원하고 있지 않습니다.');
@@ -449,7 +447,7 @@ class Social extends CB_Controller
 			$this->Social_model->save('naver', $naver_id, $socialdata);
 
 			// 이벤트가 존재하면 실행합니다
-			Events::trigger('after', $eventname);
+			
 
 			
 
@@ -524,7 +522,8 @@ class Social extends CB_Controller
 		// 	$view = $this->_common_login('naver', $naver_id);
 			
 		// 	return $this->response($view, $view['http_status_codes']);
-		}
+		} 
+			alert_close('잘못된 접근입니다');
 
 		// if ($this->input->get('code')) {
 		// 	$url = 'https://nid.naver.com/oauth2.0/token';
@@ -583,7 +582,67 @@ class Social extends CB_Controller
 		// }
 	}
 
+	public function naver_login_get()
+	{
+		
 
+		if ( ! $this->cbconfig->item('use_sociallogin_naver')) {
+			alert_close('이 웹사이트는 네이버 로그인 기능을 지원하고 있지 않습니다.');
+		}
+
+		if ($this->input->get('naver_access_token')) {
+			$url = 'https://apis.naver.com/nidlogin/nid/getUserProfile.xml';
+
+			$ch = curl_init();
+			curl_setopt ($ch, CURLOPT_URL, $url);
+			curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt ($ch, CURLOPT_SSLVERSION, 1);
+			curl_setopt ($ch, CURLOPT_HEADER, 0);
+			curl_setopt ($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $this->input->get('naver_access_token')));
+			curl_setopt ($ch, CURLOPT_POST, 0);
+			curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);
+			curl_setopt ($ch, CURLOPT_TIMEOUT, 30);
+			curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+			$result = curl_exec($ch);
+			curl_close($ch);
+
+			$xml = simplexml_load_string($result);
+
+			$naver_id = (string) $xml->response->enc_id;
+			$email = (string) $xml->response->email;
+			$nickname = (string) $xml->response->nickname;
+			$profile_image = (string) $xml->response->profile_image;
+			$age = (string) $xml->response->age;
+			$gender = (string) $xml->response->gender;
+			$id = (string) $xml->response->id;
+			$name = (string) $xml->response->name;
+			$birthday = (string) $xml->response->birthday;
+
+			if (empty($nickname)) {
+				$this->session->unset_userdata('naver_access_token');
+				alert_close('이름 정보를 확인할 수 없어 로그인할 수 없습니다');
+			}
+
+			$socialdata = array(
+				'email' => $email,
+				'familyName' => $nickname,
+				'update_datetime' => cdate('Y-m-d H:i:s'),
+				'ip_address' => $this->input->ip_address(),
+			);
+			
+			$this->Social_model->save('naver', $id, $socialdata);
+
+			
+
+			$view = $this->_common_login('naver', $id);
+			
+			return $this->response($view, $view['http_status_codes']);
+		}
+
+		if ( ! $this->input->get('naver_access_token')) {
+			show_404();
+		}
+	}
 	/**
 	 * 카카오 연동 함수입니다
 	 */
@@ -688,7 +747,7 @@ class Social extends CB_Controller
 			
 		// 	return $this->response($view, $view['http_status_codes']);
 		}
-
+			alert_close('잘못된 접근입니다');
 		// if ($this->input->get('code')) {
 		// 	$url = 'https://kauth.kakao.com/oauth/token';
 		// 	$url.= sprintf("?client_id=%s&grant_type=authorization_code&redirect_uri=%s&code=%s",

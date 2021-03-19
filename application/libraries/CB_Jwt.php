@@ -218,10 +218,7 @@ class CB_Jwt {
             $data = $this->_token;
             
             if ($data === false) {
-                $status = 403;
-                $response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
-                $this->CI->output->set_status_header($status);
-                exit(json_encode($response));
+                return AUTHORIZATION::validateToken(config_item('default_Authorization'));
                 
                 
             } else {

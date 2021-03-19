@@ -145,20 +145,44 @@ class Verify extends CB_Controller
 	}
 
 
+	public function resetpassword_get()
+    {
+
+
+        $view = array();
+        
+        $view = $this->_resetpassword();
+
+        
+        $this->data = $view;
+        
+        
+        return $this->response($view, $view['http_status_codes']);
+    }
+
+    public function resetpassword_post()
+    {
+		$view = array();        
+		$view = $this->_resetpassword();
+
+
+		$this->data = $view;
+
+
+		return $this->response($view, $view['http_status_codes']);
+       
+    }
 	/**
 	 * 패스워드 리셋위한 함수입니다.
 	 */
-	public function resetpassword()
+	public function _resetpassword()
 	{
-		// 이벤트 라이브러리를 로딩합니다
-		$eventname = 'event_verify_resetpassword';
-		$this->load->event($eventname);
+		
 
 		$view = array();
 		$view['view'] = array();
 
-		// 이벤트가 존재하면 실행합니다
-		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
 
 		if ( ! $this->input->get('code')) {
 			show_404();
@@ -167,7 +191,7 @@ class Verify extends CB_Controller
 			show_404();
 		}
 		if ($this->member->is_member()) {
-			redirect();
+			// redirect();
 		}
 
 		$this->load->library(array('form_validation'));
@@ -180,16 +204,20 @@ class Verify extends CB_Controller
 		);
 		$result = $this->Member_auth_email_model->get_one('', '', $where);
 
-		$view['view']['error_message'] = '';
-		$view['view']['successs_message'] = '';
+		$view['view']['data']['msg'] = '';
+		
 		if ( ! element('mae_id', $result)) {
-			$view['view']['error_message'] = '잘못된 접근입니다';
+			$view['view']['data']['msg'] = '잘못된 접근입니다';
+			$view['http_status_codes'] = 400;
 		} elseif ( ! empty($result['mae_use_datetime']) && element('mae_use_datetime', $result) !== '0000-00-00 00:00:00') {
-			$view['view']['error_message'] = '회원님은 이미 패스워드 변경을 하셨습니다';
+			$view['view']['data']['msg'] = '회원님은 이미 패스워드 변경을 하셨습니다';
+			$view['http_status_codes'] = 400;
 		} elseif (strtotime(element('mae_generate_datetime', $result)) < ctimestamp()- 1800) {
-			$view['view']['message'] = '30분 이내에 변경 하셔야 합니다';
+			$view['view']['data']['msg'] = '30분 이내에 변경 하셔야 합니다';
+			$view['http_status_codes'] = 400;
 		} elseif (element('mae_type', $result) !== '3') {
-			$view['view']['error_message'] = '잘못된 접근입니다';
+			$view['view']['data']['msg'] = '잘못된 접근입니다';
+			$view['http_status_codes'] = 400;
 		} else {
 			$is_dormant_member = false;
 			$select = 'mem_id, mem_userid, mem_denied, mem_email_cert';
@@ -202,15 +230,19 @@ class Verify extends CB_Controller
 				}
 			}
 			if ( ! element('mem_id', $dbmember)) {
-				$view['view']['error_message'] = '잘못된 접근입니다';
+				$view['view']['data']['msg'] = '잘못된 접근입니다';
+				$view['http_status_codes'] = 400;
 			} elseif (element('mem_userid', $dbmember) !== $this->input->get('user')) {
-				$view['view']['error_message'] = '잘못된 접근입니다';
+				$view['view']['data']['msg'] = '잘못된 접근입니다';
+				$view['http_status_codes'] = 400;
 			} elseif (element('mem_denied', $dbmember)) {
-				$view['view']['error_message'] = '회원님의 계정은 접근이 금지되어 있습니다';
+				$view['view']['data']['msg'] = '회원님의 계정은 접근이 금지되어 있습니다';
+				$view['http_status_codes'] = 400;
 			} elseif ($this->cbconfig->item('use_register_email_auth') && ! element('mem_email_cert', $dbmember)) {
-				$view['view']['error_message'] = '회원님은 회원가입 후, 또는 이메일 정보 변경후 아직 이메일 인증을 받지 않으셨습니다';
+				$view['view']['data']['msg'] = '회원님은 회원가입 후, 또는 이메일 정보 변경후 아직 이메일 인증을 받지 않으셨습니다';
+				$view['http_status_codes'] = 400;
 			}
-			$view['view']['mem_userid'] = element('mem_userid', $dbmember);
+			$view['view']['data']['mem_userid'] = element('mem_userid', $dbmember);
 
 		}
 
@@ -234,15 +266,13 @@ class Verify extends CB_Controller
 		 */
 		if ($this->form_validation->run() === false) {
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formrunfalse'] = Events::trigger('formrunfalse', $eventname);
+			return $view;
 
 		} else {
 
-			// 이벤트가 존재하면 실행합니다
-			$view['view']['event']['formruntrue'] = Events::trigger('formruntrue', $eventname);
+			
 
-			if (empty($view['view']['error_message'])) {
+			if ($view['http_status_codes'] === 200) {
 
 				if ($is_dormant_member) {
 					$this->member->recover_from_dormant(element('mem_id', $result));

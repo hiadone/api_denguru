@@ -214,7 +214,7 @@ class Findaccount extends CB_Controller
 				$this->email->message($content);
 				$this->email->send();
 
-				$view['view']['data']['msg'] = $this->input->post('idpw_email') . "로 인증메일이 발송되었습니다. \n발송된 인증메일을 확인하신 후에 회원님의 정보 확인이 가능합니다";
+				$view['view']['data']['msg'] = $this->input->post('idpw_email') . "로 인증메일이 발송되었습니다.";
 				$view['view']['data']['idpw_email'] = $this->input->post('idpw_email');
 				$view['view']['data']['verify_url'] = $verify_url;
 				return $this->response($view['view']['data'], 200);
