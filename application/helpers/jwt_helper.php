@@ -54,10 +54,9 @@ class JWT
 		$sig = JWT::urlsafeB64Decode($cryptob64);
 		if ($verify) {
 			if (empty($header->alg)) {
-				//if you don't want to disclose more details
-				return false;
+				//if you don't want to disclose more details				
 
-				//throw new DomainException('Empty algorithm');
+				alert_close('Empty algorithm');
 			}
 			if ($sig != JWT::sign("$headb64.$bodyb64", $key, $header->alg)) {
 				return false;
@@ -113,7 +112,7 @@ class JWT
 			'HS512' => 'sha512',
 		);
 		if (empty($methods[$method])) {
-			throw new DomainException('Algorithm not supported');
+			alert_close('Algorithm not supported');
 		}
 		return hash_hmac($methods[$method], $msg, $key, true);
 	}
@@ -132,7 +131,7 @@ class JWT
 		if (function_exists('json_last_error') && $errno = json_last_error()) {
 			JWT::_handleJsonError($errno);
 		} else if ($obj === null && $input !== 'null') {
-			throw new DomainException('Null result with non-null input');
+			alert_close('Null result with non-null input');
 		}
 		return $obj;
 	}
@@ -151,7 +150,7 @@ class JWT
 		if (function_exists('json_last_error') && $errno = json_last_error()) {
 			JWT::_handleJsonError($errno);
 		} else if ($json === 'null' && $input !== null) {
-			throw new DomainException('Null result with non-null input');
+			alert_close('Null result with non-null input');
 		}
 		return $json;
 	}
@@ -199,7 +198,7 @@ class JWT
 			JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
 			JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON'
 		);
-		throw new DomainException(
+		alert_close(
 			isset($messages[$errno])
 			? $messages[$errno]
 			: 'Unknown JSON error: ' . $errno
