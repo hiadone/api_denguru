@@ -922,7 +922,8 @@ class Denguruapi extends CI_Controller
         }
 
         if (empty($pet_id) OR $pet_id < 1) {
-            return false;
+            $data['pet_photo_url'] = cdn_url().'?w=200';
+            return $data;
         }
 
 
