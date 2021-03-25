@@ -1762,18 +1762,18 @@ class Search extends CB_Controller
 
 		$config = array(
 			'oth_id' => $oth_id,
-			'stype' => $this->input->get('stype'),
-			'ssort' => $this->input->get('ssort'),
+			'stype' => $this->input->post('stype'),
+			'ssort' => $this->input->post('ssort'),
 			'option' => $option,
 			// 'category_id' => $category_id,
-			'scategory' => $this->input->get('scategory'),
-			'skeyword' => $this->input->get('skeyword'),
-			'sage' => $this->input->get('sage'),
-			'sattr' => $this->input->get('sattr'),
-			'skind' => $this->input->get('skind'),
-			'sstart_price' => $this->input->get('sstart_price'),
-			'send_price' => $this->input->get('send_price'),
-			'page' => $this->input->get('page'),
+			'scategory' => $this->input->post('scategory'),
+			'skeyword' => $this->input->post('skeyword'),
+			'sage' => $this->input->post('sage'),
+			'sattr' => $this->input->post('sattr'),
+			'skind' => $this->input->post('skind'),
+			'sstart_price' => $this->input->post('sstart_price'),
+			'send_price' => $this->input->post('send_price'),
+			'page' => $this->input->post('page'),
 			'cache_minute' => 1,
 		);
 
