@@ -975,7 +975,7 @@ class Search extends CB_Controller
 
 					foreach($sattr as $sval){
 
-						if($sval == '4' || $sval == '5' || $sval == '6' ) $is_kind=true;
+						// if($sval == '4' || $sval == '5' || $sval == '6' ) $is_kind=true;
 					}
 
 					
@@ -1745,7 +1745,73 @@ class Search extends CB_Controller
 		return $this->response($this->data, parent::HTTP_OK);	
 	}
 
-	
+	public function index_post($option = 'show_list',$oth_id = 0)
+	{
+
+		// 이벤트 라이브러리를 로딩합니다
+		$eventname = 'event_search_index';
+		$this->load->event($eventname);
+
+		$view = array();
+		$view['view'] = array();
+
+		// 이벤트가 존재하면 실행합니다
+		$view['view']['event']['before'] = Events::trigger('before', $eventname);
+		
+		
+
+		$config = array(
+			'oth_id' => $oth_id,
+			'stype' => $this->input->get('stype'),
+			'ssort' => $this->input->get('ssort'),
+			'option' => $option,
+			// 'category_id' => $category_id,
+			'scategory' => $this->input->get('scategory'),
+			'skeyword' => $this->input->get('skeyword'),
+			'sage' => $this->input->get('sage'),
+			'sattr' => $this->input->get('sattr'),
+			'skind' => $this->input->get('skind'),
+			'sstart_price' => $this->input->get('sstart_price'),
+			'send_price' => $this->input->get('send_price'),
+			'page' => $this->input->get('page'),
+			'cache_minute' => 1,
+		);
+
+		$view['view'] = $this->_index($config);
+		
+		/**
+		 * 레이아웃을 정의합니다
+		 */
+		$page_title = $this->cbconfig->item('site_meta_title_search');
+		$meta_description = $this->cbconfig->item('site_meta_description_search');
+		$meta_keywords = $this->cbconfig->item('site_meta_keywords_search');
+		$meta_author = $this->cbconfig->item('site_meta_author_search');
+		$page_name = $this->cbconfig->item('site_page_name_search');
+
+		
+
+		$layoutconfig = array(
+			'path' => 'search',
+			'layout' => 'layout',
+			'skin' => 'search',
+			'layout_dir' => $this->cbconfig->item('layout_search'),
+			'mobile_layout_dir' => $this->cbconfig->item('mobile_layout_search'),
+			'use_sidebar' => $this->cbconfig->item('sidebar_search'),
+			'use_mobile_sidebar' => $this->cbconfig->item('mobile_sidebar_search'),
+			'skin_dir' => $this->cbconfig->item('skin_search'),
+			'mobile_skin_dir' => $this->cbconfig->item('mobile_skin_search'),
+			'page_title' => $page_title,
+			'meta_description' => $meta_description,
+			'meta_keywords' => $meta_keywords,
+			'meta_author' => $meta_author,
+			'page_name' => $page_name,
+		);
+		// $view['view']['layout'] = $this->managelayout->front($layoutconfig, $this->cbconfig->get_device_view_type());
+		// 
+		$this->data = $view['view'];
+		
+		return $this->response($this->data, parent::HTTP_OK);	
+	}
 
 	public function _searchcountby($config)
 	{
