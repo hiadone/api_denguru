@@ -1377,21 +1377,21 @@ class Search extends CB_Controller
 
 				if(!array_key_exists(12,$cmall_age)){
 					$cmall_age[12] = array(
-						'cat_id' => 12,
+						'cat_id' => '12',
 						'cat_value' => '퍼피',
 						'rownum' => 0,
 					);
 				}
 				if(!array_key_exists(13,$cmall_age)){
 					$cmall_age[13] = array(
-						'cat_id' => 13,
+						'cat_id' => '13',
 						'cat_value' => '어덜트',
 						'rownum' => 0,
 					);
 				}
 				if(!array_key_exists(14,$cmall_age)){
 					$cmall_age[14] = array(
-						'cat_id' => 14,
+						'cat_id' => '14',
 						'cat_value' => '시니어',
 						'rownum' => 0,
 					);
